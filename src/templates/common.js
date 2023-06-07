@@ -55,7 +55,26 @@ module.exports = {
   conformance: () => {
     return {
       conformsTo: [
+        "http://www.opengis.net/spec/ogcapi-common-1/1.0/req/core",
+        //"http://www.opengis.net/spec/ogcapi-common-1/1.0/req/landing-page"
+        "http://www.opengis.net/spec/ogcapi-common-1/1.0/req/oas30",
+        "http://www.opengis.net/spec/ogcapi-common-1/1.0/req/html",
+        "http://www.opengis.net/spec/ogcapi-common-1/1.0/req/json",
+
         "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core",
+        "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/html",
+        "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/geojson",
+        "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/oas30",
+
+
+        "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/core",
+        "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tileset",
+        "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tilesets-list",
+        "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/collections-selection", 
+        "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/oas30",
+        "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/png",
+        "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/jpeg",
+        "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/mvt",
       ],
     };
   },
@@ -143,8 +162,8 @@ module.exports = {
     }, {
       href: baseurl + "/collections/" + table_name + "/tiles/WebMercatorQuad/{tileMatrix}/{tileRow}/{tileCol}",
       rel: "item",
-      type: "application/vnd.mapbox-vector-tile",
-      title: "Mapbox vector tiles; the link is a URI template where {tileMatrix}/{tileRow}/{tileCol} is the tile in the tiling scheme 'WebMercatorQuad'",
+      type: "image/*",
+      title: "specific tile from the collection",
       templated: true
     }]);
 

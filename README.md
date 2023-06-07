@@ -161,21 +161,32 @@ This is an example of how to use this Fastify plugin in your own project.
 ## Roadmap
 
 - [x]  OGC API - Common
+  - [x] part 1: Core
 - [ ] OGC API - Features
-    - [x] part 1
-    - [ ] part 2
-    - [x] part 3
-    - [x] part 3
+    - [x] part 1: Core
+    - [ ] part 2: CRS by Reference
+    - [x] part 3: Filtering
+    - [x] part 4: Create, Replace, Update and Delete
 - [ ] OGC API - Tiles
-    - [ ] part 1
+    - [ ] part 1: Core
 - [ ] OGC API - Styles
-    - [ ] part 1
+    - [ ] part 1: Core
 
 See the [open issues](https://github.com/kortxyz/ogcapi-gpkg/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Roadmap
 
+- [x] Add Changelog
+- [x] Add back to top links
+- [ ] Add Additional Templates w/ Examples
+- [ ] Add "components" document to easily copy & paste sections of the readme
+- [ ] Multi-language Support
+    - [ ] Chinese
+    - [ ] Spanish
+
+See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 ## Contributing

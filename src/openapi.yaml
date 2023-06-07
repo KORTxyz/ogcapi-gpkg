@@ -27,6 +27,19 @@ tags:
   - name: Tiles
     description: Data partitioned into a hierarchy of tiles of a collection
     x-displayName: Collection Tiles
+
+x-tagGroups:
+  - name: OGC API - COMMON
+    tags:
+      - Capabilities
+  - name: OGC API - Features
+    tags:
+      - Features
+  - name: OGC API - TILES
+    tags:
+      - Tile Matrix Sets
+      - Collection Tiles
+    
 paths:
   /:
     get:
@@ -263,6 +276,9 @@ paths:
         200:
           description: List of available tilesets.
           content:
+            text/html:
+              schema:
+                type: string
             application/json:
               schema:
                 type: object
@@ -277,9 +293,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/tileSet"
-            text/html:
-              schema:
-                type: string
         400:
           $ref: "#/components/responses/ServerError"
       security: 
@@ -299,12 +312,15 @@ paths:
         200:
           description: Description of the tileset
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/tileSet"
             text/html:
               schema:
                 type: string
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tileSet"
+              examples:
+                tileSet:
+                  $ref: '#/components/examples/tileSet'
         400:
           $ref: "#/components/responses/ServerError"
       security: 
@@ -1188,11 +1204,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/link"
-      example:
-        title: Test
-        datatype: map
-
-
+      
     dataType:
       anyOf:
         - type: string
@@ -1275,48 +1287,9 @@ components:
         application/geo+json:
           schema:
             $ref: '#/components/schemas/featureCollectionGeoJSON'
-          example:
-            type: FeatureCollection
-            links:
-              - href: http://data.example.com/collections/buildings/items.json
-                rel: self
-                type: application/geo+json
-                title: this document
-              - href: http://data.example.com/collections/buildings/items.html
-                rel: alternate
-                type: text/html
-                title: this document as HTML
-              - href: >-
-                  http://data.example.com/collections/buildings/items.json&offset=10&limit=2
-                rel: next
-                type: application/geo+json
-                title: next page
-            timeStamp: '2018-04-03T14:52:23Z'
-            numberMatched: 123
-            numberReturned: 2
-            features:
-              - type: Feature
-                id: '123'
-                geometry:
-                  type: Point
-                  coordinates:
-                    - 0
-                    - 0
-                properties:
-                  function: residential
-                  floors: '2'
-                  lastUpdate: '2015-08-01T12:34:56Z'
-              - type: Feature
-                id: '132'
-                geometry:
-                  type: Point
-                  coordinates:
-                    - 11.234
-                    - 54.23
-                properties:
-                  function: public use
-                  floors: '10'
-                  lastUpdate: '2013-12-03T10:15:37Z'
+          examples:
+            featureCollection:
+              $ref: "#/components/examples/featureCollection"
     Feature:
       description: |-
         fetch the feature with id `featureId` in the feature collection
@@ -1325,49 +1298,99 @@ components:
         application/geo+json:
           schema:
             $ref: '#/components/schemas/featureGeoJSON'
-          example:
-            type: Feature
-            links:
-              - href: http://data.example.com/id/building/123
-                rel: canonical
-                type: text/html
-                title: canonical URI of the building
-              - href: http://data.example.com/collections/buildings/items/123.json
-                rel: self
-                type: application/geo+json
-                title: this document
-              - href: http://data.example.com/collections/buildings/items/123.html
-                rel: alternate
-                type: text/html
-                title: this document as HTML
-              - href: http://data.example.com/collections/buildings
-                rel: collection
-                type: application/geo+json
-                title: the collection document
-            id: '123'
-            geometry:
-              type: Point
-              coordinates:
-                - 8.66
-                - 15.35
-            properties:
-              function: residential
-              floors: '2'
-              lastUpdate: '2015-08-01T12:34:56Z'
+          examples:
+            feature:
+              $ref: '#/components/examples/feature'
     ServerError:
       description: A server error occurred.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/exception'
-x-tagGroups:
-  - name: OGC API - COMMON
-    tags:
-      - Capabilities
-  - name: OGC API - Features
-    tags:
-      - Features
-  - name: OGC API - TILES
-    tags:
-      - Tile Matrix Sets
-      - Collection Tiles
+  examples: 
+    tileSet:
+      value:
+        title: Test
+        dataType: map
+        crs: "ESPG:4326"
+        links: 
+          - href: http://data.example.com/id/building/123
+            rel: canonical
+            type: text/html
+            title: canonical URI of the building
+      summary: A sample tileset
+    featureCollection:
+      summary: A sample featureCollection
+      value:
+        type: FeatureCollection
+        links:
+          - href: http://data.example.com/collections/buildings/items.json
+            rel: self
+            type: application/geo+json
+            title: this document
+          - href: http://data.example.com/collections/buildings/items.html
+            rel: alternate
+            type: text/html
+            title: this document as HTML
+          - href: >-
+              http://data.example.com/collections/buildings/items.json&offset=10&limit=2
+            rel: next
+            type: application/geo+json
+            title: next page
+        timeStamp: '2018-04-03T14:52:23Z'
+        numberMatched: 123
+        numberReturned: 2
+        features:
+          - type: Feature
+            id: '123'
+            geometry:
+              type: Point
+              coordinates:
+                - 0
+                - 0
+            properties:
+              function: residential
+              floors: '2'
+              lastUpdate: '2015-08-01T12:34:56Z'
+          - type: Feature
+            id: '132'
+            geometry:
+              type: Point
+              coordinates:
+                - 11.234
+                - 54.23
+            properties:
+              function: public use
+              floors: '10'
+              lastUpdate: '2013-12-03T10:15:37Z'
+    feature:
+      summary: A sample feature
+      value:
+        type: Feature
+        links:
+          - href: http://data.example.com/id/building/123
+            rel: canonical
+            type: text/html
+            title: canonical URI of the building
+          - href: http://data.example.com/collections/buildings/items/123.json
+            rel: self
+            type: application/geo+json
+            title: this document
+          - href: http://data.example.com/collections/buildings/items/123.html
+            rel: alternate
+            type: text/html
+            title: this document as HTML
+          - href: http://data.example.com/collections/buildings
+            rel: collection
+            type: application/geo+json
+            title: the collection document
+        id: '123'
+        geometry:
+          type: Point
+          coordinates:
+            - 8.66
+            - 15.35
+        properties:
+          function: residential
+          floors: '2'
+          lastUpdate: '2015-08-01T12:34:56Z'

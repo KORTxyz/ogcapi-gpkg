@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Tiles</title>
+
+    <link href="../../public/tailwind.css" rel="stylesheet" />
+  <script src="../../src/maplibre-gl.js"></script>
+  <link href="../../src/maplibre-gl.css" rel="stylesheet" />
+
+
+</head>
+
+<body class="bg-neutral-800 text-neutral-400">
+  <header class="flex text-xs items-center justify-between">
+    <div id="breadcrumbs" class="mx-1 flex cursor-pointer opacity-20 hover:opacity-100 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+      </svg>
+      <a class="hover:text-neutral-100" href="/">home</a>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+      <% if(it.collectionId){ %>
+        <a class="hover:text-neutral-100" href="/collections">collections</a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+  
+        <a class="hover:text-neutral-100" href="/collections/<%= it.collectionId %>">
+          <%= it.collectionId %>
+        </a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      <% } %>      
+      <a class="cursor-default">tiles</a>
+    </div>
+    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json" target="_blank">JSON</a>
+  </header>
+
+  <div id="content" class="p-5">
+
+    <h1 class="text-4xl mb-2.5">
+      Tiles
+    </h1>
+
+    <div class="flex my-3">
+      <div class="basis-1/4 font-bold">Tile Matrix Set</div>
+      <div class="basis-3/4">
+        <select name="TileMatrixSet" id="TileMatrixSet" class="text-neutral-900">
+          <option value="WebMercatorQuad">WebMercatorQuad</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex my-3">
+      <div class="basis-1/4 font-bold">URL template</div>
+      <div class="basis-3/4 cursor-pointer hover:text-neutral-100 truncate" onclick="copy('<%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad/{z}/{x}/{y}')">
+        <%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad/{z}/{x}/{y} 
+      </div>
+    </div>
+
+    <div class="flex my-3">
+      <div class="basis-1/4 font-bold">Metadata</div>
+      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank" href="<%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad?f=json">
+        Metadata for these tiles in the TileJSON format
+      </a>
+    </div>
+
+    <div class="flex my-3">
+      <div class="basis-1/4 font-bold">Tiles</div>
+      <div class="basis-3/4 h-96" id="map"></div>
+    </div>
+    <br>
+
+
+  </div>
+
+  <script>
+    let map;
+
+    const copy = text =>{
+      navigator.clipboard.writeText(text)
+      alert("URL template copied to clipboard")
+    }
+
+    fetch("<%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad?f=tilejson")
+    .then(e=>e.json())
+    .then(tilejson=>{
+      const {name, tiles, bounds, vector_layers, maxzoom, minzoom} = tilejson;
+      
+    let mapStyle = {
+        "version": 8,
+        "name": name,
+        "metadata": {
+          "mapbox:autocomposite": true,
+          "mapbox:type": "template"
+        },
+        "sources": {
+          "collection-tiles": {
+            "type": vector_layers == null ? "raster": "vector",
+            "tileSize": vector_layers == null ? 256: 512,
+            "scheme": "xyz",
+            "tiles": tiles,
+            "maxzoom": maxzoom, 
+            "minzoom": minzoom
+          }
+        },
+        "layers": [
+          {
+            "id": "background",
+            "type": "background",
+            "paint": {
+              "background-color": "grey"
+            }
+          }
+        ]
+      }
+    if(vector_layers == null){
+      mapStyle.layers.push({
+            "id": "collection-tiles",
+            "type": "raster",
+            "source": "collection-tiles"
+          })
+    }
+    else{
+      vector_layers.forEach(layer=>{
+        const layerColor = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99'][Math.random() * 11 | 0]
+        mapStyle.layers.push({
+          'id': layer.id + '-polygons',
+          'type': 'fill',
+          "source": "collection-tiles",
+          'source-layer': layer.id,
+          'filter': ["==", "$type", "Polygon"],
+          'layout': {},
+          'paint': {
+            'fill-opacity': ["case", ["boolean", ["feature-state", "hover"], false], 0.8, 0.4],
+            'fill-color': layerColor
+          }
+        },{
+          'id': layer.id + '-polygons-outline',
+          'type': 'line',
+          "source": "collection-tiles",
+          'source-layer': layer.id,
+          'filter': ["==", "$type", "Polygon"],
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': layerColor,
+            'line-width': 1,
+            'line-opacity': 0.7
+          }
+        },{
+          'id': layer.id + '-lines',
+          'type': 'line',
+          "source": "collection-tiles",
+          'source-layer': layer.id,
+          'filter': ["==", "$type", "LineString"],
+          'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          'paint': {
+            'line-color': layerColor,
+            'line-width': 1,
+            'line-opacity': ["case", ["boolean", ["feature-state", "hover"], false], 0.8, 0.4]
+          }
+        },{
+          'id': layer.id + '-pts',
+          'type': 'circle',
+          "source": "collection-tiles",
+          'source-layer': layer.id,
+          'filter': ["==", "$type", "Point"],
+          'paint': {
+            'circle-color': layerColor,
+            'circle-radius': 2.5,
+            'circle-opacity': ["case", ["boolean", ["feature-state", "hover"], false], 0.8, 0.4]
+          }
+        })
+      })
+    }
+    map = new maplibregl.Map({
+      container: 'map', // container id
+      bounds : bounds,
+      minZoom: minzoom,
+      style: mapStyle, // style URL
+    });
+
+    map.addControl(new maplibregl.FullscreenControl());
+
+    map.showTileBoundaries = true
+  })
+  </script>
+</body>
+
+</html>

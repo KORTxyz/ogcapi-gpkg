@@ -24,14 +24,20 @@ module.exports = async (fastify, opts, done) => {
     if(opts.skipIndex) delete globalThis.api.paths["/"]    
     const handler = getHandlers();
 
+
     fastify.addContentTypeParser('application/geo+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
+    fastify.addContentTypeParser('image/*', async (request, payload) => {
+      await imageParser(payload);
+    })
 
     fastify.register(require('@fastify/static'), {
         root: path.join(__dirname, 'public'),
         prefix: '/public/',
       })
 
+
     fastify.register(require('@fastify/accepts'))
+    fastify.register(require('@fastify/compress'), { global: false, encodings: ['gzip'], customTypes: /x-protobuf$/ });
 
     fastify.register(require('fastify-openapi-glue'), {
         specification: globalThis.api,
@@ -40,7 +46,6 @@ module.exports = async (fastify, opts, done) => {
         noAdditional: false,
     });
 
-    fastify.register(require('@fastify/cors'), { exposedHeaders: 'Content-Disposition' });
 
     fastify.register(require("@fastify/view"), {
         engine: {
