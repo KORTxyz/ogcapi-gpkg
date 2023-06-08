@@ -95,49 +95,56 @@ const tileMatrixSet = (tileMatrixSet, tileMatrices) => {
 
 };
 
-const tilesets = (collectionId) => ({
+const tilesets = (collection) => {
+  const {table_name} = collection
+  return {
+    "links": [
+      {
+        "rel": "self",
+        "type": "application/json",
+        "title": "This document",
+        "href": `${baseurl}/collections/${table_name}/tiles?f=json`
+      },
+      {
+        "rel": "alternate",
+        "type": "text/html",
+        "title": "This document as HTML",
+        "href": `${baseurl}/collections/${table_name}/tiles?f=html`
+      }
+    ],
+    "tilesets": [module.exports.tileset(collection)]
+  }
+};
+
+const tileset = (collection) => {
+  
+  const {table_name, extension_name, srs_id} = collection
+   
+  return {
+  "dataType": extension_name == "gpkg_mapbox_vector_tiles" ? "vector": "map",
+  "crs": "epsg:"+srs_id,
+  "tileMatrixSetURI": table_name,
   "links": [
     {
-      "rel": "self",
-      "type": "application/json",
-      "title": "This document",
-      "href": `${baseurl}/collections/${collectionId}/tiles?f=json`
+      "rel": "item",
+      "type": extension_name == "gpkg_mapbox_vector_tiles" ? "application/vnd.mapbox-vector-tile": "image/*",
+      "title": "template for tiles",
+      "href": `${baseurl}/collections/${table_name}/tiles/${table_name}/{tileMatrix}/{tileRow}/{tileCol}`,
+      "templated": true
     },
     {
-      "rel": "alternate",
+      "rel": "http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme",
+      "type": "application/json",
+      "title": "the tile matrix set for this tileset",
+      "href": `${baseurl}/tileMatrixSets/${table_name}?f=json`
+    },
+    {
+      "rel": "http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme",
       "type": "text/html",
-      "title": "This document as HTML",
-      "href": `${baseurl}/collections/${collectionId}/tiles?f=html`
-    }
-  ],
-  "tilesets": [module.exports.tileset(collectionId)]
-});
-
-const tileset = (collectionId) => ({
-  "dataType": "map",
-  "crs": "string",
-  "tileMatrixSetURI": "string",
-  "links": [
-  {
-    "rel": "item",
-    "type": "image/*", //TODO:How to figure out this?
-    "title": "template for tiles",
-    "href": `${baseurl}/collections/${collectionId}/tiles/${collectionId}/{tileMatrix}/{tileRow}/{tileCol}`,
-    "templated": true
-  },
-  {
-    "rel": "http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme",
-    "type": "application/json",
-    "title": "the tile matrix set for this tileset",
-    "href": `${baseurl}/collections/${collectionId}/tiles/${collectionId}?f=json`
-  },
-  {
-    "rel": "http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme",
-    "type": "text/html",
-    "title": "the tile matrix set for this tileset",
-    "href": `${baseurl}/collections/${collectionId}/tiles/${collectionId}?f=html`
-  }]
-})
+      "title": "the tile matrix set for this tileset",
+      "href": `${baseurl}/tileMatrixSets/${table_name}?f=html`
+    }]
+}}
 
 module.exports = {
   tileMatrixSets,

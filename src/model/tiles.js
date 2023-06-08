@@ -9,10 +9,17 @@ const getCollectionTile = async (collectionId, tileMatrix, tileRow, tileCol) => 
   return tile?.tile_data || null;
 }
 
+const getCollectionMetadata = (collectionId) => db.prepare(`
+SELECT * 
+FROM gpkg_contents c 
+LEFT JOIN gpkg_extensions e ON c.table_name=e.table_name
+WHERE c.table_name=?
+`).get(collectionId);
 
 module.exports = {
   getTileMatrixSets,
   getTileMatrixSet,
   getTileMatrices,
-  getCollectionTile
+  getCollectionTile,
+  getCollectionMetadata
 }

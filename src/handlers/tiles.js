@@ -3,9 +3,6 @@ const { baseurl } = process.env;
 const templates = require('../templates/tiles');
 const model = require('../model/tiles');
 
-const fileType = require('file-type').fromStream;
-
-
 const getTileMatrixSets = async (req, reply, fastify) => {
   const { f } = req.query;
 
@@ -36,9 +33,10 @@ const getTileMatrixSet = async (req, reply, fastify) => {
 const getCollectionTilesets  = async (req, reply, fastify) => {
   const { collectionId } = req.params;
   const { f } = req.query; 
-
+  const collection = model.getCollectionMetadata(collectionId)
   if (f == "json") {
-    reply.send(templates.tilesets(collectionId))
+    console.log(templates.tilesets(collection))
+    reply.send(templates.tilesets(collection))
   }
   else {
     return reply.view("tilesets", { baseurl, collectionId });

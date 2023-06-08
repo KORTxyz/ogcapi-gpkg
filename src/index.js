@@ -21,10 +21,12 @@ module.exports = async (fastify, opts, done) => {
     require('./helper/database').init(databasePath)
 
     globalThis.api = require('js-yaml').load(require('fs').readFileSync(path.join(__dirname, 'openapi.yaml')), 'utf8')
-    if(opts.skipIndex) delete globalThis.api.paths["/"]    
+    if(opts.skipLandingpage) delete globalThis.api.paths["/"]    
     const handler = getHandlers();
 
-
+    fastify.addContentTypeParser('text/html', async (request, payload) => {
+      await htmlParser(payload);
+    })
     fastify.addContentTypeParser('application/geo+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
     fastify.addContentTypeParser('image/*', async (request, payload) => {
       await imageParser(payload);

@@ -4,8 +4,8 @@ const fastify = require('fastify')({
 
 fastify.register(require('../src/index'),{
     baseUrl: 'http://127.0.0.1:3000',
-    gpkg:'F:/DATA/World/S2Maps_2018.gpkg',
-    skipIndex:false, 
+    gpkg:'F:/DATA/OGCAPI/OS_Open_Zoomstack.gpkg',
+    skipLandingpage:false, 
 })
 
 fastify.register(require('@fastify/cors'), { exposedHeaders: 'Content-Disposition' });

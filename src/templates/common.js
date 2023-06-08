@@ -104,8 +104,10 @@ module.exports = {
     const itemType = {
       "2d-gridded-coverage": "Tiles",
       "tiles": "Tiles",
-      "features": "Features"
+      "features": "Features",
+      "tiled-features": "VectorTiles"
     }
+    
     let template = {
       id: table_name,
       title: identifier,
@@ -167,6 +169,18 @@ module.exports = {
       templated: true
     }]);
 
+    if (itemType[data_type] == "VectorTiles") template.links = template.links.concat([{
+      href: baseurl + "/collections/" + table_name + "/tiles",
+      rel: "tiles",
+      type: "application/json",
+      title: "tiles in the collection",
+    }, {
+      href: baseurl + "/collections/" + table_name + "/tiles/WebMercatorQuad/{tileMatrix}/{tileRow}/{tileCol}",
+      rel: "item",
+      type: "application/vnd.mapbox-vector-tile",
+      title: "specific tile from the collection",
+      templated: true
+    }]);
     return template;
   },
 };

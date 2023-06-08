@@ -144,13 +144,13 @@ This is an example of how to use this Fastify plugin in your own project.
 {
   baseUrl: 'http://127.0.0.1:3000',
   gpkg: 'data/naturcenter.gpkg',
-  skipIndex: true,
+  skipLandingpage: true,
 }
 ```
 + `prefix` (Default: "" ): Standard .
 + `baseUrl` (Default: `undefined`): baseurl for the links in the json responses, prefix are added automatically.
 + `gpkg` (Default: `generated.gpkg`): path to the OGC Geopackage used a datastore for this API
-+ `skipIndex` (Default: `false`): skip creating a root landingpage. Fx if you are not giving the routes a prefix.
++ `skipLandingpage` (Default: `false`): skip creating a root landingpage. Fx if you are not giving the routes a prefix.
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
