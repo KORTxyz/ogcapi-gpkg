@@ -5,8 +5,8 @@
   <title>Tiles</title>
 
     <link href="../../public/tailwind.css" rel="stylesheet" />
-  <script src="../../src/maplibre-gl.js"></script>
-  <link href="../../src/maplibre-gl.css" rel="stylesheet" />
+  <script src='https://unpkg.com/maplibre-gl@3.0.1/dist/maplibre-gl.js'></script>
+  <link href='https://unpkg.com/maplibre-gl@3.0.1/dist/maplibre-gl.css' rel='stylesheet' />
 
 
 </head>
@@ -89,10 +89,11 @@
       alert("URL template copied to clipboard")
     }
 
-    fetch("<%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad?f=tilejson")
+    fetch("<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>?f=tilejson")
     .then(e=>e.json())
     .then(tilejson=>{
-      const {name, tiles, bounds, vector_layers, maxzoom, minzoom} = tilejson;
+      console.log(tilejson)
+      const {name, tiles, bounds, vector_layers} = tilejson;
       
     let mapStyle = {
         "version": 8,
@@ -102,13 +103,18 @@
           "mapbox:type": "template"
         },
         "sources": {
+          "s2cloudless": {
+            "maxzoom": 6,
+            "tileSize": 256,
+            "tiles": [
+              "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2019_3857/default/GoogleMapsCompatible/{z}/{y}/{x}.jpg"
+            ],
+            "type": "raster"
+          },
           "collection-tiles": {
             "type": vector_layers == null ? "raster": "vector",
             "tileSize": vector_layers == null ? 256: 512,
-            "scheme": "xyz",
-            "tiles": tiles,
-            "maxzoom": maxzoom, 
-            "minzoom": minzoom
+            "tiles": tiles
           }
         },
         "layers": [
@@ -118,6 +124,12 @@
             "paint": {
               "background-color": "grey"
             }
+          },
+          {
+            "id": "s2cloudless",
+            "type": "raster",
+            "source": "s2cloudless",
+            "maxzoom": 14,
           }
         ]
       }
@@ -186,10 +198,10 @@
         })
       })
     }
+    console.log(mapStyle)
     map = new maplibregl.Map({
       container: 'map', // container id
       bounds : bounds,
-      minZoom: minzoom,
       style: mapStyle, // style URL
     });
 

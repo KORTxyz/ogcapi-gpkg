@@ -17,3 +17,7 @@ CREATE TABLE "gpkgext_vt_fields" (
 	FOREIGN KEY("layer_id") REFERENCES "gpkgext_vt_layers"("id"),
 	PRIMARY KEY("id")
 );
+
+UPDATE "vectortiles" SET "tile_row" = pow(2, "zoom_level") - "tile_row" - 1
+
+CREATE UNIQUE INDEX vectortiles_IDX ON vectortiles (zoom_level,tile_column,tile_row);

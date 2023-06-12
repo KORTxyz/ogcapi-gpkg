@@ -16,10 +16,17 @@ LEFT JOIN gpkg_extensions e ON c.table_name=e.table_name
 WHERE c.table_name=?
 `).get(collectionId);
 
+const getVectorLayers = (collectionId) => db.prepare(`
+SELECT * 
+FROM gpkgext_vt_layers
+WHERE table_name=?
+`).all(collectionId);
+
 module.exports = {
   getTileMatrixSets,
   getTileMatrixSet,
   getTileMatrices,
   getCollectionTile,
-  getCollectionMetadata
+  getCollectionMetadata,
+  getVectorLayers
 }

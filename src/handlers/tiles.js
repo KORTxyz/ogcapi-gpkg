@@ -2,6 +2,7 @@ const { baseurl } = process.env;
 
 const templates = require('../templates/tiles');
 const model = require('../model/tiles');
+const imageType = require('image-type')
 
 const getTileMatrixSets = async (req, reply, fastify) => {
   const { f } = req.query;
@@ -35,7 +36,6 @@ const getCollectionTilesets  = async (req, reply, fastify) => {
   const { f } = req.query; 
   const collection = model.getCollectionMetadata(collectionId)
   if (f == "json") {
-    console.log(templates.tilesets(collection))
     reply.send(templates.tilesets(collection))
   }
   else {
@@ -47,9 +47,15 @@ const getCollectionTilesets  = async (req, reply, fastify) => {
 const getCollectionTileset  = async (req, reply, fastify) => {
   const { collectionId, tileMatrixSetId } = req.params;
   const { f } = req.query;
+
+  const collection = model.getCollectionMetadata(collectionId)
+  const vectorLayers = model.getVectorLayers(collectionId)
   
   if (f == "json") {
-    reply.send(templates.tileset(collectionId))
+    reply.send(templates.tileset(collection))
+  }
+  if (f == "tilejson") {
+    reply.schema("tilejson").send(templates.tilejson(collection, vectorLayers))
   }
   else {
     return reply.view("tileset", { baseurl, collectionId });
@@ -59,12 +65,15 @@ const getCollectionTileset  = async (req, reply, fastify) => {
 
 const getCollectionTile = async (req, reply, fastify) => {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
+
   let tile = await model.getCollectionTile(collectionId, tileMatrix, tileRow, tileCol)
-  if (tile) {
+    if (tile) {
+    const format = await imageType(tile)
+
     reply
-      .header('Content-Type', 'image/png')
-      .send(tile)
-  }
+      .header('Content-Type', format?.mime || 'application/x-protobuf')
+      .header('Content-Encoding', 'gzip').send(tile)
+    }
   else {
     reply.status(404).send()
   }

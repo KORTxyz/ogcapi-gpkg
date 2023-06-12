@@ -60,14 +60,14 @@
 
     <div class="flex my-3">
       <div class="basis-1/4 font-bold">URL template</div>
-      <div class="basis-3/4 cursor-pointer hover:text-neutral-100 truncate" onclick="copy('<%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad/{z}/{x}/{y}')">
-        <%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad/{z}/{x}/{y} 
+      <div class="basis-3/4 cursor-pointer hover:text-neutral-100 truncate" onclick="copy('<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>/{z}/{x}/{y}')">
+        <%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>/{tileMatrix}/{x}/{y} 
       </div>
     </div>
 
     <div class="flex my-3">
       <div class="basis-1/4 font-bold">Metadata</div>
-      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank" href="<%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad?f=json">
+      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank" href="<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>?f=json">
         Metadata for these tiles in the TileJSON format
       </a>
     </div>
@@ -102,7 +102,7 @@
             "type": "raster",
             "tileSize": 256,
             "scheme": "xyz",
-            "tiles": ['<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>/{z}/{x}/{y}'],
+            "tiles": ['<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>/{z}/{y}/{x}'],
             "maxzoom": 20, 
             "minzoom": 0
           }

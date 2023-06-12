@@ -27,6 +27,9 @@ module.exports = async (fastify, opts, done) => {
     fastify.addContentTypeParser('text/html', async (request, payload) => {
       await htmlParser(payload);
     })
+    fastify.addContentTypeParser('application/tilejson', async (request, payload) => {
+      console.log("tilejsonParser", request,payload)
+    })
     fastify.addContentTypeParser('application/geo+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
     fastify.addContentTypeParser('image/*', async (request, payload) => {
       await imageParser(payload);
@@ -37,7 +40,61 @@ module.exports = async (fastify, opts, done) => {
         prefix: '/public/',
       })
 
-
+      fastify.register(require('@fastify/any-schema'), {
+        schemas: [{
+          $id: 'tilejson',
+            "type": "object",
+            "properties": {
+              "tilejson": {
+                "type": "string",
+                "pattern": "\\d+\\.\\d+\\.\\d+\\w?[\\w\\d]*"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "tiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "vector_layers": {
+                "type": "array",
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              },
+              "minzoom": {
+                "minimum": 0,
+                "maximum": 22,
+                "type": "integer"
+              },
+              "maxzoom": {
+                "minimum": 0,
+                "maximum": 22,
+                "type": "integer"
+              },
+              "bounds": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "center": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          
+          }]
+      })
+      
     fastify.register(require('@fastify/accepts'))
     fastify.register(require('@fastify/compress'), { global: false, encodings: ['gzip'], customTypes: /x-protobuf$/ });
 

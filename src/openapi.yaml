@@ -307,7 +307,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/collectionId'
         - $ref: '#/components/parameters/tileMatrixSetId'
-        - $ref: "#/components/parameters/fCommon"
+        - $ref: "#/components/parameters/fTileset"
       responses:
         200:
           description: Description of the tileset
@@ -315,14 +315,19 @@ paths:
             text/html:
               schema:
                 type: string
+            application/tilejson:
+              schema:
+                type: object
             application/json:
               schema:
                 $ref: "#/components/schemas/tileSet"
               examples:
                 tileSet:
                   $ref: '#/components/examples/tileSet'
+
         400:
           $ref: "#/components/responses/ServerError"
+
       security: 
         - {}
   /collections/{collectionId}/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
@@ -365,6 +370,20 @@ components:
         enum:
           - json
           - html
+    fTileset:
+      name: f
+      in: query
+      description: >-
+        Select the output format of the response. If no value is provided, the
+        standard HTTP rules apply, i.e., the accept header will be used to
+        determine the format.
+      required: false
+      schema:
+        type: string
+        enum:
+          - json
+          - html
+          - tilejson
     query:
       name: q
       in: query

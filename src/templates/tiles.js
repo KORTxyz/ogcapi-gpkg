@@ -146,9 +146,40 @@ const tileset = (collection) => {
     }]
 }}
 
+
+const tilejson = (collection, vectorLayers) => {
+  const {table_name, description, min_x, min_y, max_x, max_y} = collection
+   
+  return {
+    "hello":"test",
+    "tilejson": "3.0.0",
+    "name": table_name, 
+    "description": description,
+    "tiles": [
+      `${baseurl}/collections/${table_name}/tiles/${table_name}/{z}/{x}/{y}`
+    ],
+    "vector_layers": vectorLayers.map(vl => ({
+        "id": vl.name,
+        "fields": {},
+        "description": vl.description,
+        "maxzoom": vl.maxzoom,
+        "minzoom": vl.minzoom,
+        "geometry_type": "unknown"
+      })
+    ),
+    "bounds": [
+      min_x,
+      min_y,
+      max_x,
+      max_y
+    ]
+}}
+
+
 module.exports = {
   tileMatrixSets,
   tileMatrixSet,
   tilesets,
-  tileset
+  tileset,
+  tilejson
 }
