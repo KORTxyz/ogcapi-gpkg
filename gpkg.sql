@@ -21,3 +21,7 @@ CREATE TABLE "gpkgext_vt_fields" (
 UPDATE "vectortiles" SET "tile_row" = pow(2, "zoom_level") - "tile_row" - 1
 
 CREATE UNIQUE INDEX vectortiles_IDX ON vectortiles (zoom_level,tile_column,tile_row);
+
+CREATE TABLE gpkgext_styles ( id INTEGER PRIMARY KEY, style TEXT, description TEXT, uri TEXT, UNIQUE(uri) );
+
+CREATE TABLE gpkgext_stylesheets ( id INTEGER PRIMARY KEY, style_id INTEGER, format TEXT NOT NULL, stylesheet BLOB NOT NULL, UNIQUE(style_id, format) );

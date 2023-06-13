@@ -122,6 +122,7 @@
 
     let url = new URL(location.href);
     url.searchParams.set("f", "json")
+    url.searchParams.set("properties", "fid")
 
     fetch(url.href)
       .then(e => e.json())

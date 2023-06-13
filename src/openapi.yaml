@@ -355,6 +355,41 @@ paths:
           $ref: "#/components/responses/ServerError"
       security: 
         - {}
+  /styles:
+    get:
+      tags:
+        - Use styles
+      summary: information about the available styles
+      operationId: getStyles
+      description: |-
+        This operation fetches the set of styles available. For
+        each style the id, a title, links to the stylesheet of
+        the style in each supported encoding, and the link to the
+        metadata is provided.
+    
+        Testbed-15 only requires support for a small number of the
+        styles. Therefore, the currently simple approach is sufficient,
+        but in general the operation should support paging (using a
+        parameter `limit` and links to the `next` page in responses).
+      parameters:
+        - $ref: "#/components/parameters/fCommon"
+      responses:
+        200:
+          description: the set of available styles
+          content:
+            text/html:
+              schema:
+                type: string
+            application/json:
+              schema:
+                $ref: "#/components/schemas/mbstyle"
+        400:
+          $ref: "#/components/responses/ServerError"
+      security: 
+        - {}
+  
+
+
 components:
   parameters:
     fCommon:
@@ -1262,6 +1297,43 @@ components:
               description: A reference system data structure as defined in the MD_ReferenceSystem
                 of the ISO 19115
               type: object
+    mbstyle:
+      required:
+        - layers
+        - sources
+        - version
+      type: object
+      properties:
+        version:
+          type: number
+          example: 8
+        name:
+          type: string
+          example: night
+        sources:
+          type: object
+          properties:
+            daraa:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: vector
+                url:
+                  type: string
+                  example: >-
+                    https://services.interactive-instruments.de/vtp/daraa/tiles/default/{z}/{y}/{x}?f=mvt
+        sprite:
+          type: string
+          example: >-
+            http://vtp2018.s3-eu-west-1.amazonaws.com/static/mapstorestyle/sprites/sprites
+        glyphs:
+          type: string
+          example: http://fonts.openmaptiles.org/{fontstack}/{range}.pbf
+        layers:
+          type: array
+          items:
+            type: object
   responses:
     Features:
       description: >-
@@ -1413,3 +1485,9 @@ components:
           function: residential
           floors: '2'
           lastUpdate: '2015-08-01T12:34:56Z'
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+
