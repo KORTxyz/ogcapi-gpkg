@@ -2,7 +2,9 @@ const { baseurl } = process.env;
 
 const templates = require('../templates/tiles');
 const model = require('../model/tiles');
+
 const imageType = require('image-type')
+const isGzip = require('is-gzip');
 
 const getTileMatrixSets = async (req, reply, fastify) => {
   const { f } = req.query;
@@ -46,6 +48,7 @@ const getCollectionTilesets  = async (req, reply, fastify) => {
 
 const getCollectionTileset  = async (req, reply, fastify) => {
   const { collectionId, tileMatrixSetId } = req.params;
+  console.log(collectionId)
   const { f } = req.query;
 
   const collection = model.getCollectionMetadata(collectionId)
@@ -69,10 +72,13 @@ const getCollectionTile = async (req, reply, fastify) => {
   let tile = await model.getCollectionTile(collectionId, tileMatrix, tileRow, tileCol)
     if (tile) {
     const format = await imageType(tile)
+    const gzip = await isGzip(tile)
 
+    
     reply
-      .header('Content-Type', format?.mime || 'application/x-protobuf')
-      .header('Content-Encoding', 'gzip').send(tile)
+      .header('Content-Type', format?.mime || 'application/vnd.mapbox-vector-tile')
+      .header('Content-Encoding', gzip? 'gzip':'none')
+      .send(tile)
     }
   else {
     reply.status(404).send()

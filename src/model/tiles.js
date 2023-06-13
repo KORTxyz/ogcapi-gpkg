@@ -10,16 +10,17 @@ const getCollectionTile = async (collectionId, tileMatrix, tileRow, tileCol) => 
 }
 
 const getCollectionMetadata = (collectionId) => db.prepare(`
-SELECT * 
-FROM gpkg_contents c 
-LEFT JOIN gpkg_extensions e ON c.table_name=e.table_name
-WHERE c.table_name=?
+  SELECT * 
+  FROM gpkg_contents c 
+  LEFT JOIN gpkg_extensions e ON c.table_name=e.table_name
+  LEFT JOIN (select table_name, max(zoom_level) maxzoom, min(zoom_level) minzoom from gpkg_tile_matrix) t ON c.table_name=t.table_name
+  WHERE c.table_name=?
 `).get(collectionId);
 
 const getVectorLayers = (collectionId) => db.prepare(`
-SELECT * 
-FROM gpkgext_vt_layers
-WHERE table_name=?
+  SELECT * 
+  FROM gpkgext_vt_layers
+  WHERE table_name=?
 `).all(collectionId);
 
 module.exports = {

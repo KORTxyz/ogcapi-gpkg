@@ -30,6 +30,7 @@
     "fastify-openapi-glue": "^2.6.6",
     "file-type": "^16.5.4",
     "image-type": "^4.1.0",
+    "is-gzip": "^2.0.0",
     "js-yaml": "^4.1.0",
     "proj4": "^2.9.0",
     "tsscmp": "^1.0.6"

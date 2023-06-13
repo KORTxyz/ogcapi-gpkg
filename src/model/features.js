@@ -158,23 +158,26 @@ const getSchema = (collectionId) => {
     }, {})
 
     geometryType = table_info.filter(column => isGeometryType(column.type))
+  
+    const isGpkgSchema = db.prepare("SELECT * from gpkg_extensions where extension_name='gpkg_schema'").get();
+    if(isGpkgSchema != undefined){
+        const data_columns = db.prepare(`
+            SELECT a.column_name, a.title, a.description,'[' || group_concat('{"type": "string", "const":"' || b.value || '","description":"' || b.description || '"}', ',') || ']' as "values" 
+            FROM gpkg_data_columns a
+            LEFT JOIN gpkg_data_column_constraints b ON a.constraint_name=b.constraint_name 
+            WHERE a.table_name = '${collectionId}'
+            GROUP BY a.column_name, a.title, a.description
+        `).all();
 
-    const data_columns = db.prepare(`
-        SELECT a.column_name, a.title, a.description,'[' || group_concat('{"type": "string", "const":"' || b.value || '","description":"' || b.description || '"}', ',') || ']' as "values" 
-        FROM gpkg_data_columns a
-        LEFT JOIN gpkg_data_column_constraints b ON a.constraint_name=b.constraint_name 
-        WHERE a.table_name = '${collectionId}'
-        GROUP BY a.column_name, a.title, a.description
-    `).all();
-
-    data_columns.map(column => {
-        let schema = { name: column.column_name, properties: { title: column.title, description: column.description } }
-        if (column.values) schema.properties.oneOf = JSON.parse(column.values)
-        return schema
-    }).forEach(column => {
-        const type = properties[column.name].type
-        properties[column.name] = { type: type, ...column.properties }
-    })
+        data_columns.map(column => {
+            let schema = { name: column.column_name, properties: { title: column.title, description: column.description } }
+            if (column.values) schema.properties.oneOf = JSON.parse(column.values)
+            return schema
+        }).forEach(column => {
+            const type = properties[column.name].type
+            properties[column.name] = { type: type, ...column.properties }
+        })
+    }
 
     return { properties, geometryType }
 }

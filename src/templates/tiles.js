@@ -1,4 +1,5 @@
 const { baseurl } = process.env;
+const proj4 = require('proj4');
 
 const tileMatrixSetURI = {
   3857: "http://www.opengis.net/def/tilematrixset/OGC/1.0/WebMercatorQuad",
@@ -148,8 +149,9 @@ const tileset = (collection) => {
 
 
 const tilejson = (collection, vectorLayers) => {
-  const {table_name, description, min_x, min_y, max_x, max_y} = collection
-   
+  console.log(collection)
+  let {table_name, description, min_x, min_y, max_x, max_y, srs_id, minzoom, maxzoom} = collection;
+  if(srs_id !== 4326) [min_x, min_y, max_x, max_y] = [...proj4('EPSG:'+srs_id).inverse([min_x, min_y]),...proj4('EPSG:'+srs_id).inverse([max_x, max_y])]
   return {
     "hello":"test",
     "tilejson": "3.0.0",
@@ -167,6 +169,13 @@ const tilejson = (collection, vectorLayers) => {
         "geometry_type": "unknown"
       })
     ),
+    "minzoom": minzoom,
+    "maxzoom": maxzoom,
+    "center":[
+      max_y-min_y,
+      max_x-min_x,
+      Math.floor(maxzoom-minzoom/2)
+    ],
     "bounds": [
       min_x,
       min_y,

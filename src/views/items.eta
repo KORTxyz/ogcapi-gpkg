@@ -6,10 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link href="../../public/tailwind.css" rel="stylesheet" />
-  <script src="../../src/maplibre-gl.js"></script>
-  <link href="../../src/maplibre-gl.css" rel="stylesheet" />
-  <script src='../../src/turf.min.js'></script>
-  <script src="../../src/ag-grid-community.min.js"></script>
+<script src='https://unpkg.com/maplibre-gl@3.0.1/dist/maplibre-gl.js'></script>
+<link href='https://unpkg.com/maplibre-gl@3.0.1/dist/maplibre-gl.css' rel='stylesheet' />
+<script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+  
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@30.0.0/dist/ag-grid-community.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/ag-grid-community@29.2.0/styles/ag-theme-alpine.min.css" rel="stylesheet">
 
 
   <style>
@@ -75,31 +77,6 @@
   </script>
 
   <script>
-    class CustomTooltip {
-      init(params) {
-        const eGui = this.eGui = document.createElement('div');
-        const data = params.api.getDisplayedRowAtIndex(params.rowIndex).data;
-
-
-        eGui.innerHTML = `
-       <p>
-                <span class"name">${data.athlete}</span>
-            </p>
-            <p>
-                <span>Country: </span>
-                ${data.country}
-            </p>
-            <p>
-                <span>Total: </span>
-                ${data.total}
-            </p>
-       `;
-      }
-
-      getGui() {
-        return this.eGui;
-      }
-    }
 
     let schemaDef;
 
@@ -111,7 +88,7 @@
           .map(property => {
             return {
               field: property[0],
-              tooltipField: "ttt", 
+              tooltipField: property[0], 
               headerName: property[1].title, 
               headerTooltip: property[1].description, 
               filter: property[1].type == "integer" || property[1].type == "number" ? "agNumberColumnFilter" : "agTextColumnFilter"
@@ -129,7 +106,6 @@
           },
           tooltipShowDelay: 10,
           tooltipHideDelay: 200000,
-          tooltipComponent: CustomTooltip,
           //pagination: true,
           onRowClicked: e => map.fitBounds(turf.bbox(e.data.geometry)),
           /*rowClassRules: {
