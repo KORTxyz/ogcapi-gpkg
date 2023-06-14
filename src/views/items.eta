@@ -122,7 +122,6 @@
 
     let url = new URL(location.href);
     url.searchParams.set("f", "json")
-    url.searchParams.set("properties", "fid")
 
     fetch(url.href)
       .then(e => e.json())
@@ -142,10 +141,7 @@
           }
           const rowData = geojson.features.map(e => { return { ...{ id: e.id }, ...e.properties, ...{ geometry: e.geometry } } });
           window.grid.gridOptions.api.setRowData(rowData)
-          /*map.once('ready',()=>{
-            map.fitBounds(turf.bbox(geojson));
-            map.getSource("items").setData(geojson)
-          })*/
+
         }
         else window.grid.gridOptions.api.showNoRowsOverlay();
 
