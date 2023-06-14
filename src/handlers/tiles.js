@@ -35,9 +35,10 @@ const getTileMatrixSet = async (req, reply, fastify) => {
 
 const getCollectionTilesets  = async (req, reply, fastify) => {
   const { collectionId } = req.params;
-  const { f } = req.query; 
-  const collection = model.getCollectionMetadata(collectionId)
+  const { f } = req.query;
+   
   if (f == "json") {
+    const collection = model.getCollectionMetadata(collectionId)
     reply.send(templates.tilesets(collection))
   }
   else {
@@ -48,7 +49,7 @@ const getCollectionTilesets  = async (req, reply, fastify) => {
 
 const getCollectionTileset  = async (req, reply, fastify) => {
   const { collectionId, tileMatrixSetId } = req.params;
-  console.log(collectionId)
+
   const { f } = req.query;
 
   const collection = model.getCollectionMetadata(collectionId)
@@ -57,7 +58,7 @@ const getCollectionTileset  = async (req, reply, fastify) => {
   if (f == "json") {
     reply.send(templates.tileset(collection))
   }
-  if (f == "tilejson") {
+  else if (f == "tilejson") {
     reply.schema("tilejson").send(templates.tilejson(collection, vectorLayers))
   }
   else {

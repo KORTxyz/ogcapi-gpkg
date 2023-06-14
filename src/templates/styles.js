@@ -50,7 +50,35 @@ const style = (styleDesc) => {
     return styleJSON
 }
 
+const resources = (resources) => ({
+    "links": [
+      {
+        "rel": "self",
+        "type": "application/json",
+        "title": "This document",
+        "href": `${baseurl}/resources?f=json`
+      },
+      {
+        "rel": "alternate",
+        "type": "text/html",
+        "title": "This document as HTML",
+        "href": `${baseurl}/resources?f=html`
+      }
+    ],
+    "resources": resources.map(resource=>({
+      "id": resource.symbol,
+      "link": {
+        "rel": "item",
+        "title": resource.symbol,
+        "type": resource.format,
+        "href": `${baseurl}/resources/${resource.symbol}`
+      }
+    }))
+  
+});
+
 module.exports = {
     styles,
-    style
+    style,
+    resources
   }

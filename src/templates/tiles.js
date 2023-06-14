@@ -149,7 +149,6 @@ const tileset = (collection) => {
 
 
 const tilejson = (collection, vectorLayers) => {
-  console.log(collection)
   let {table_name, description, min_x, min_y, max_x, max_y, srs_id, minzoom, maxzoom} = collection;
   if(srs_id !== 4326) [min_x, min_y, max_x, max_y] = [...proj4('EPSG:'+srs_id).inverse([min_x, min_y]),...proj4('EPSG:'+srs_id).inverse([max_x, max_y])]
   return {
@@ -183,6 +182,7 @@ const tilejson = (collection, vectorLayers) => {
       max_y
     ]
 }}
+
 
 
 module.exports = {

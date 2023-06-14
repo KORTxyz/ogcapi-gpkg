@@ -4,9 +4,8 @@
 <head>
   <title>tileMatrixSets</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!--<link href="../src/tailwind.css" rel="stylesheet" /> -->
+  <link href="../../../public/tailwind.css" rel="stylesheet" />
 
-  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-neutral-800 text-neutral-400">
@@ -131,9 +130,6 @@
 
   </div>
 
-  <script>
-        <% console.log(it) %>
-  </script>
 </body>
 
 </html>

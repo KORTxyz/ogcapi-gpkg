@@ -40,12 +40,13 @@
 
     </div>
     <script>
-    /*TODO: implement search function.
+                
+
+    //TODO: implement search function.
         (async () => {
 
             let url = new URL(location.href);
             url.searchParams.set("f", "json")
-            console.log(url.href)
 
             const response = await fetch(url.href);
             const { tileMatrixSets } = await response.json();
@@ -55,7 +56,7 @@
             const template = tileMatrixSets.map(tileMatrixSet => {
                 return `
             <div class="bg-neutral-700 pl-5 pt-5 h-60 hover:cursor-pointer hover:bg-neutral-600 flex flex-col" onclick="window.location='${tileMatrixSet.links[1].href}'">
-            <div class="text-xs mb-2 capitalize">Style</div>
+            <div class="text-xs mb-2 capitalize">TileMatrixset</div>
             <div class="text-neutral-100 hover:underline shrink-0 text-xl mb-4 font-bold truncate pr-5" title=${tileMatrixSet.id} >${tileMatrixSet.id}</div>
             <div class="pr-5 text-sm overflow-clip" title="${tileMatrixSet.title}">${tileMatrixSet.title || "No description"}</div>
             <div id="spacer" class="flex-1"></div>

@@ -41,3 +41,4 @@ CREATE TABLE gpkgext_stylesheets ( id INTEGER PRIMARY KEY, style_id INTEGER, for
 CREATE TABLE gpkgext_symbol_content ( id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, format TEXT NOT NULL, content BLOB NOT NULL, uri TEXT NOT NULL)
 CREATE TABLE gpkgext_symbol_images ( id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, content_id INTEGER NOT NULL, symbol_id INTEGER NOT NULL, width INTEGER, height INTEGER, offset_x INTEGER, offset_y INTEGER, pixel_ratio INTEGER)
 CREATE TABLE gpkgext_symbols ( id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, uri TEXT, symbol TEXT NOT NULL, title TEXT NOT NULL, description TEXT )
+

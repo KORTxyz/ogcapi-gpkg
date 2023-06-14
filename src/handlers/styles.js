@@ -7,7 +7,7 @@ const model = require('../model/styles');
 const getStyles = async (req, reply, fastify) => {
     const { f } = req.query;
     const styles = model.getStyles();
-    console.log(styles)
+
     if (f == "json") {
         reply.type('application/json').send(templates.styles(styles));
     }
@@ -38,13 +38,13 @@ const getStyle = async (req, reply, fastify) => {
 
 const getResources = async (req, reply, fastify) => {
     const { f } = req.query;
-    const resources = model.getResources();
 
     if (f == "json") {
-        reply.type('application/json').send(resources);
+        const resources = model.getResources();
+        reply.type('application/json').send(templates.resources(resources));
     }
     else {
-        return reply.view("styles");
+        return reply.view("resources");
     }
 };
 
