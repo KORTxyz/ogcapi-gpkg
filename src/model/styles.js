@@ -26,7 +26,7 @@ const createStylesTable = () => {
 
 const getStyles = () => db.prepare("SELECT a.id,style,description,format FROM gpkgext_styles a LEFT JOIN gpkgext_stylesheets b ON a.id=b.style_id").all();
 
-const getStyle = (styleId) => db.prepare("SELECT a.id, format, stylesheet FROM gpkgext_styles a LEFT JOIN gpkgext_stylesheets b ON a.id=b.style_id WHERE a.style=?").get(styleId);
+const getStyle = (styleId,format) => db.prepare("SELECT a.id, format, stylesheet FROM gpkgext_styles a LEFT JOIN gpkgext_stylesheets b ON a.id=b.style_id WHERE a.style=? and b.format=?").get(styleId,format);
 
 const addStyle = (style) => {
   style = JSON.parse(style)

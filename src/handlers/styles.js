@@ -21,13 +21,12 @@ const getStyle = async (req, reply, fastify) => {
     const { styleId } = req.params;
     const { f } = req.query;
 
-    const style = await model.getStyle(styleId)
-    
-    if(!style) reply.code(404).send();
-    const { stylesheet } = style;
 
     if (f == "mbs") {
-        reply.type('application/json').send(stylesheet.replaceAll("baseurl:/",baseurl));
+        const style = await model.getStyle(styleId,"mbstyle")
+        if(!style) reply.code(404).send();
+        const { stylesheet } = style;
+        reply.type('application/json').send(stylesheet.toString().replaceAll("baseurl:/",baseurl));
     }
 
     else {
