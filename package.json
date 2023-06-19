@@ -20,6 +20,7 @@
     "@fastify/compress": "^6.4.0",
     "@fastify/static": "^6.10.1",
     "@fastify/view": "^7.4.1",
+    "@kortxyz/kortxyz-components": "^0.0.2",
     "@ngageoint/geopackage": "^5.0.2-beta",
     "@ngageoint/projections-js": "^1.0.2",
     "@ngageoint/simple-features-proj-js": "^1.1.3",

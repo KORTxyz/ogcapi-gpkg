@@ -37,64 +37,67 @@ module.exports = async (fastify, opts, done) => {
     })
 
     fastify.register(require('@fastify/static'), {
-        root: path.join(__dirname, 'public'),
-        prefix: '/public/',
+        root: [
+          path.join(__dirname, 'public'),
+          path.join(__dirname,'../node_modules/@kortxyz/kortxyz-components/dist/kortxyz-components')
+        ],
+        prefix: '/public/'
       })
 
-      fastify.register(require('@fastify/any-schema'), {
-        schemas: [{
-          $id: 'tilejson',
-            "type": "object",
-            "properties": {
-              "tilejson": {
-                "type": "string",
-                "pattern": "\\d+\\.\\d+\\.\\d+\\w?[\\w\\d]*"
-              },
-              "name": {
+    fastify.register(require('@fastify/any-schema'), {
+      schemas: [{
+        $id: 'tilejson',
+          "type": "object",
+          "properties": {
+            "tilejson": {
+              "type": "string",
+              "pattern": "\\d+\\.\\d+\\.\\d+\\w?[\\w\\d]*"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "tiles": {
+              "type": "array",
+              "items": {
                 "type": "string"
-              },
-              "description": {
-                "type": "string"
-              },
-              "tiles": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "vector_layers": {
-                "type": "array",
-                "items": {
-                  "additionalProperties": true,
-                  "type": "object"
-                }
-              },
-              "minzoom": {
-                "minimum": 0,
-                "maximum": 22,
-                "type": "integer"
-              },
-              "maxzoom": {
-                "minimum": 0,
-                "maximum": 22,
-                "type": "integer"
-              },
-              "bounds": {
-                "type": "array",
-                "items": {
-                  "type": "number"
-                }
-              },
-              "center": {
-                "type": "array",
-                "items": {
-                  "type": "number"
-                }
+              }
+            },
+            "vector_layers": {
+              "type": "array",
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              }
+            },
+            "minzoom": {
+              "minimum": 0,
+              "maximum": 22,
+              "type": "integer"
+            },
+            "maxzoom": {
+              "minimum": 0,
+              "maximum": 22,
+              "type": "integer"
+            },
+            "bounds": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "center": {
+              "type": "array",
+              "items": {
+                "type": "number"
               }
             }
-          
-          }]
-      })
+          }
+        
+        }]
+    })
       
     fastify.register(require('@fastify/accepts'))
     fastify.register(require('@fastify/compress'), { global: false, encodings: ['gzip'], customTypes: /x-protobuf$/ });
