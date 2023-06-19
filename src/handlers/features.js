@@ -1,12 +1,19 @@
 const templates = require('../templates/features');
 const model = require('../model/features');
 
+const reproject = require('reproject');
+const epsg = require('epsg');
+
+
 const getItems = async (req, reply, fastify) => {
     const { collectionId } = req.params;
-    const { f, limit, offset, bbox, properties, ...searchParams } = req.query;
-
+    const { f, limit, offset, bbox, properties, crs, ...searchParams } = req.query;
+    
     if (f == "json") {
-        const features = await model.getItems(collectionId, limit, offset, bbox, properties, searchParams)
+        let features = await model.getItems(collectionId, limit, offset, bbox, properties, searchParams)
+        console.log(crs)
+        //if(crs) features = reproject(features, from, proj4.WGS84, crss)
+
         reply.type('application/json').send(templates.items(collectionId, features, limit, offset, searchParams));
     }
     else {

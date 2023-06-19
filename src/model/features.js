@@ -1,5 +1,7 @@
-const { GeoPackageGeometryData } = require('@ngageoint/geopackage');
-const { FeatureConverter } = require('@ngageoint/simple-features-geojson-js')
+const { GeoPackageGeometryData, SpatialReferenceSystem, SpatialReferenceSystemConstants, GeoJSONResultSet } = require('@ngageoint/geopackage');
+const { FeatureConverter } = require('@ngageoint/simple-features-geojson-js');
+const { Projection, ProjectionConstants, Projections, ProjectionTransform } = require('@ngageoint/projections-js');
+const { GeometryTransform } = require('@ngageoint/simple-features-proj-js');
 
 const convertSQLITEtype = (type) => {
     type = type.match(/\w+/g);
@@ -85,10 +87,17 @@ const getItems = async (collectionId, limit, offset, bbox, properties, options) 
                 }
             }
 
+            const geoPackageGeometryData = new GeoPackageGeometryData(geom); 
+            const geometryTransform = new GeometryTransform(
+                Projections.getProjectionForName("EPSG:"+geoPackageGeometryData.getSrsId()),
+                Projections.getWGS84Projection()
+            )
+
+            
             return {
                 id: ROWID,
                 type: "Feature",
-                geometry: FeatureConverter.toFeatureGeometry(new GeoPackageGeometryData(geom).getGeometry()),
+                geometry: FeatureConverter.toFeatureGeometry(geometryTransform.transformGeometry(geoPackageGeometryData.getGeometry())),
                 properties
             }
         })
@@ -98,7 +107,7 @@ const getItems = async (collectionId, limit, offset, bbox, properties, options) 
 
 const postItems = async (collectionId, geojson) => {
 
-    const { geomCol } = globalThis.db.prepare('SELECT column_name as geomCol FROM gpkg_geometry_columns WHERE table_name=?', [collectionId]).get(collectionId);
+    const { geomCol, srsId } = globalThis.db.prepare('SELECT column_name as geomCol, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?', [collectionId]).get(collectionId);
 
     let blobColumns = db.prepare(`SELECT name FROM pragma_table_info('${collectionId}') WHERE type='BLOB'`).pluck().all()
 
@@ -110,7 +119,13 @@ const postItems = async (collectionId, geojson) => {
         }
 
         let geometry = FeatureConverter.toSimpleFeaturesGeometry(feature);
-        const geometryData = GeoPackageGeometryData.createAndWrite(geometry).toBuffer()
+
+        const geometryTransform = new GeometryTransform(
+            Projections.getWGS84Projection(),
+            Projections.getProjectionForName("EPSG:"+srsId),
+        )
+
+        const geometryData = GeoPackageGeometryData.createAndWrite(geometryTransform.transformGeometry(geometry)).toBuffer()
         delete feature.properties[geomCol];
 
         const sql = `
