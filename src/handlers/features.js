@@ -1,10 +1,6 @@
 const templates = require('../templates/features');
 const model = require('../model/features');
 
-const reproject = require('reproject');
-const epsg = require('epsg');
-
-
 const getItems = async (req, reply, fastify) => {
     const { collectionId } = req.params;
     const { f, limit, offset, bbox, properties, crs, ...searchParams } = req.query;
