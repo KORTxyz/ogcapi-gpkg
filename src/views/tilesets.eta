@@ -7,7 +7,41 @@
     <link href="../../public/tailwind.css" rel="stylesheet" />
   <script src='https://unpkg.com/maplibre-gl@3.0.1/dist/maplibre-gl.js'></script>
   <link href='https://unpkg.com/maplibre-gl@3.0.1/dist/maplibre-gl.css' rel='stylesheet' />
+<style>
+      .mbview_popup {
+      color: #333;
+      display: table;
+      font-family: "Open Sans", sans-serif;
+      font-size: 10px;
+    }
 
+    .mbview_feature:not(:last-child) {
+      border-bottom: 1px solid #ccc;
+    }
+
+    .mbview_layer:before {
+      content: '#';
+    }
+
+    .mbview_layer {
+      display: block;
+      font-weight: bold;
+    }
+
+    .mbview_property {
+      display: table-row;
+    }
+
+    .mbview_property-value {
+      display: table-cell;
+
+    }
+
+    .mbview_property-name {
+      display: table-cell;
+      padding-right: 10px;
+    }
+</style>
 
 </head>
 
@@ -67,7 +101,7 @@
 
     <div class="flex my-3">
       <div class="basis-1/4 font-bold">Metadata</div>
-      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank" href="<%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad?f=json">
+      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank" href="<%=it.baseurl%><%if(it.collectionId){%><%="/collections/"+it.collectionId%><%}%>/tiles/WebMercatorQuad?f=tilejson">
         Metadata for these tiles in the TileJSON format
       </a>
     </div>
@@ -92,7 +126,6 @@
     fetch("<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>?f=tilejson")
     .then(e=>e.json())
     .then(tilejson=>{
-      console.log(tilejson)
       const {name, tiles, bounds, vector_layers, maxzoom} = tilejson;
       
     let mapStyle = {
@@ -199,7 +232,6 @@
         })
       })
     }
-    console.log(mapStyle)
     map = new maplibregl.Map({
       container: 'map', // container id
       bounds : bounds,
@@ -208,7 +240,87 @@
 
     map.addControl(new maplibregl.FullscreenControl());
 
-    map.showTileBoundaries = true
+    map.showTileBoundaries = true;
+
+    var popup = new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    function displayValue(value,propName) {
+      if (propName=== '@timestamp'){
+        return value.toString() + "<br>[ " + (new Date(value*1000)).toISOString() + " ]";
+      }
+      if (typeof value === 'undefined' || value === null) return value;
+      if (typeof value === 'object' ||
+          typeof value === 'number' ||
+          typeof value === 'string') return value.toString();
+      return value;
+    }
+
+    function renderProperty(propertyName, property) {
+      return '<div class="mbview_property">' +
+        '<div class="mbview_property-name">' + propertyName + '</div>' +
+        '<div class="mbview_property-value">' + displayValue(property,propertyName) + '</div>' +
+        '</div>';
+    }
+
+    function renderLayer(layerId) {
+      return '<div class="mbview_layer">' + layerId + '</div>';
+    }
+
+    function renderProperties(feature) {
+      var sourceProperty = renderLayer(feature.layer['source-layer'] || feature.layer.source);
+      var idProperty = renderProperty('$id', feature.id);
+      var typeProperty = renderProperty('$type', feature.geometry.type);
+      var properties = Object.keys(feature.properties).map(function (propertyName) {
+        return renderProperty(propertyName, feature.properties[propertyName]);
+      });
+      return (feature.id ? [sourceProperty, idProperty, typeProperty]
+        : [sourceProperty, typeProperty]).concat(properties).join('');
+    }
+
+    function renderFeatures(features) {
+      return features.map(function (ft) {
+        return '<div class="mbview_feature">' + renderProperties(ft) + '</div>';
+      }).join('');
+    }
+
+    function renderPopup(features) {
+      return '<div class="mbview_popup">' + renderFeatures(features) + '</div>';
+    }
+
+    map.on('mousemove', function (e) {
+      // set a bbox around the pointer
+      var selectThreshold = 1;
+      var queryBox = [
+        [
+          e.point.x - selectThreshold,
+          e.point.y + selectThreshold
+        ], // bottom left (SW)
+        [
+          e.point.x + selectThreshold,
+          e.point.y - selectThreshold
+        ] // top right (NE)
+      ];
+
+      var features = map.queryRenderedFeatures(queryBox) || [];
+      map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+
+      if (!features.length) {
+        popup.remove();
+      } else {
+        popup.setLngLat(e.lngLat)
+          .setHTML(renderPopup(features))
+          .addTo(map);
+        
+      }
+    });
+    map.on('zoomstart', () => {
+      popup.remove();
+      map.getCanvas().style.cursor = '';
+
+    });
   })
   </script>
 </body>

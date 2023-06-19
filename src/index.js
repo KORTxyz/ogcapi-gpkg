@@ -27,10 +27,11 @@ module.exports = async (fastify, opts, done) => {
     fastify.addContentTypeParser('text/html', async (request, payload) => {
       await htmlParser(payload);
     })
-    fastify.addContentTypeParser('application/tilejson', async (request, payload) => {
-      console.log("tilejsonParser", request,payload)
-    })
+
     fastify.addContentTypeParser('application/geo+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
+    fastify.addContentTypeParser('application/tilejson', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
+    fastify.addContentTypeParser('application/vnd.mapbox.style+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
+
     fastify.addContentTypeParser('image/*', async (request, payload) => {
       await imageParser(payload);
     })

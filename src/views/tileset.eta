@@ -67,7 +67,7 @@
 
     <div class="flex my-3">
       <div class="basis-1/4 font-bold">Metadata</div>
-      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank" href="<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>?f=json">
+      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank" href="<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/<%=it.collectionId%>?f=tilejson">
         Metadata for these tiles in the TileJSON format
       </a>
     </div>

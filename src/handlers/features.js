@@ -4,9 +4,9 @@ const model = require('../model/features');
 const getItems = async (req, reply, fastify) => {
     const { collectionId } = req.params;
     const { f, limit, offset, bbox, properties, ...searchParams } = req.query;
-
+    
     if (f == "json") {
-        const features = await model.getItems(collectionId, limit, offset, bbox, properties, searchParams)
+        let features = await model.getItems(collectionId, limit, offset, bbox, properties, searchParams)
         reply.type('application/json').send(templates.items(collectionId, features, limit, offset, searchParams));
     }
     else {

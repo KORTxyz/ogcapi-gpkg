@@ -7,10 +7,7 @@
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="../public/tailwind.css" rel="stylesheet" />
-  <link href="../public/maplibre-gl.css" rel="stylesheet" />
-  <script src="../src/maplibre-gl.js"></script>
-  <link href="../src/maplibre-gl.css" rel="stylesheet" />
-  <script src='../src/turf.min.js'></script>
+
 
 </head>
 
@@ -116,78 +113,6 @@
         </div>
   </div>
 
-  <script>
-
-    let map = new maplibregl.Map({
-      container: 'map', // container id
-      bounds: [<%= it.extent.spatial.bbox %>],
-      zoom: 9,
-      style: {
-        "version": 8,
-        "name": "Empty",
-        "metadata": {
-          "mapbox:autocomposite": true,
-          "mapbox:type": "template"
-        },
-        "sources": {
-          "s2maps-tiles": {
-            "type": "raster",
-            "tiles": [
-              "https://s2maps-tiles.eu/wmts?layer=s2cloudless-2020_3857&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}"
-            ],
-            "tileSize": 256,
-            "maxzoom": 14
-          },
-          "bounds": {
-            'type': 'geojson',
-            'data': turf.bboxPolygon([<%= it.extent.spatial.bbox[0] %>])
-          }
-        },
-        "layers": [
-          {
-            "id": "background",
-            "type": "background",
-            "paint": {
-              "background-color": "rgba(0,0,0,0)"
-            }
-          },
-          {
-            "id": "s2maps",
-            "type": "raster",
-            "source": "s2maps-tiles",
-            "paint": {
-              "raster-saturation": -0.5
-            }
-          },
-          {
-            'id': "bounds",
-            'type': 'fill',
-            "source": "bounds",
-            'filter': ["==", "$type", "Polygon"],
-            'layout': {},
-            'paint': {
-              'fill-opacity': ["case", ["boolean", ["feature-state", "hover"], false], 0.8, 0.4],
-              'fill-color': "red"
-            }
-          },
-          {
-            'id': "bounds-outline",
-            'type': "line",
-            'source': "bounds",
-            'layout': {
-              'line-join': 'round',
-              'line-cap': 'round'
-            },
-            'paint': {
-              'line-color': "red",
-              'line-width': 1,
-              'line-opacity': 0.7
-            }
-          }
-        ]
-      }, // style URL
-    });
-  </script>
 
 </body>
 

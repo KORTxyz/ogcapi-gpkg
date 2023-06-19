@@ -355,6 +355,104 @@ paths:
           $ref: "#/components/responses/ServerError"
       security: 
         - {}
+  /styles:
+    get:
+      tags:
+        - Styles
+      summary: information about the available styles
+      operationId: getStyles
+      description: |-
+        This operation fetches the set of styles available. For
+        each style the id, a title, links to the stylesheet of
+        the style in each supported encoding, and the link to the
+        metadata is provided.
+    
+        Testbed-15 only requires support for a small number of the
+        styles. Therefore, the currently simple approach is sufficient,
+        but in general the operation should support paging (using a
+        parameter `limit` and links to the `next` page in responses).
+      parameters:
+        - $ref: "#/components/parameters/fCommon"
+      responses:
+        200:
+          description: the set of available styles
+          content:
+            text/html:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  links:
+                    type: array
+                  styles:
+                    type: array
+        400:
+          $ref: "#/components/responses/ServerError"
+      security: 
+        - {}
+  /styles/{styleId}:
+    get:
+      tags:
+        - Styles
+      summary: fetch a style by id
+      description: |-
+        Fetches the style with identifier `styleId`. The set of
+        available styles can be retrieved at `/styles`.
+
+        Not all styles are available in all style encodings.
+      operationId: getStyle
+      parameters:
+        - $ref: "#/components/parameters/styleId"
+        - $ref: "#/components/parameters/fStyle"
+      responses:
+        200:
+          description: The style
+          content:
+            text/html:
+              schema:
+                type: string
+            application/vnd.mapbox.style+json:
+              schema:
+                $ref: "#/components/schemas/mbstyle"
+        400:
+          $ref: "#/components/responses/ServerError"
+      security: 
+        - {}
+
+  /resources:
+    get: 
+      tags:
+        - Styles
+      summary: information about the available resources (symbols, sprites)
+      operationId: getResources
+      parameters:
+        - $ref: "#/components/parameters/fCommon"
+      responses: 
+        200: 
+          description: the set of available resources
+        400:
+          $ref: "#/components/responses/ServerError"
+      security: 
+        - {}
+
+  /resources/{resourceId}:
+    get: 
+      tags:
+        - Styles
+      summary: fetch a symbol resource by id
+      operationId: getResource
+      parameters:
+        - $ref: "#/components/parameters/resourceId"
+      responses: 
+        200: 
+          description: The symbol resource
+        400:
+          $ref: "#/components/responses/ServerError"
+      security: 
+        - {}   
+
 components:
   parameters:
     fCommon:
@@ -384,6 +482,19 @@ components:
           - json
           - html
           - tilejson
+    fStyle:
+      name: f
+      in: query
+      description: >-
+        Select the output format of the response. If no value is provided, the
+        standard HTTP rules apply, i.e., the accept header will be used to
+        determine the format.
+      required: false
+      schema:
+        type: string
+        enum:
+          - mbs
+          - html
     query:
       name: q
       in: query
@@ -612,6 +723,20 @@ components:
       required: true
       schema:
         type: number
+    styleId:
+      name: styleId
+      in: path
+      description: Id of the style
+      required: true
+      schema:
+        type: string
+    resourceId:
+      name: resourceId
+      in: path
+      description: Id of the resource
+      required: true
+      schema:
+        type: string
   schemas:
     link:
       required:
@@ -1262,6 +1387,43 @@ components:
               description: A reference system data structure as defined in the MD_ReferenceSystem
                 of the ISO 19115
               type: object
+    mbstyle:
+      required:
+        - layers
+        - sources
+        - version
+      type: object
+      properties:
+        version:
+          type: number
+          example: 8
+        name:
+          type: string
+          example: night
+        sources:
+          type: object
+          properties:
+            daraa:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: vector
+                url:
+                  type: string
+                  example: >-
+                    https://services.interactive-instruments.de/vtp/daraa/tiles/default/{z}/{y}/{x}?f=mvt
+        sprite:
+          type: string
+          example: >-
+            http://vtp2018.s3-eu-west-1.amazonaws.com/static/mapstorestyle/sprites/sprites
+        glyphs:
+          type: string
+          example: http://fonts.openmaptiles.org/{fontstack}/{range}.pbf
+        layers:
+          type: array
+          items:
+            type: object
   responses:
     Features:
       description: >-
@@ -1413,3 +1575,9 @@ components:
           function: residential
           floors: '2'
           lastUpdate: '2015-08-01T12:34:56Z'
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+
