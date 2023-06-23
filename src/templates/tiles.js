@@ -1,5 +1,9 @@
 const { baseurl } = process.env;
-const proj4 = require('proj4');
+
+const { Projections, ProjectionConstants } = require("@ngageoint/projections-js");
+
+const projection = Projections.getProjectionForName("EPSG:4326");
+
 
 const tileMatrixSetURI = {
   3857: "http://www.opengis.net/def/tilematrixset/OGC/1.0/WebMercatorQuad",
@@ -149,15 +153,25 @@ const tileset = (collection) => {
 
 
 const tilejson = (collection, vectorLayers) => {
-  let {table_name, description, min_x, min_y, max_x, max_y, srs_id, minzoom, maxzoom} = collection;
-  if(srs_id !== 4326) [min_x, min_y, max_x, max_y] = [...proj4('EPSG:'+srs_id).inverse([min_x, min_y]),...proj4('EPSG:'+srs_id).inverse([max_x, max_y])]
+  console.log("template.tilejson",collection)
+  let {name, description, min_x, min_y, max_x, max_y, srs_id, minzoom, maxzoom} = collection;
+
+  if(srs_id !== 4326){
+    const storageProjection = Projections.getProjectionForName("EPSG:"+srs_id);
+    const wgs84Projection = Projections.getProjectionForName("EPSG:4326");
+    const transformation = Projections.getProjectionTransformation(storageProjection, wgs84Projection);
+
+    [min_x, min_y, max_x, max_y] = [...transformation.transformCoordinateArray([min_x, min_y]),...transformation.transformCoordinateArray([max_x, max_y])]
+  }
+
+  if(collection["data_type"] == "features") return dynamicTilejson(name, description, min_x, min_y, max_x, max_y, srs_id, minzoom, maxzoom) 
+
   return {
-    "hello":"test",
     "tilejson": "3.0.0",
-    "name": table_name, 
+    "name": name, 
     "description": description,
     "tiles": [
-      `${baseurl}/collections/${table_name}/tiles/${table_name}/{z}/{x}/{y}`
+      `${baseurl}/collections/${name}/tiles/${name}/{z}/{x}/{y}`
     ],
     "vector_layers": vectorLayers.map(vl => ({
         "id": vl.name,
@@ -183,6 +197,36 @@ const tilejson = (collection, vectorLayers) => {
     ]
 }}
 
+const dynamicTilejson = (name, description, min_x, min_y, max_x, max_y, srs_id, minzoom, maxzoom) => ({
+    "tilejson": "3.0.0",
+    "name": name, 
+    "description": description,
+    "tiles": [
+      `${baseurl}/collections/${name}/tiles/webmercator/{z}/{x}/{y}`
+    ],
+    "vector_layers": [{
+        "id": name,
+        "fields": {},
+        "description": description,
+        "maxzoom": 0,
+        "minzoom": 14,
+        "geometry_type": "unknown"
+      }]
+    ,
+    "minzoom": 0,
+    "maxzoom": 14,
+    "center":[
+      max_y-min_y,
+      max_x-min_x,
+      Math.floor(maxzoom-minzoom/2)
+    ],
+    "bounds": [
+      min_x,
+      min_y,
+      max_x,
+      max_y
+    ]
+})
 
 
 module.exports = {

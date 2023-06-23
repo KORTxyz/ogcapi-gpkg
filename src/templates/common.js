@@ -120,13 +120,14 @@ module.exports = {
         temporal: {
           interval: [
             [
-              "",
-              last_change
+              last_change,
+              ""
             ]
           ],
           trs: "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian",
         }
       },
+      crs: "http://www.opengis.net/def/crs/EPSG/0/"+srs_id,
       itemType: itemType[data_type],
       links: [
         {

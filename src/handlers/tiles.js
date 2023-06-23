@@ -71,10 +71,11 @@ const getCollectionTile = async (req, reply, fastify) => {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
 
   let tile = await model.getCollectionTile(collectionId, tileMatrix, tileRow, tileCol)
-    if (tile) {
+  if (tile) {
+    if(typeof tile == "object") tile = Buffer.from(tile)
+
     const format = await imageType(tile)
     const gzip = await isGzip(tile)
-
     
     reply
       .header('Content-Type', format?.mime || 'application/vnd.mapbox-vector-tile')
