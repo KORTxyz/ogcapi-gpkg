@@ -137,7 +137,7 @@
         },
         "sources": {
           "s2cloudless": {
-            "maxzoom": 6,
+            "maxzoom": 14,
             "tileSize": 256,
             "tiles": [
               "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2019_3857/default/GoogleMapsCompatible/{z}/{y}/{x}.jpg"

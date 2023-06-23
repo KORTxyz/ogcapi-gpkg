@@ -50,9 +50,9 @@ const partition = (array, filter) => {
 
 
 const getItems = async (collectionId, limit, offset, bbox, properties, options) => {
-    const { geomCol } = db.prepare('SELECT column_name as geomCol FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
+    const { geomCol, srsId } = db.prepare('SELECT column_name as geomCol, srs_id as srsId  FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
 
-    properties = properties !== undefined ? [properties, geomCol, "ROWID as ROWID"].filter(e => e.length != 0).join(',') : 'c.*,ROWID as ROWID ';
+    properties = properties !== undefined ? [properties, geomCol, "c.rowid as rowid"].filter(e => e.length != 0).join(',') : 'c.*,c.ROWID as ROWID ';
 
     let from = `
     FROM  ${collectionId} c
@@ -63,10 +63,15 @@ const getItems = async (collectionId, limit, offset, bbox, properties, options) 
 
     if (bbox) {
         const [minx, miny, maxx, maxy] = bbox?.split(",").map(e => Number(e))
+        const bounds = srsId != 4326 ? new GeometryTransform(
+            Projections.getWGS84Projection(),
+            Projections.getProjectionForName("EPSG:"+srsId),
+            ).transformBounds(minx, miny, maxx, maxy) : [minx, miny, maxx, maxy];
+            
         from = `
         FROM rtree_${collectionId}_${geomCol} r
-        LEFT JOIN ${collectionId} c ON r.id=c.ROWID 
-        WHERE ${maxx} >= r.minx AND ${minx} <= r.maxx AND ${maxy} >= r.miny AND ${miny} <= r.maxy AND
+        LEFT JOIN ${collectionId} c ON r.id=c.rowid 
+        WHERE ${bounds[2]} >= r.minx AND ${bounds[0]} <= r.maxx AND ${bounds[3]} >= r.miny AND ${bounds[1]} <= r.maxy AND
         `
     }
 
@@ -77,7 +82,6 @@ const getItems = async (collectionId, limit, offset, bbox, properties, options) 
     LIMIT ${limit || 9999}
     OFFSET ${offset || 0}
     `;
-
     let features = db.prepare(sql).all()
         .map(feature => {
             const { [geomCol]: geom, ROWID, ...properties } = feature;
@@ -101,7 +105,6 @@ const getItems = async (collectionId, limit, offset, bbox, properties, options) 
                 properties
             }
         })
-
     return features;
 }
 
@@ -123,7 +126,7 @@ const postItems = async (collectionId, geojson) => {
         const geometryTransform = new GeometryTransform(
             Projections.getWGS84Projection(),
             Projections.getProjectionForName("EPSG:"+srsId),
-        )
+        ).transformBounds
 
         const geometryData = GeoPackageGeometryData.createAndWrite(geometryTransform.transformGeometry(geometry)).toBuffer()
         delete feature.properties[geomCol];
