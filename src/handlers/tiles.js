@@ -53,7 +53,7 @@ const getCollectionTileset  = async (req, reply, fastify) => {
   const { f } = req.query;
 
   const collection = model.getCollectionMetadata(collectionId)
-  const vectorLayers = model.getVectorLayers(collectionId)
+  const vectorLayers = collection["data_type"] == "feature_tiles" ? model.getVectorLayers(collectionId) : [];
   
   if (f == "json") {
     reply.send(templates.tileset(collection))

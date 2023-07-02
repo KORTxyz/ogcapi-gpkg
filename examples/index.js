@@ -4,7 +4,7 @@ const fastify = require('fastify')({
 
 fastify.register(require('../src/index'),{
     baseUrl: 'http://127.0.0.1:3000',
-    gpkg:'../../../DATA/OGCAPI/OS_Open_Zoomstack.gpkg',
+    gpkg: 'c:/Temp/flyfoto.gpkg', //'../OS_Open_Zoomstack.gpkg',
     skipLandingpage:false, 
 })
 
