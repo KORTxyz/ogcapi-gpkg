@@ -48,19 +48,36 @@ const partition = (array, filter) => {
     return [pass, fail];
 }
 
+const toGeojson = (feature, geomColName) => {
+    const { [geomColName]: geom, ROWID, ...properties } = feature;
+    for (const key in properties) {
+        if (typeof properties[key] === "object") {
+            properties[key] = properties[key] == null ? "" : properties[key].toString('base64')
+        }
+    }
+
+    const geoPackageGeometryData = new GeoPackageGeometryData(geom); 
+    const geometryTransform = new GeometryTransform(
+        Projections.getProjectionForName("EPSG:"+geoPackageGeometryData.getSrsId()),
+        Projections.getWGS84Projection()
+    )
+
+    return {
+        id: ROWID,
+        type: "Feature",
+        geometry: FeatureConverter.toFeatureGeometry(geometryTransform.transformGeometry(geoPackageGeometryData.getGeometry())),
+        properties
+    }
+}
 
 const getItems = async (collectionId, limit, offset, bbox, properties, options) => {
-    const { geomCol, srsId } = db.prepare('SELECT column_name as geomCol, srs_id as srsId  FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
+    const { geomColName, srsId } = db.prepare('SELECT column_name as geomColName, srs_id as srsId  FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
 
-    properties = properties !== undefined ? [properties, geomCol, "c.rowid as rowid"].filter(e => e.length != 0).join(',') : 'c.*,c.ROWID as ROWID ';
+    const selectVariables = properties == undefined ?  'c.*,c.ROWID as ROWID ' : ["c.rowid as rowid", geomColName, properties].filter(Boolean).join(',');
+    
+    const whereClause = options ? Object.entries(options).map(e => e[0] + " = '" + decodeURI(e[1]) + "'").join(" AND ") : " ";
 
-    let from = `
-    FROM  ${collectionId} c
-    WHERE
-    `;
-
-    const where = options ? Object.entries(options).map(e => e[0] + " = '" + unescape(e[1]) + "'").join(" AND ") : ""
-
+    let from;
     if (bbox) {
         const [minx, miny, maxx, maxy] = bbox?.split(",").map(e => Number(e))
         const bounds = srsId != 4326 ? new GeometryTransform(
@@ -69,43 +86,27 @@ const getItems = async (collectionId, limit, offset, bbox, properties, options) 
             ).transformBounds(minx, miny, maxx, maxy) : [minx, miny, maxx, maxy];
             
         from = `
-        FROM rtree_${collectionId}_${geomCol} r
+        FROM rtree_${collectionId}_${geomColName} r
         LEFT JOIN ${collectionId} c ON r.id=c.rowid 
         WHERE ${bounds[2]} >= r.minx AND ${bounds[0]} <= r.maxx AND ${bounds[3]} >= r.miny AND ${bounds[1]} <= r.maxy AND
         `
     }
-
+    else {
+     from = `
+        FROM  ${collectionId} c
+        WHERE
+        `;
+    }
+    
     const sql = `
-    SELECT ${properties}
-    ${from} 
-    ${where ? " " + where : "1=1"}
-    LIMIT ${limit || 9999}
-    OFFSET ${offset || 0}
+        SELECT ${selectVariables}
+        ${from} 
+        ${whereClause ? " " + whereClause : "1=1"}
+        LIMIT ${limit || 9999}
+        OFFSET ${offset || 0}
     `;
-    let features = db.prepare(sql).all()
-        .map(feature => {
-            const { [geomCol]: geom, ROWID, ...properties } = feature;
-            for (const key in properties) {
-                if (typeof properties[key] === "object") {
-                    properties[key] = properties[key] == null ? "" : properties[key].toString('base64')
-                }
-            }
 
-            const geoPackageGeometryData = new GeoPackageGeometryData(geom); 
-            const geometryTransform = new GeometryTransform(
-                Projections.getProjectionForName("EPSG:"+geoPackageGeometryData.getSrsId()),
-                Projections.getWGS84Projection()
-            )
-
-            
-            return {
-                id: ROWID,
-                type: "Feature",
-                geometry: FeatureConverter.toFeatureGeometry(geometryTransform.transformGeometry(geoPackageGeometryData.getGeometry())),
-                properties
-            }
-        })
-    return features;
+    return db.prepare(sql).all().map(feature => toGeojson(feature, geomColName));
 }
 
 const postItems = async (collectionId, geojson) => {
