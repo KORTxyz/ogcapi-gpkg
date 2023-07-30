@@ -80,7 +80,7 @@
 Add standardbased geospatial capabilites to you API. 
 
 
-![Product Name Screen Shot](https://github.com/kortxyz/ogcapi-gpkg/.readme/screenshot.jpg)
+![Product Name Screen Shot](https://raw.githubusercontent.com/KORTxyz/ogcapi-gpkg/master/.readme/screenshot.jpg)
 
 
 
