@@ -1,6 +1,6 @@
 {
   "name": "@kortxyz/ogcapi-gpkg",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Fastify routes that follows the OGC API standard and stores/read from a OGC Geopackage",
   "main": "src/index.js",
   "scripts": {
