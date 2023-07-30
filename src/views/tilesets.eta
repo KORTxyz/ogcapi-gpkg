@@ -166,6 +166,14 @@
               "paint": {
                 "background-color": "grey"
               }
+            },
+            {
+              "id": "s2cloudless",
+              "source":"s2cloudless",
+              "type": "raster",
+              "paint": {
+                "raster-saturation": -0.5
+              }
             }
           ]
         }

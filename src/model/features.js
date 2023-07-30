@@ -1,6 +1,6 @@
-const { GeoPackageGeometryData, SpatialReferenceSystem, SpatialReferenceSystemConstants, GeoJSONResultSet } = require('@ngageoint/geopackage');
+const { GeoPackageGeometryData } = require('@ngageoint/geopackage');
 const { FeatureConverter } = require('@ngageoint/simple-features-geojson-js');
-const { Projection, ProjectionConstants, Projections, ProjectionTransform } = require('@ngageoint/projections-js');
+const { Projections } = require('@ngageoint/projections-js');
 const { GeometryTransform } = require('@ngageoint/simple-features-proj-js');
 
 const convertSQLITEtype = (type) => {
@@ -56,9 +56,9 @@ const toGeojson = (feature, geomColName) => {
         }
     }
 
-    const geoPackageGeometryData = new GeoPackageGeometryData(geom); 
+    const geoPackageGeometryData = new GeoPackageGeometryData(geom);
     const geometryTransform = new GeometryTransform(
-        Projections.getProjectionForName("EPSG:"+geoPackageGeometryData.getSrsId()),
+        Projections.getProjectionForName("EPSG:" + geoPackageGeometryData.getSrsId()),
         Projections.getWGS84Projection()
     )
 
@@ -70,34 +70,33 @@ const toGeojson = (feature, geomColName) => {
     }
 }
 
+const getRthreeFilter = bbox => {
+    const [minx, miny, maxx, maxy] = bbox?.split(",").map(e => Number(e))
+    const bounds = srsId != 4326 ?
+        new GeometryTransform(
+            Projections.getWGS84Projection(),
+            Projections.getProjectionForName("EPSG:" + srsId),
+        ).transformBounds(minx, miny, maxx, maxy)
+        : [minx, miny, maxx, maxy];
+
+    return `
+    rtree_${collectionId}_${geomColName} r LEFT JOIN ${collectionId} c ON r.id=c.ROWID 
+    WHERE ${bounds[2]} >= r.minx AND ${bounds[0]} <= r.maxx AND ${bounds[3]} >= r.miny AND ${bounds[1]} <= r.maxy AND
+    `
+}
+
+
 const getItems = async (collectionId, limit, offset, bbox, properties, options) => {
     const { geomColName, srsId } = db.prepare('SELECT column_name as geomColName, srs_id as srsId  FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
 
-    const selectVariables = properties == undefined ?  'c.*,c.ROWID as ROWID ' : ["c.rowid as rowid", geomColName, properties].filter(Boolean).join(',');
-    
+    const selectVariables = properties == undefined ? 'c.*,c.ROWID as ROWID ' : ["c.ROWID as ROWID", geomColName, properties].filter(Boolean).join(',');
+
     const whereClause = options ? Object.entries(options).map(e => e[0] + " = '" + decodeURI(e[1]) + "'").join(" AND ") : " ";
 
-    let from;
-    if (bbox) {
-        const [minx, miny, maxx, maxy] = bbox?.split(",").map(e => Number(e))
-        const bounds = srsId != 4326 ? new GeometryTransform(
-            Projections.getWGS84Projection(),
-            Projections.getProjectionForName("EPSG:"+srsId),
-            ).transformBounds(minx, miny, maxx, maxy) : [minx, miny, maxx, maxy];
-            
-        from = `
-        FROM rtree_${collectionId}_${geomColName} r
-        LEFT JOIN ${collectionId} c ON r.id=c.rowid 
-        WHERE ${bounds[2]} >= r.minx AND ${bounds[0]} <= r.maxx AND ${bounds[3]} >= r.miny AND ${bounds[1]} <= r.maxy AND
-        `
-    }
-    else {
-     from = `
-        FROM  ${collectionId} c
-        WHERE
-        `;
-    }
-    
+    let from = ` FROM  ${collectionId} c`;
+    if (bbox) from += getRthreeFilter(bbox);
+    from += ` WHERE`;
+
     const sql = `
         SELECT ${selectVariables}
         ${from} 
@@ -126,7 +125,7 @@ const postItems = async (collectionId, geojson) => {
 
         const geometryTransform = new GeometryTransform(
             Projections.getWGS84Projection(),
-            Projections.getProjectionForName("EPSG:"+srsId),
+            Projections.getProjectionForName("EPSG:" + srsId),
         ).transformBounds
 
         const geometryData = GeoPackageGeometryData.createAndWrite(geometryTransform.transformGeometry(geometry)).toBuffer()
@@ -177,9 +176,9 @@ const getSchema = (collectionId) => {
     }, {})
 
     geometryType = table_info.filter(column => isGeometryType(column.type))
-  
+
     const isGpkgSchema = db.prepare("SELECT * from gpkg_extensions where extension_name='gpkg_schema'").get();
-    if(isGpkgSchema != undefined){
+    if (isGpkgSchema != undefined) {
         const data_columns = db.prepare(`
             SELECT a.column_name, a.title, a.description,'[' || group_concat('{"type": "string", "const":"' || b.value || '","description":"' || b.description || '"}', ',') || ']' as "values" 
             FROM gpkg_data_columns a

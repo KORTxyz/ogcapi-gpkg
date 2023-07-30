@@ -29,7 +29,7 @@
     "basic-auth": "^2.0.1",
     "better-sqlite3": "^8.4.0",
     "eta": "^2.2.0",
-    "fastify": "^4.17.0",
+    "fastify": "^4.21.0",
     "fastify-openapi-glue": "^2.6.6",
     "file-type": "^16.5.4",
     "geojson-vt": "^3.2.1",
@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@fastify/cors": "^8.2.1",
-    "nodemon": "^2.0.22"
+    "nodemon": "^3.0.1"
   },
   "publishConfig": {
     "access": "public"

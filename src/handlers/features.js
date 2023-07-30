@@ -1,17 +1,19 @@
 const templates = require('../templates/features');
 const model = require('../model/features');
 
+
 const getItems = async (req, reply, fastify) => {
     const { collectionId } = req.params;
     const { f, limit, offset, bbox, properties, ...searchParams } = req.query;
-    
-    if (f == "json") {
-        let features = await model.getItems(collectionId, limit, offset, bbox, properties, searchParams)
-        reply.type('application/json').send(templates.items(collectionId, features, limit, offset, searchParams));
-    }
-    else {
-        return reply.view("items", { collectionId });
-    }
+
+    const contentType = f || req.accepts().type(['json', 'html']) || "json";
+    if(contentType == "html") reply.view("items", { collectionId });
+
+    let features = await model.getItems(collectionId, limit, offset, bbox, properties, searchParams);
+    const templatedFeatures =  templates.items(collectionId, features, limit, offset, searchParams);
+
+    reply.type('application/json').send(templatedFeatures);
+
 };
 
 const postItems = async (req, reply, fastify) => {
@@ -24,18 +26,15 @@ const postItems = async (req, reply, fastify) => {
 
 const getItem = async (req, reply, fastify) => {
     const { collectionId, featureId } = req.params;
-    const { f, zoomlevel } = req.query;
+    const { f } = req.query;
 
-    if (f == "json") {
-        const feature = await model.getItem(collectionId, featureId, zoomlevel)
-        //const template = templates.item(collectionId, featureId, feature);
-        if(!feature) reply.status(404);
+    const contentType = f || req.accepts().type(['json', 'html']) || "json";
+    if(contentType == "html") reply.view("items", { collectionId });
 
-        reply.type('application/json').send(feature);
-    }
-    else {
-        return reply.view("items", { collectionId });
-    }
+    const feature = await model.getItem(collectionId, featureId)
+    if(!feature) reply.status(404);
+
+    reply.type('application/json').send(feature);
 };
 
 const getSchema = async (req, reply, fastify) => {
