@@ -39,7 +39,7 @@ module.exports = async (fastify, opts, done) => {
     fastify.register(require('@fastify/static'), {
         root: [
           path.join(__dirname, 'public'),
-          path.join(__dirname,'../node_modules/@kortxyz/kortxyz-components/dist/kortxyz-components')
+          path.join(process.cwd(),'node_modules/@kortxyz/kortxyz-components/dist/kortxyz-components')
         ],
         prefix: '/public/'
       })
