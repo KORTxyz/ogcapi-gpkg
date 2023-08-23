@@ -96,13 +96,13 @@ This is an example of how to use this Fastify plugin in your own project.
 
 ### Prerequisites
 
-* Install fastify trough npm 
+* Install fastify through npm 
   ```sh
-  npm install fastify @kortxyz/ogcapi-gpkg
+  npm install fastify
   ```
 ### Installation
 
-1. Install the plugin trough npm
+1. Install the plugin through npm
     ```sh
     npm install @kortxyz/ogcapi-gpkg
     ```

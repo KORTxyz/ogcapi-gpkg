@@ -87,7 +87,7 @@ const getRthreeFilter = bbox => {
 
 
 const getItems = async (collectionId, limit, offset, bbox, properties, options) => {
-    const { geomColName, srsId } = db.prepare('SELECT column_name as geomColName, srs_id as srsId  FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
+    const { geomColName, srsId } = db.prepare('SELECT column_name as geomColName, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
 
     const selectVariables = properties == undefined ? 'c.*,c.ROWID as ROWID ' : ["c.ROWID as ROWID", geomColName, properties].filter(Boolean).join(',');
 
@@ -107,7 +107,7 @@ const getItems = async (collectionId, limit, offset, bbox, properties, options) 
 
     return db.prepare(sql).all().map(feature => toGeojson(feature, geomColName));
 }
-
+c
 const postItems = async (collectionId, geojson) => {
 
     const { geomCol, srsId } = globalThis.db.prepare('SELECT column_name as geomCol, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?', [collectionId]).get(collectionId);
@@ -126,17 +126,19 @@ const postItems = async (collectionId, geojson) => {
         const geometryTransform = new GeometryTransform(
             Projections.getWGS84Projection(),
             Projections.getProjectionForName("EPSG:" + srsId),
-        ).transformBounds
+        );
 
-        const geometryData = GeoPackageGeometryData.createAndWrite(geometryTransform.transformGeometry(geometry)).toBuffer()
+        const geometryData = GeoPackageGeometryData.createAndWriteWithSrsId(srsId, geometryTransform.transformGeometry(geometry)).toBuffer()
         delete feature.properties[geomCol];
 
         const sql = `
-            INSERT INTO punkter(${[...Object.keys(feature.properties), geomCol].join(",")})
+            INSERT INTO ${collectionId}(${[...Object.keys(feature.properties), geomCol].join(",")})
             VALUES (${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")});
         `
-
         globalThis.db.prepare(sql).run(Object.values(feature.properties), geometryData);
+
+        //TODO: add update of gpkg_content metadata last_change, bbox
+
     }
 
     return {}
