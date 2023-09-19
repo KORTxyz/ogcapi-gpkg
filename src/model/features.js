@@ -107,7 +107,7 @@ const getItems = async (collectionId, limit, offset, bbox, properties, options) 
 
     return db.prepare(sql).all().map(feature => toGeojson(feature, geomColName));
 }
-c
+
 const postItems = async (collectionId, geojson) => {
 
     const { geomCol, srsId } = globalThis.db.prepare('SELECT column_name as geomCol, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?', [collectionId]).get(collectionId);
