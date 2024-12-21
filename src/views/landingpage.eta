@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../assets/tailwind.css" rel="stylesheet" />
+
+  <title>OGC API</title>
+</head>
+
+<body class="bg-neutral-800 text-neutral-400">
+  <header class="mx-1 flex text-xs items-center justify-between">
+    <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+      </svg>
+      <a class="cursor-default">home</a>
+    </div>
+    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
+      target="_blank">JSON</a>
+  </header>
+
+
+
+  <div class="p-10">
+
+    <h1 class="text-3xl font-bold  pb-2">
+      OGC API
+    </h1>
+    <div>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque aliquam ante ligula, a euismod leo sollicitudin in. Fusce sit amet luctus leo. Duis neque dolor, laoreet ut efficitur et, maximus sed nisi. Donec id lacinia mauris, vitae blandit nisi. Duis turpis nulla, faucibus in quam tristique, lacinia sagittis neque. Nam blandit turpis est, eu tincidunt ex tincidunt at. Sed quis sapien sed tellus varius ultricies a eu urna. Fusce a arcu a mauris aliquet tristique ac sed urna. Vivamus quis velit vitae nisl finibus eleifend. Etiam at mollis sem, sed condimentum ipsum. Maecenas dictum porttitor porta. Ut nec gravida metus, id tincidunt sapien. Fusce vel massa condimentum, pretium lectus ut, maximus magna. Nunc convallis lacus ut diam fringilla rhoncus. Proin non dapibus tellus. In vehicula euismod urna at faucibus.
+      <br><br>
+      Praesent velit lectus, cursus quis facilisis vitae, dignissim eu massa. Integer et condimentum mauris. Donec tellus augue, consectetur vel varius ac, vehicula ultrices ante. Fusce eu ante dolor. Sed lobortis magna eget euismod egestas. Nullam non orci tempus, dignissim lectus ac, suscipit quam. Aliquam convallis velit non massa sollicitudin finibus. Etiam eu malesuada nisl. Etiam efficitur, odio bibendum porta iaculis, elit ligula dignissim tortor, in elementum turpis enim et odio.
+      <br><br>
+      Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum et mattis dui, ac efficitur ex. Fusce interdum pulvinar lectus ac maximus. Phasellus at tincidunt lectus. Cras nec lorem id elit pulvinar commodo id quis erat. Phasellus et urna vel nunc ullamcorper ultrices id ac lectus. Fusce tempus iaculis augue. Nunc id tortor ut turpis venenatis ullamcorper. Integer molestie ante enim, rutrum fringilla est lobortis ut. Maecenas enim sem, auctor sed imperdiet sed, interdum eu mi.
+    </div>
+    <br />
+
+    <h2 class="text-3xl font-bold">Links to the main resources</h2>
+    <div class="flex flex-col">
+      <a class="text-blue-500 text-xl" href="collections">Access the data</a>
+      <a class="text-blue-500 text-xl" href="styles">Styles to render the data in maps</a>
+      <a class="text-blue-500 text-xl" href="processes">Processing services</a>
+    </div>
+
+    <br />
+
+    <h2 class="text-3xl font-bold">API information</h2>
+
+    <div class="flex">
+      <div class="basis-1/4 font-bold">API description</div>
+      <div class="basis-3/4	flex flex-col">
+            <a class="text-blue-500" href="api?f=json" target="_blank">Definition of the API in OpenAPI 3.0</a>
+            <a class="text-blue-500" href="api?f=html" target="_blank">Documentation of the API</a>
+      </div>
+    </div>
+    <br />
+
+    <h2 class="text-3xl font-bold">Expert information</h2>
+
+    <div class="flex">
+      <div class="basis-1/4 font-bold">Additional Links</div>
+      <div class="basis-3/4 flex flex-col">
+        <a class="text-blue-500" href="conformance">OGC API conformance classes implemented by this  server</a>
+        <a class="text-blue-500" href="resources">Resources for rendering the data in maps</a>
+        <a class="text-blue-500" href="tileMatrixSets">List of tile matrix sets implemented by this  API</a>
+      </div>
+    </div>
+
+
+
+  </div>
+</body>
+
+</html>

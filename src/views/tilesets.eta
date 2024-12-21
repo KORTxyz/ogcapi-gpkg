@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Tiles</title>
+
+  <link href="../../assets/tailwind.css" rel="stylesheet" />
+
+  <script nonce="swZ7bunhoIt1ZuQOntvNmJYbP/ra7XRwL7WVEgsg8iE=" type="module"
+    src="https://cdn.kort.xyz/kortxyz-components@latest/kortxyz-components.esm.js"></script>
+  <link rel="stylesheet" href="https://cdn.kort.xyz/kortxyz-components@latest/build/kortxyz-components.css" />
+
+</head>
+
+<body class="bg-neutral-800 text-neutral-400">
+  <header class="flex text-xs items-center justify-between">
+    <div id="breadcrumbs" class="mx-1 flex cursor-pointer opacity-20 hover:opacity-100 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+      </svg>
+      <a class="hover:text-neutral-100" href="/">home</a>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+      <% if(it.collectionId){ %>
+        <a class="hover:text-neutral-100" href="/collections">collections</a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+
+        <a class="hover:text-neutral-100" href="/collections/<%= it.collectionId %>">
+          <%= it.collectionId %>
+        </a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <% } %>
+          <a class="cursor-default">tiles</a>
+    </div>
+    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
+      target="_blank">JSON</a>
+  </header>
+
+  <div id="content" class="p-5">
+
+    <h1 class="text-4xl mb-2.5">
+      Tiles
+    </h1>
+
+    <div class="flex my-3">
+      <div class="basis-1/4 font-bold">Tile Matrix Set</div>
+      <div class="basis-3/4">
+        <select name="TileMatrixSet" id="TileMatrixSet" class="text-neutral-900">
+          <option value="WebMercatorQuad">WebMercatorQuad</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex my-3">
+      <div class="basis-1/4 font-bold">URL template</div>
+      <div class="basis-3/4 cursor-pointer hover:text-neutral-100 truncate"
+        onclick="copy('<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/WebMercatorQuad/{z}/{x}/{y}')">
+        <%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/WebMercatorQuad/{z}/{x}/{y}
+      </div>
+    </div>
+
+    <div class="flex my-3">
+      <div class="basis-1/4 font-bold">Metadata</div>
+      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank"
+        href="<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/WebMercatorQuad?f=json">
+        Metadata for these tiles in the JSON format
+      </a>
+    </div>
+
+    <div class="flex my-3">
+      <div class="basis-1/4 font-bold">Tiles</div>
+      <div class="flex basis-3/4 h-96" id="map">
+        <kortxyz-maplibre class="flex-1" show-tile-boundaries hoverpopup
+          mapstyle="<%=it.baseurl%>/collections/<%=it.collectionId%>/styles/default?f=mbs"></kortxyz-maplibre>
+      </div>
+    </div>
+    <br>
+
+
+  </div>
+</body>
+
+</html>
