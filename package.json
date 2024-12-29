@@ -1,6 +1,6 @@
 {
   "name": "@kortxyz/ogcapi-gpkg",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -13,28 +13,29 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@fastify/accepts": "^4.3.0",
+    "@fastify/accepts": "^5.0.2",
     "@fastify/etag": "^6.0.1",
-    "@fastify/static": "^7.0.4",
-    "@fastify/view": "^9.1.0",
-    "@mapbox/sphericalmercator": "^1.2.0",
+    "@fastify/static": "^8.0.3",
+    "@fastify/view": "^10.0.1",
+    "@kortxyz/geostyler-mapbox-parser": "^6.1.1",
+    "@kortxyz/kortxyz-components": "^0.0.8",
+    "@mapbox/sphericalmercator": "^2.0.1",
     "@ngageoint/geopackage": "^5.0.2-beta",
     "@ngageoint/projections-js": "^1.0.2",
     "@ngageoint/simple-features-geojson-js": "^1.1.1",
     "@ngageoint/simple-features-proj-js": "^1.1.3",
-    "better-sqlite3": "^11.1.2",
+    "better-sqlite3": "^11.7.0",
     "eta": "^3.4.0",
-    "fastify": "^4.28.1",
+    "fastify": "^5.2.0",
     "fastify-openapi-glue": "^4.6.1",
     "geojson-vt": "^4.0.2",
-    "geostyler-mapbox-parser": "^6.0.0",
-    "geostyler-sld-parser": "^6.1.2",
+    "geostyler-sld-parser": "^7.0.0",
     "is-gzip": "^2.0.0",
     "magic-bytes.js": "^1.10.0",
-    "selfsigned": "^2.4.1",
     "vt-pbf": "^3.1.3"
   },
   "devDependencies": {
-    "@fastify/cors": "^9.0.1"
+    "@fastify/cors": "^10.0.1",
+    "selfsigned": "^2.4.1"
   }
 }

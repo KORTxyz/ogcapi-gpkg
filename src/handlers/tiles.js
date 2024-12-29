@@ -91,17 +91,16 @@ async function getCollectionMapTileset(req, reply) {
 
 async function getCollectionMapTile(req, reply) {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
-  console.time("start")
   let tile = await model.getCollectionTile(this.db, collectionId, tileMatrix, tileRow, tileCol)
-  console.timeEnd("start")
+  console.log(tile, tileMatrix, tileRow, tileCol)
   if (tile) {
-    //if (typeof tile == "object") tile = Buffer.from(tile)
-    //const format = await filetypemime(tile);
-    //const gzip = await isGzip(tile)
-
+    if (typeof tile == "object") tile = Buffer.from(tile)
+    const format = await filetypemime(tile);
+    const gzip = await isGzip(tile)
+    console.log(tile)
     reply
-      .header('Content-Type', 'application/vnd.mapbox-vector-tile')//format[0] || 'application/vnd.mapbox-vector-tile')
-      .header('Content-Encoding', 'gzip') //gzip ? 'gzip' : 'none')
+      .header('Content-Type', format[0] || 'application/vnd.mapbox-vector-tile')
+      .header('Content-Encoding', gzip ? 'gzip' : 'none')
       .send(tile)
   }
   else {

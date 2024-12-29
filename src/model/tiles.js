@@ -3,7 +3,7 @@ import * as featuresModel from "../model/features.js";
 import vtpbf from 'vt-pbf';
 import geojsonVt from 'geojson-vt';
 
-import SphericalMercator from '@mapbox/sphericalmercator';
+import {SphericalMercator} from '@mapbox/sphericalmercator';
 
 const merc = new SphericalMercator({
   size: 512,

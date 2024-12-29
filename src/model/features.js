@@ -156,7 +156,7 @@ const postItems = async (collectionId, geojson) => {
         `
         globalThis.db.prepare(sql).run(Object.values(feature.properties), geometryData);
 
-        //TODO: add update of gpkg_content metadata last_change, bbox
+        //TODO: add update of gpkg_content metadata last_change, bbox + spatialindex
 
     }
 

@@ -285,7 +285,7 @@ paths:
 
       security:
         - {}
-  ? /collections/{collectionId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}
+  ? /collections/{collectionId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileCol}/{tileRow}
   : get:
       operationId: getCollectionMapTile
       tags:

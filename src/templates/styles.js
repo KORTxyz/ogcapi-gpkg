@@ -1,5 +1,5 @@
 import SldStyleParser from 'geostyler-sld-parser';
-import MapboxStyleParser from 'geostyler-mapbox-parser';
+import MapboxStyleParser from '@kortxyz/geostyler-mapbox-parser';
 
 import { Projections } from "@ngageoint/projections-js";
 

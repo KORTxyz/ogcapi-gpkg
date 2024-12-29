@@ -157,14 +157,6 @@
         "version": 8,
         "name": "default",
         "sources": {
-          's2maps-tiles': {
-            'type': 'raster',
-            'tiles': [
-              'http://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2023_3857/default/GoogleMapsCompatible/{z}/{y}/{x}.jpg'
-            ],
-            'tileSize': 256,
-            'maxzoom': 14,
-          }
         },
         "layers": [
           {
@@ -172,14 +164,6 @@
             "type": "background",
             "paint": {
               "background-color": "#0f0f0f"
-            }
-          },
-          {
-            'id': 's2maps',
-            'type': 'raster',
-            'source': 's2maps-tiles',
-            'paint': {
-              'raster-saturation': -0.9
             }
           }
         ]
