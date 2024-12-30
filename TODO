@@ -1,5 +1,4 @@
 [X] Make Geostyler-mapbox-parser ESM friendly.
-[ ] Make Geostyler-sld-parser ESM friendly.
-[X] Make kortxyz-components a local libary.
+[X] Make Geostyler-sld-parser ESM friendly.
+[ ] Make Geostyler-style ESM friendly.
 [ ] Make the browser use memorycache when calling files.
-[ ] Tiles path not pointing to dynamic creating vectortiles.

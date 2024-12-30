@@ -43,7 +43,7 @@ const ogcapi = async (fastify, options) => {
     fastify.register(fastifyStatic, {
         root: [
           `${__dirname}/assets`,
-          `${join(__dirname,'../node_modules/@kortxyz/kortxyz-components/dist')}`
+          `${join(process.cwd(),'node_modules/@kortxyz/kortxyz-components/dist')}`
         ],
         prefix: '/assets/',
       })
