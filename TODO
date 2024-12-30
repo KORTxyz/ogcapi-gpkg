@@ -1,5 +1,5 @@
-[ ] Make Geostyler-mapbox-parser ESM friendly.
+[X] Make Geostyler-mapbox-parser ESM friendly.
 [ ] Make Geostyler-sld-parser ESM friendly.
-[ ] Make kortxyz-components a local libary.
+[X] Make kortxyz-components a local libary.
 [ ] Make the browser use memorycache when calling files.
-[ ] TileRow and TileCOlum errors between map and vector tiles path.
+[ ] Tiles path not pointing to dynamic creating vectortiles.

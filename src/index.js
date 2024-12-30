@@ -1,4 +1,4 @@
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
 
@@ -42,10 +42,12 @@ const ogcapi = async (fastify, options) => {
 
     fastify.register(fastifyStatic, {
         root: [
-          `${__dirname}/assets`
+          `${__dirname}/assets`,
+          `${join(__dirname,'../node_modules/@kortxyz/kortxyz-components/dist')}`
         ],
-        prefix: '/assets/'
+        prefix: '/assets/',
       })
+
 
     fastify.addContentTypeParser('text/html', async (req, payload) => await htmlParser(payload))
     fastify.addContentTypeParser('image/*', async (req, payload) => await imageParser(payload))

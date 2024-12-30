@@ -12,7 +12,7 @@
   </style>
 
   <script type="module"
-    src="https://cdn.kort.xyz/kortxyz-components@latest//kortxyz-components.esm.js"></script>
+    src="../../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
   <link href="../../../assets/tailwind.css" rel="stylesheet" />
 </head>
 
