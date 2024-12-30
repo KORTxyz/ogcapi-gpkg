@@ -37,22 +37,20 @@ async function getCollectionTileset(req, reply) {
 async function getCollectionTile(req, reply) {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
   const { limit = 10000, properties = null } = req.query;
-  /*
-  const collection = modelCommon.getCollection(this.db, collectionId)
   
+  const {data_type} = modelCommon.getCollection(this.db, collectionId)
+
   let tile;
-  if (collection.data_type == 'features') tile = await model.getAsVectorTile(this.db, collectionId, tileMatrix, tileRow, tileCol, limit, properties)
-  else 
-  */
-  let tile = await model.getCollectionTile(this.db,collectionId, tileMatrix, tileRow, tileCol)
-  
+  if (data_type == 'features') tile = await model.getAsVectorTile(this.db, collectionId, tileMatrix, tileRow, tileCol, limit, properties)
+
+  else tile = await model.getCollectionTile(this.db,collectionId, tileMatrix, tileRow, tileCol)
   if (tile) {
-    //if (typeof tile == "object") tile = Buffer.from(tile)
-    //const gzip = await isGzip(tile)
+    if (typeof tile == "object") tile = Buffer.from(tile)
+    const gzip = await isGzip(tile)
 
     reply
-      .header('Content-Type',  'application/vnd.mapbox-vector-tile')
-      .header('Content-Encoding', 'gzip')
+      .header('Content-Type', 'application/vnd.mapbox-vector-tile')
+      .header('Content-Encoding', gzip ? 'gzip' : 'none')
       .send(tile)
   }
   else {
@@ -92,12 +90,10 @@ async function getCollectionMapTileset(req, reply) {
 async function getCollectionMapTile(req, reply) {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
   let tile = await model.getCollectionTile(this.db, collectionId, tileMatrix, tileRow, tileCol)
-  console.log(tile, tileMatrix, tileRow, tileCol)
   if (tile) {
     if (typeof tile == "object") tile = Buffer.from(tile)
     const format = await filetypemime(tile);
     const gzip = await isGzip(tile)
-    console.log(tile)
     reply
       .header('Content-Type', format[0] || 'application/vnd.mapbox-vector-tile')
       .header('Content-Encoding', gzip ? 'gzip' : 'none')

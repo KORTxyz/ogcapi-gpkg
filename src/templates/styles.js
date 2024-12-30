@@ -306,7 +306,7 @@ const generateVectorStylesheet = (db, baseurl, collectionId, collection) => {
                   "background-color": "grey"
                 }
             },
-            generateMapboxLayerStyle(name)
+            ...generateMapboxLayerStyle(name)
         ]
     }
 }
