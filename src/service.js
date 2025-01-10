@@ -5,7 +5,6 @@ import * as Styles from "./handlers/styles.js";
 
 class Service {
     constructor(fastify, baseurl) {
-        console.log(fastify.api.servers)
         this.db = fastify.db;
         this.api = fastify.api;
         this.baseurl = baseurl;
