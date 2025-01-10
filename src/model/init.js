@@ -29,6 +29,16 @@ const initDb = async (databasePath) => {
         );
 
         INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
+            Select 'gpkgext_symbols', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_symbols');
+
+        CREATE TABLE if not exists gpkgext_symbols (
+            id INTEGER PRIMARY KEY,
+            symbol TEXT NOT NULL,
+            description TEXT,
+            uri TEXT
+        );
+
+        INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
             Select 'gpkgext_stylesheets', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_stylesheets');
 
         CREATE TABLE if not exists gpkgext_stylesheets (
@@ -36,6 +46,30 @@ const initDb = async (databasePath) => {
             style_id INTEGER NOT NULL,
             format TEXT NOT NULL,
             stylesheet TEXT NOT NULL
+        );
+
+        INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
+            Select 'gpkgext_symbol_images', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_stylesheets');
+
+        CREATE TABLE if not exists gpkgext_symbol_images (
+            id INTEGER PRIMARY KEY,
+            symbol_id INTEGER NOT NULL,
+            content_id INTEGER NOT NULL,
+            width INTEGER,
+            height  INTEGER,
+            offset_x INTEGER,
+            offset_y INTEGER,
+            pixel_ratio INTEGER
+        );
+
+        INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
+            Select 'gpkgext_symbol_content', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_stylesheets');
+
+        CREATE TABLE if not exists gpkgext_symbol_content (
+            id INTEGER PRIMARY KEY,
+            format TEXT NOT NULL,
+            content BLOB NOT NULL,
+            uri TEXT
         );
     `;
 
