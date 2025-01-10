@@ -12,7 +12,7 @@ import yaml from "js-yaml";
 import { Eta } from "eta"
 
 import { Service } from "./service.js";
-import {initDb} from "./model/init.js"
+import { initDb } from "./model/init.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -22,11 +22,13 @@ async function readYaml() {
 }
 
 const ogcapi = async (fastify, options) => {
-    const { gpkg, skipLandingpage, ...opts } = options;
+    const { gpkg, skipLandingpage, baseurl="http://127.0.0.1:3000" } = options;
 
     fastify.decorate('api', await readYaml())
-    if(skipLandingpage) delete fastify.api.paths["/"]    
-    
+    fastify.api.servers[0].url = baseurl;
+
+    if (skipLandingpage) delete fastify.api.paths["/"]
+
     fastify.decorate('db', await initDb(gpkg))
 
     fastify.addHook('preHandler', async (req, reply) => {
@@ -42,11 +44,11 @@ const ogcapi = async (fastify, options) => {
 
     fastify.register(fastifyStatic, {
         root: [
-          `${__dirname}/assets`,
-          `${join(process.cwd(),'node_modules/@kortxyz/kortxyz-components/dist')}`
+            `${__dirname}/assets`,
+            `${join(process.cwd(), 'node_modules/@kortxyz/kortxyz-components/dist')}`
         ],
         prefix: '/assets/',
-      })
+    })
 
 
     fastify.addContentTypeParser('text/html', async (req, payload) => await htmlParser(payload))
@@ -57,7 +59,7 @@ const ogcapi = async (fastify, options) => {
 
     fastify.register(openapiGlue, {
         specification: fastify.api,
-        serviceHandlers: new Service(fastify, opts),
+        serviceHandlers: new Service(fastify, baseurl),
     });
 
 }

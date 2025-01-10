@@ -4,10 +4,11 @@ import * as Tiles from "./handlers/tiles.js";
 import * as Styles from "./handlers/styles.js";
 
 class Service {
-    constructor(fastify,options) {
+    constructor(fastify, baseurl) {
+        console.log(fastify.api.servers)
         this.db = fastify.db;
         this.api = fastify.api;
-        this.baseurl = options.baseurl || "http://127.0.0.1:3000"
+        this.baseurl = baseurl;
         this.fastify = fastify;
     }
 }
@@ -19,5 +20,5 @@ Object.assign(Service.prototype, {
     ...Styles
 });
 
-export {Service}
+export { Service }
 
