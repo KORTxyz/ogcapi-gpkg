@@ -1,4 +1,4 @@
-import * as model from "../model/features.js";
+import * as model from "../database/features.js";
 import * as templates from "../templates/features.js";
 
 

@@ -1,5 +1,5 @@
-import * as model from "../model/tiles.js"
-import * as modelCommon from "../model/common.js"
+import * as model from "../database/tiles.js"
+import * as modelCommon from "../database/common.js"
 
 import * as templates from "../templates/tiles.js"
 

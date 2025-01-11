@@ -1,4 +1,4 @@
-import * as model from "../model/styles.js";
+import * as model from "../database/styles.js";
 import * as templates from "../templates/styles.js";
 
 async function getStyles(req, reply) {

@@ -1,4 +1,4 @@
-import * as model from '../model/common.js';
+import * as model from '../database/common.js';
 import * as templates from '../templates/common.js';
 
 async function getLandingpage(req, reply) {

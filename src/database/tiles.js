@@ -1,9 +1,9 @@
-import * as featuresModel from "../model/features.js";
+import * as featuresModel from "./features.js";
 
 import vtpbf from 'vt-pbf';
 import geojsonVt from 'geojson-vt';
 
-import {SphericalMercator} from '@mapbox/sphericalmercator';
+import { SphericalMercator } from '@mapbox/sphericalmercator';
 
 const merc = new SphericalMercator({
   size: 512,
@@ -60,39 +60,39 @@ const getAsVectorTile = async (db, collectionId, tileMatrix, tileRow, tileCol, l
 };
 
 const getVectorTilesSpec = (db, collectionId) => db.prepare(`
-SELECT 
-	gvl.name as id, 
-  gvl.description, 
-  'vector' as dataType,
-  minzoom as minTileMatrix,
-  maxzoom as maxTileMatrix,
-	CASE 
-		WHEN
-		gvf.name is null THEN NULL
-		ELSE
-		json_object(
-		  'properties',
-      json_group_object(
-        gvf.name,
-        json_object(
-          'title',gvf.name,
-          'description' ,gvf.description,
-          'type',gvf.type
-        )
-      ),
+  SELECT 
+    gvl.name as id, 
+    gvl.description, 
+    'vector' as dataType,
+    minzoom as minTileMatrix,
+    maxzoom as maxTileMatrix,
+    CASE 
+      WHEN
+      gvf.name is null THEN NULL
+      ELSE
+      json_object(
+        'properties',
+        json_group_object(
+          gvf.name,
+          json_object(
+            'title',gvf.name,
+            'description' ,gvf.description,
+            'type',gvf.type
+          )
+        ),
 
-      'type', 
-      'object'
-		)
-	END as propertiesSchema
-FROM
-	gpkgext_vt_layers gvl
-LEFT JOIN
-	gpkgext_vt_fields gvf ON gvl.name=gvf.layer_id
-WHERE
-	table_name=?
-GROUP BY 
-	gvl.name
+        'type', 
+        'object'
+      )
+    END as propertiesSchema
+  FROM
+    gpkgext_vt_layers gvl
+  LEFT JOIN
+    gpkgext_vt_fields gvf ON gvl.name=gvf.layer_id
+  WHERE
+    table_name=?
+  GROUP BY 
+    gvl.name
 `).all(collectionId).map(e => ({ ...e, propertiesSchema: JSON.parse(e.propertiesSchema) }));
 
 

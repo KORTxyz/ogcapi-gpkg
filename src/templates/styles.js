@@ -7,10 +7,10 @@ const parser = new SldStyleParser();
 parser.sldVersion = '1.1.0'
 const mbParser = new MapboxStyleParser();
 
-import { getCollectionStylesheet } from '../model/styles.js';
-import { getCollection } from '../model/common.js';
+import { getCollectionStylesheet } from '../database/styles.js';
+import { getCollection } from '../database/common.js';
 import { collectionMapTileSet } from '../templates/tiles.js';
-import { getTileMatrixSetLimits, getVectorTilesSpec } from '../model/tiles.js';
+import { getTileMatrixSetLimits, getVectorTilesSpec } from '../database/tiles.js';
 
 const layerColor = () => ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99'][Math.random() * 11 | 0]
 

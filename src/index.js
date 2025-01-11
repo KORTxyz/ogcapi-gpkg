@@ -12,7 +12,7 @@ import yaml from "js-yaml";
 import { Eta } from "eta"
 
 import { Service } from "./service.js";
-import { initDb } from "./model/init.js"
+import { initDb } from "./database/init.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
