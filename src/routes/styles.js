@@ -8,12 +8,31 @@ async function getStyles(req, reply) {
 
     const styles = model.getStyles(this.db);
 
-    if (["JSON", "HTML"].includes(contentType)) reply.status(404);
+    if (["JSON", "HTML"].includes(contentType)) reply.callNotFound();
     else if (contentType == "html") return reply.view("styles");
 
     else reply.send(templates.styles(this.baseurl, null, styles))
 
 };
+
+async function getStyle(req, reply) {
+    const { styleId } = req.params;
+    const { f } = req.query;
+
+    const contentType = f || req.accepts().type(['json', 'html']) || "json";
+    const format = contentType.toUpperCase()
+
+    if (!["MBS", "HTML"].includes(format)) reply.callNotFound();
+
+    else if (format == "HTML") return reply.view("style", { baseurl: this.baseurl, styleId });
+
+    else {
+        stylesheet = await model.getStyle(this.db, styleId)
+        reply.send(stylesheet)
+    }
+
+};
+
 
 async function getCollectionStyles(req, reply) {
     const { contentType } = req;
@@ -38,11 +57,11 @@ async function getCollectionStyle(req, reply) {
 
     if (!["MBS", "SLD", "QML", "HTML"].includes(format)) reply.callNotFound();
 
-    else if (format == "HTML") return reply.view("style", {  baseurl: this.baseurl, collectionId, styleId });
+    else if (format == "HTML") return reply.view("style", { baseurl: this.baseurl, collectionId, styleId });
 
     else {
         let stylesheet;
-        if(styleId == "default") stylesheet = templates.generateDefaultStylesheet(this.db, this.baseurl, collectionId)
+        if (styleId == "default") stylesheet = templates.generateDefaultStylesheet(this.db, this.baseurl, collectionId)
         else if (format == "MBS") stylesheet = await templates.convertStyleToMBS(this.baseurl, this.db, collectionId, styleId)
         else stylesheet = model.getCollectionStylesheet(this.db, collectionId, styleId, format)
 
@@ -54,6 +73,8 @@ async function getCollectionStyle(req, reply) {
 
 export {
     getStyles,
+    getStyle,
+
     getCollectionStyles,
     getCollectionStyle
 }

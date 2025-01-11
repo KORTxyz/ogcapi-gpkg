@@ -1,7 +1,7 @@
 const getStyles = async (db) => db.prepare(`
   SELECT style, description
   FROM  gpkgext_styles
-`).all(collectionId);
+`).all();
 
 const getStyle = (db, styleId) => db.prepare(`
   SELECT style, description

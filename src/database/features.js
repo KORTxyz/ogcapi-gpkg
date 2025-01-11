@@ -101,7 +101,6 @@ const partition = (array, filter) => {
 }
 
 
-
 const getItems = async (db, collectionId, limit, offset, bbox, properties, options) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
     const select = formatSelect(properties, geomColName);
@@ -126,42 +125,6 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
     return geojsonfeatures
 }
 
-
-const postItems = async (collectionId, geojson) => {
-
-    const { geomCol, srsId } = globalThis.db.prepare('SELECT column_name as geomCol, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?', [collectionId]).get(collectionId);
-
-    let blobColumns = db.prepare(`SELECT name FROM pragma_table_info('${collectionId}') WHERE type='BLOB'`).pluck().all()
-
-
-    for (const feature of geojson.features) {
-
-        for (const blobColumn of blobColumns) {
-            if (feature.properties[blobColumn]) feature.properties[blobColumn] = Buffer.from(feature.properties[blobColumn], "base64")
-        }
-
-        let geometry = FeatureConverter.toSimpleFeaturesGeometry(feature);
-
-        const geometryTransform = new GeometryTransform(
-            Projections.getWGS84Projection(),
-            Projections.getProjectionForName("EPSG:" + srsId),
-        );
-
-        const geometryData = GeoPackageGeometryData.createAndWriteWithSrsId(srsId, geometryTransform.transformGeometry(geometry)).toBuffer()
-        delete feature.properties[geomCol];
-
-        const sql = `
-            INSERT INTO ${collectionId}(${[...Object.keys(feature.properties), geomCol].join(",")})
-            VALUES (${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")});
-        `
-        globalThis.db.prepare(sql).run(Object.values(feature.properties), geometryData);
-
-        //TODO: add update of gpkg_content metadata last_change, bbox + spatialindex
-
-    }
-
-    return {}
-};
 
 
 const getItem = async (db, collectionId, featureId) => {
@@ -213,7 +176,6 @@ const getSchema = (db, collectionId) => {
 
 export {
     getItems,
-    postItems,
     getItem,
     getSchema
 }
