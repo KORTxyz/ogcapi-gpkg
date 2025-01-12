@@ -26,6 +26,41 @@ const getBboxZoom = (bbox) => {
     return MAX_ZOOM;
 }
 
+const styles = (baseurl, styles) => ({
+    default: styles[0].style,
+    styles: styles.map(style =>
+    ({
+        id: style.style,
+        title: style.description,
+        links: [{
+            rel: "stylesheet",
+            title: "Style in format 'Mapbox'",
+            type: "application/vnd.mapbox.style+json",
+            href: baseurl + "/styles/" + style.style + "?f=mbs"
+        }, {
+            rel: "stylesheet",
+            title: "Style in format 'HTML'",
+            type: "application/vnd.qgis.qml",
+            href: baseurl + "/styles/" + style.style + "?f=hmtl"
+        }]
+    })
+    ),
+    links: [
+        {
+            rel: "self",
+            type: "application/json",
+            title: "This document",
+            href: baseurl + "/styles?f=json",
+        },
+        {
+            rel: "alternate",
+            type: "text/html",
+            title: "This document",
+            href: baseurl + "/styles?f=html",
+        }
+    ]
+});
+
 const collectionStyles = (baseurl, collectionId, styles) => ({
     default: styles.find(style => style.useAsDefault == 1).styleName,
     styles: styles.map(style =>
@@ -106,7 +141,7 @@ const generateCollectionStyles = (baseurl, collectionId) => ({
 
 const generateDefaultStylesheet = (db, baseurl, collectionId) => {
     const collection = getCollection(db, collectionId);
-    
+
     if (collection.data_type == "tiles") return generateMapStylesheet(db, baseurl, collectionId, collection);
     if (collection.data_type == "vector-tiles") return generateVectortilesStylesheet(db, baseurl, collectionId, collection);
 
@@ -152,7 +187,7 @@ const generateMapStylesheet = (db, baseurl, collectionId, collection) => {
     }
 };
 
-const generateMapboxLayerStyle = (name,minzoom,maxzoom) => ([
+const generateMapboxLayerStyle = (name, minzoom, maxzoom) => ([
     {
         'id': name + '-polygons',
         'type': 'fill',
@@ -217,7 +252,7 @@ const generateVectortilesStylesheet = (db, baseurl, collectionId, collection) =>
 
     const vectorTilesSpec = getVectorTilesSpec(db, collectionId)
 
-    const layers = vectorTilesSpec.map(layer=>generateMapboxLayerStyle(layer.id,layer.minTileMatrix,layer.maxTileMatrix)).flat()
+    const layers = vectorTilesSpec.map(layer => generateMapboxLayerStyle(layer.id, layer.minTileMatrix, layer.maxTileMatrix)).flat()
 
     if (srs_id !== 4326) {
         const storageProjection = Projections.getProjectionForName("EPSG:" + srs_id);
@@ -254,7 +289,7 @@ const generateVectortilesStylesheet = (db, baseurl, collectionId, collection) =>
                 "id": "background",
                 "type": "background",
                 "paint": {
-                  "background-color": "grey"
+                    "background-color": "grey"
                 }
             },
             ...layers
@@ -303,7 +338,7 @@ const generateVectorStylesheet = (db, baseurl, collectionId, collection) => {
                 "id": "background",
                 "type": "background",
                 "paint": {
-                  "background-color": "grey"
+                    "background-color": "grey"
                 }
             },
             ...generateMapboxLayerStyle(name)
@@ -365,6 +400,7 @@ const convertStyleToMBS = async (baseurl, db, collectionId, styleId) => {
 };
 
 export {
+    styles,
     collectionStyles,
 
     generateCollectionStyles,

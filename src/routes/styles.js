@@ -6,12 +6,12 @@ async function getStyles(req, reply) {
 
     const { f } = req.query;
 
-    const styles = model.getStyles(this.db);
-
+    const styles = await model.getStyles(this.db);
+    console.log(styles)
     if (["JSON", "HTML"].includes(contentType)) reply.callNotFound();
     else if (contentType == "html") return reply.view("styles");
 
-    else reply.send(templates.styles(this.baseurl, null, styles))
+    else reply.send(templates.styles(this.baseurl, styles))
 
 };
 
@@ -38,7 +38,7 @@ async function getCollectionStyles(req, reply) {
     const { contentType } = req;
     const { collectionId } = req.params;
 
-    if (contentType == "html") return reply.view("styles", { collectionId });
+    if (contentType == "html") return reply.view("collectionstyles", { collectionId });
     else {
         const styles = await model.getCollectionStyles(this.db, collectionId).catch((err) => ({}));
 
@@ -57,7 +57,7 @@ async function getCollectionStyle(req, reply) {
 
     if (!["MBS", "SLD", "QML", "HTML"].includes(format)) reply.callNotFound();
 
-    else if (format == "HTML") return reply.view("style", { baseurl: this.baseurl, collectionId, styleId });
+    else if (format == "HTML") return reply.view("collectionstyle", { baseurl: this.baseurl, collectionId, styleId });
 
     else {
         let stylesheet;
