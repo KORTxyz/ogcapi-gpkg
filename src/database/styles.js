@@ -9,11 +9,11 @@ const getStyle = (db, styleId) => db.prepare(`
   WHERE style=?
 `).get(styleId);
 
-const getStylesheet = (db, styleId, format) => db.prepare(`
+const getStylesheet = (db, styleId) => db.prepare(`
     SELECT stylesheet
-    FROM  gpkgext_stylesheet
-    WHERE styleId=? AND format=?
-`).pluck().get(styleId, format);
+    FROM  gpkgext_stylesheets
+    WHERE style_id=?
+`).pluck().get(styleId);
 
 
 const getCollectionStyles = async (db, collectionId) => db.prepare(`

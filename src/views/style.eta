@@ -16,8 +16,8 @@
   <link href="../../../assets/tailwind.css" rel="stylesheet" />
 </head>
 
-<body>
-  <header class="absolute z-10 mx-1 flex text-xs items-center justify-between">
+<body class="bg-neutral-800 text-neutral-400">
+  <header class="absolute mx-1 z-10 flex text-xs items-center justify-between w-[calc(100%-0.25rem)]">
     <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
         <path
@@ -30,11 +30,20 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
       </svg>
 
-      <a class="cursor-default"><%= it.styleId %></a>
+      <a class="hover:text-neutral-100" href="/styles">styles</a>
+
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+
+    <a class="cursor-default"><%= it.styleId %></a>
     </div>
+    <a class="hover:text-neutral-100  px-1 opacity-20 hover:opacity-100 transition" href="?f=mbs" target="_blank">MBS</a>
   </header>
-  <kortxyz-maplibre style="width:100%;height:100%;display:block"
-    mapstyle="<%=it.baseurl%>/collections/<%=it.collectionId%>/styles/<%=it.styleId%>?f=mbs"></kortxyz-maplibre>
+  <kortxyz-maplibre class="w-full h-full block" 
+    mapstyle="<%=it.baseurl%>/styles/<%=it.styleId%>?f=mbs"
+    nopopup></kortxyz-maplibre>
 </body>
 
 </html>

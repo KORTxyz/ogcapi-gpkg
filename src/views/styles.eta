@@ -18,14 +18,13 @@
       <a class="hover:text-neutral-100" href="/">home</a>
 
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
 
       <a class="cursor-default">styles</a>
     </div>
-    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
-      target="_blank">JSON</a>
+    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json" target="_blank">JSON</a>
   </header>
   <div id="content" class="p-5">
 
@@ -36,7 +35,8 @@
 
     </div>
 
-    <input class="my-2 p-4 w-full bg-neutral-700 text-l text-neutral-200 focus:outline-none focus:ring" placeholder="Search for collections" oninput="search(this)">
+    <input class="my-2 p-4 w-full bg-neutral-700 text-l text-neutral-200 focus:outline-none focus:ring"
+      placeholder="Search for collections" oninput="search(this)">
 
     <div id="styles" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-6 gap-4 mt-6"></div>
 
@@ -44,11 +44,11 @@
   </div>
   <script>
     let url = new URL(location.href);
-        url.searchParams.set("f", "json")
+    url.searchParams.set("f", "json")
 
     const renderCollections = async () => {
       const response = await fetch(url.href);
-      const { styles, default:def } = await response.json();
+      const { styles, default: def } = await response.json();
 
       const stylesGrid = document.querySelector("#styles");
 
@@ -57,7 +57,7 @@
 
         return `
           <div class="bg-neutral-700 pl-5 pt-5 h-60 hover:cursor-pointer hover:bg-neutral-600 flex flex-col" onclick="window.location='styles/${style.id}'">
-            <div class="text-xs mb-2 h-4 capitalize">${style.id === def? "default": " " }</div>
+            <div class="text-xs mb-2 h-4 capitalize">${style.id === def ? "default" : " "}</div>
             <div class="text-neutral-100 hover:underline shrink-0 text-xl mb-4 font-bold truncate pr-5" title=${style.id} >${style.id}</div>
             <div class="pr-5 text-sm overflow-clip" title="${style.title}">${style.title || "No description"}</div>
             <div id="spacer" class="flex-1"></div>

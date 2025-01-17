@@ -27,7 +27,7 @@ async function getStyle(req, reply) {
     else if (format == "HTML") return reply.view("style", { baseurl: this.baseurl, styleId });
 
     else {
-        stylesheet = await model.getStyle(this.db, styleId)
+        const stylesheet = await model.getStylesheet(this.db, styleId)
         reply.send(stylesheet)
     }
 
