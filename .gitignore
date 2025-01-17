@@ -1,3 +1,2 @@
 node_modules
-test/dummydata.gpkg-shm
-test/dummydata.gpkg-wal
+test/dummydata.gpkg*
