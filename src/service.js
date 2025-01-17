@@ -1,11 +1,10 @@
-import * as Common from "./handlers/common.js";
-import * as Features from "./handlers/features.js";
-import * as Tiles from "./handlers/tiles.js";
-import * as Styles from "./handlers/styles.js";
+import * as Common from "./routes/common.js";
+import * as Features from "./routes/features.js";
+import * as Tiles from "./routes/tiles.js";
+import * as Styles from "./routes/styles.js";
 
 class Service {
     constructor(fastify, baseurl) {
-        console.log(fastify.api.servers)
         this.db = fastify.db;
         this.api = fastify.api;
         this.baseurl = baseurl;
@@ -21,4 +20,3 @@ Object.assign(Service.prototype, {
 });
 
 export { Service }
-
