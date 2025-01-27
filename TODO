@@ -1,4 +1,0 @@
-[X] Make Geostyler-mapbox-parser ESM friendly.
-[X] Make Geostyler-sld-parser ESM friendly.
-[ ] Make Geostyler-style ESM friendly.
-[ ] Make the browser use memorycache when calling files.

@@ -7,7 +7,7 @@ async function getStyles(req, reply) {
     const { f } = req.query;
 
     const styles = await model.getStyles(this.db);
-    console.log(styles)
+
     if (["JSON", "HTML"].includes(contentType)) reply.callNotFound();
     else if (contentType == "html") return reply.view("styles");
 
