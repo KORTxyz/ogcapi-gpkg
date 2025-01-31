@@ -399,9 +399,38 @@ const convertStyleToMBS = async (baseurl, db, collectionId, styleId) => {
     }
 };
 
+
+const resources = (baseurl, resources) => ({
+    "links": [
+      {
+        "rel": "self",
+        "type": "application/json",
+        "title": "This document",
+        "href": `${baseurl}/resources?f=json`
+      },
+      {
+        "rel": "alternate",
+        "type": "text/html",
+        "title": "This document as HTML",
+        "href": `${baseurl}/resources?f=html`
+      }
+    ],
+    "resources": resources.map(resource=>({
+      "id": resource.symbol,
+      "link": {
+        "rel": "item",
+        "title": resource.symbol,
+        "type": resource.format,
+        "href": `${baseurl}/resources/${resource.symbol}`
+      }
+    }))
+  
+});
+
 export {
     styles,
     collectionStyles,
+    resources,
 
     generateCollectionStyles,
     generateDefaultStylesheet,

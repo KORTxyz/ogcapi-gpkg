@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Resources</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../../assets/tailwind.css" rel="stylesheet" />
+</head>
+
+<body class="bg-neutral-800 text-neutral-400">
+
+  <header class="mx-1 flex text-xs items-center justify-between">
+    <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+      </svg>
+      <a class="hover:text-neutral-100" href="/">home</a>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+
+      <a class="cursor-default">resources</a>
+    </div>
+    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
+      target="_blank">JSON</a>
+  </header>
+  <div id="content" class="p-5">
+
+    <div class="flex justify-between items-center">
+      <h1 class="text-4xl mb-2.5">
+        resources
+      </h1>
+
+    </div>
+
+    <input class="my-2 p-4 w-full bg-neutral-700 text-l text-neutral-200 focus:outline-none focus:ring" placeholder="Search for resources" oninput="search(this)">
+
+    <div id="resources" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-6 gap-4 mt-6"></div>
+
+  </div>
+  </div>
+  <script>
+    let url = new URL(location.href);
+        url.searchParams.set("f", "json")
+
+    const renderResources = async () => {
+      const response = await fetch(url.href);
+      const { resources } = await response.json();
+
+      const resourcesGrid = document.querySelector("#resources");
+
+      const template = resources.map(resource => {
+        console.log(resource)
+        return `
+          <div class="bg-neutral-700 pl-5 pt-5 h-60 hover:cursor-pointer hover:bg-neutral-600 flex flex-col" onclick="window.location='resources/${resource.id}'">
+            <div class="text-xs mb-2 ">${resource.link.type}</div>
+            <div class="text-neutral-100 hover:underline shrink-0 text-xl mb-4 font-bold truncate pr-5" title="${resource.id}" >${resource.id}</div>
+            <div class="pr-5 text-sm overflow-clip" title=""></div>
+            <div id="spacer" class="flex-1"></div>
+            <div id="toolbar" class="flex justify-end">
+    
+            </div>
+          </div>
+          `
+      }).join("")
+
+      resourcesGrid.innerHTML = template
+    }
+
+    renderResources()
+
+  </script>
+</body>
+
+</html>

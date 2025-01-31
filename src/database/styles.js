@@ -15,6 +15,10 @@ const getStylesheet = (db, styleId) => db.prepare(`
     WHERE style_id=(select id from gpkgext_styles WHERE style=?)
 `).pluck().get(styleId);
 
+const getResources = (db) => db.prepare("SELECT symbol, description, format FROM gpkgext_symbols s LEFT JOIN gpkgext_symbol_content c ON s.id=c.id").all();
+
+const getResource = (db, resourceId) => db.prepare("SELECT content FROM gpkgext_symbols s LEFT JOIN gpkgext_symbol_content c ON s.id=c.id WHERE symbol = ?").get(resourceId).content;
+
 
 const getCollectionStyles = async (db, collectionId) => db.prepare(`
     SELECT styleName,useAsDefault, description
@@ -38,6 +42,9 @@ export {
   getStyles,
   getStyle,
   getStylesheet,
+
+  getResources,
+  getResource,
 
   getCollectionStyles,
   getCollectionStyle,

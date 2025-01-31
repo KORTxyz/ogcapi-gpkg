@@ -35,6 +35,26 @@ async function getStyle(req, reply) {
 
 };
 
+async function getResources(req, reply) {
+    const { f } = req.query;
+
+    if (f == "json") {
+        const resources = model.getResources(this.db);
+        console.log(resources)
+        reply.type('application/json').send(templates.resources(this.baseurl,resources));
+    }
+    else {
+        return reply.view("resources");
+    }
+};
+
+async function getResource(req, reply) {
+    const { resourceId } = req.params;
+
+    const resources = model.getResource(this.db, resourceId);
+
+    reply.send(resources);
+};
 
 async function getCollectionStyles(req, reply) {
     const { contentType } = req;
@@ -76,6 +96,9 @@ async function getCollectionStyle(req, reply) {
 export {
     getStyles,
     getStyle,
+
+    getResources,
+    getResource,
 
     getCollectionStyles,
     getCollectionStyle
