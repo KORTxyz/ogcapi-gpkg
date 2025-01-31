@@ -11,8 +11,8 @@ const getStyle = (db, styleId) => db.prepare(`
 
 const getStylesheet = (db, styleId) => db.prepare(`
     SELECT stylesheet
-    FROM  gpkgext_stylesheets
-    WHERE style_id=?
+    FROM gpkgext_stylesheets
+    WHERE style_id=(select id from gpkgext_styles WHERE style=?)
 `).pluck().get(styleId);
 
 

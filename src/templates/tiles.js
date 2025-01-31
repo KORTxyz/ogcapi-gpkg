@@ -1,4 +1,4 @@
-import {Projections} from "@ngageoint/projections-js";
+import { Projections } from "@ngageoint/projections-js";
 
 const tileMatrixSetURI = {
   3857: "http://www.opengis.net/def/tilematrixset/OGC/1.0/WebMercatorQuad",
@@ -116,9 +116,9 @@ const collectionTileSets = (baseurl, collection) => {
   }
 };
 
-const collectionTileSet = (baseurl, collection,layers) => {
+const collectionTileSet = (baseurl, collection, layers) => {
   const { name, description, srs_id } = collection
-  let { min_x, min_y, max_x, max_y} = collection;
+  let { min_x, min_y, max_x, max_y } = collection;
 
   if (srs_id !== 4326) {
     const storageProjection = Projections.getProjectionForName("EPSG:" + srs_id);
@@ -205,8 +205,8 @@ const collectionMapTileSets = (baseurl, collection) => {
 
 const collectionMapTileSet = (baseurl, collection) => {
 
-  const { name, description, srs_id,tileMatrixSetLimits } = collection
-  let { min_x, min_y, max_x, max_y} = collection;
+  const { name, description, srs_id, tileMatrixSetLimits } = collection
+  let { min_x, min_y, max_x, max_y } = collection;
 
   if (srs_id !== 4326) {
     const storageProjection = Projections.getProjectionForName("EPSG:" + srs_id);

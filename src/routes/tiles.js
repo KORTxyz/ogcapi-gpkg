@@ -25,11 +25,10 @@ async function getCollectionTileset(req, reply) {
 
   const collection = modelCommon.getCollection(this.db, collectionId)
 
-  if (collection.data_type == "tiles") collection.zoomlevels = model.getZoomlevels(this.db, collectionId);
-
   if (contentType == "html") return reply.view("tileset", { baseurl: this.baseurl, collectionId });
 
   const layers = collection.data_type == 'vector-tiles' ? await model.getVectorTilesSpec(this.db, collection.name) : [{"id": collection.name,"dataType":'vector'}];
+  
   if (contentType == "json") reply.send(templates.collectionTileSet(this.baseurl, collection, layers));
 
 };

@@ -76,7 +76,6 @@ const getVectorTilesSpec = (db, collectionId) => db.prepare(`
           gvf.name,
           json_object(
             'title',gvf.name,
-            'description' ,gvf.description,
             'type',gvf.type
           )
         ),
