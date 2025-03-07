@@ -116,9 +116,10 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
         SELECT ${select}
         FROM  ${fromStatement}
         WHERE ${whereStatement}
-        LIMIT ${limit || 9999}
+        LIMIT ${limit || 999}
         OFFSET ${offset || 0}
     `;
+
     const features = db.prepare(sql).all();
     const geojsonfeatures = features.map(feature => toGeoJSON(feature, geomColName))
 

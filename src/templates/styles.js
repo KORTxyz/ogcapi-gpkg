@@ -141,7 +141,6 @@ const generateCollectionStyles = (baseurl, collectionId) => ({
 
 const generateDefaultStylesheet = (db, baseurl, collectionId) => {
     const collection = getCollection(db, collectionId);
-
     if (collection.data_type == "tiles") return generateMapStylesheet(db, baseurl, collectionId, collection);
     if (collection.data_type == "vector-tiles") return generateVectortilesStylesheet(db, baseurl, collectionId, collection);
 
@@ -156,7 +155,6 @@ const generateMapStylesheet = (db, baseurl, collectionId, collection) => {
     const zoomlevels = tileMatrixSetLimits.map(e => e.tileMatrix)
     const maxZoom = Math.max(...zoomlevels)
     const minZoom = Math.min(...zoomlevels)
-
     return {
         "version": 8,
         "name": "default",
@@ -261,7 +259,6 @@ const generateVectortilesStylesheet = (db, baseurl, collectionId, collection) =>
 
         [min_x, min_y, max_x, max_y] = [...transformation.transformCoordinateArray([min_x, min_y]), ...transformation.transformCoordinateArray([max_x, max_y])]
     }
-
     return {
         "version": 8,
         "name": name,
@@ -302,7 +299,6 @@ const generateVectorStylesheet = (db, baseurl, collectionId, collection) => {
     const { name } = collection;
 
     let { min_x, min_y, max_x, max_y, srs_id } = getCollection(db, collectionId)
-
     if (srs_id !== 4326) {
         const storageProjection = Projections.getProjectionForName("EPSG:" + srs_id);
         const wgs84Projection = Projections.getProjectionForName("EPSG:4326");
@@ -318,7 +314,7 @@ const generateVectorStylesheet = (db, baseurl, collectionId, collection) => {
             (max_x + min_x) / 2,
             (max_y + min_y) / 2,
         ],
-        "zoom": getBboxZoom([min_x, min_y, max_x, max_y]),
+        "zoom": Math.max(getBboxZoom([min_x, min_y, max_x, max_y]),9),
         "metadata": {
             "mapbox:autocomposite": true,
             "mapbox:type": "template"

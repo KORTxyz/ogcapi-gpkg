@@ -35,7 +35,7 @@ async function getCollectionTileset(req, reply) {
 
 async function getCollectionTile(req, reply) {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
-  const { limit = 10000, properties = null } = req.query;
+  const { limit = 100, properties = null } = req.query;
   
   const {data_type} = modelCommon.getCollection(this.db, collectionId)
 

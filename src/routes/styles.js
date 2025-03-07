@@ -29,7 +29,6 @@ async function getStyle(req, reply) {
     else {
         let stylesheet = await model.getStylesheet(this.db, styleId)
         stylesheet = stylesheet.replaceAll("{baseurl}", this.baseurl)
-        console.log(this.baseurl)
         reply.send(stylesheet)
     }
 
@@ -40,7 +39,6 @@ async function getResources(req, reply) {
 
     if (f == "json") {
         const resources = model.getResources(this.db);
-        console.log(resources)
         reply.type('application/json').send(templates.resources(this.baseurl,resources));
     }
     else {

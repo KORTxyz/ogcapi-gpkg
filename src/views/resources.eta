@@ -52,7 +52,6 @@
       const resourcesGrid = document.querySelector("#resources");
 
       const template = resources.map(resource => {
-        console.log(resource)
         return `
           <div class="bg-neutral-700 pl-5 pt-5 h-60 hover:cursor-pointer hover:bg-neutral-600 flex flex-col" onclick="window.location='resources/${resource.id}'">
             <div class="text-xs mb-2 ">${resource.link.type}</div>
