@@ -16,7 +16,7 @@
     <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
       <div id="homebreadcrumb" class="flex">
 
-        <a class="hover:text-neutral-100 flex" href="/">
+        <a class="hover:text-neutral-100 flex" href="<%= it.baseurl %>">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
             <path
               d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
@@ -30,7 +30,7 @@
 
       </div>
 
-      <a class="hover:text-neutral-100" href="/collections">collections</a>
+      <a class="hover:text-neutral-100" href="<%= it.baseurl %>/collections">collections</a>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
         stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -56,22 +56,22 @@
     <div class="flex flex-col">
       <% if(it.collection.data_type=="features" ){ %>
         <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-          href="/collections/<%= it.collection.name %>/items">Access the features in the collection</a>
+          href="<%= it.baseurl %>/collections/<%= it.collection.name %>/items">Access the features in the collection</a>
         <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-          href="/collections/<%= it.collection.name %>/tiles">Access the data as tiles</a>
+          href="<%= it.baseurl %>/collections/<%= it.collection.name %>/tiles">Access the data as tiles</a>
 
       <% } %>
 
       <% if(it.collection.data_type=="tiles" ){ %>
         <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-          href="/collections/<%= it.collection.name %>/map/tiles">Access the data as map tiles</a>
+          href="<%= it.baseurl %>/collections/<%= it.collection.name %>/map/tiles">Access the data as map tiles</a>
       <% } %>
       <% if(it.collection.data_type=="vector-tiles" ){ %>
         <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-          href="/collections/<%= it.collection.name %>/tiles">Access the data as vectortiles</a>
+          href="<%= it.baseurl %>/collections/<%= it.collection.name %>/tiles">Access the data as vectortiles</a>
       <% } %>
         <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-        href="/collections/<%= it.collection.name %>/styles">Access the styles for the collection</a>
+        href="<%= it.baseurl %>/collections/<%= it.collection.name %>/styles">Access the styles for the collection</a>
     </div>
 
     <br>
@@ -110,7 +110,7 @@
         <div class="basis-1/4 font-bold">Additional Links</div>
         <div class="basis-3/4 flex flex-col">
           <a>Queryable attributes</a>
-          <a href="/collections/<%= it.collection.name %>/schema">Schema of feature collections</a>
+          <a href="<%= it.baseurl %>/collections/<%= it.collection.name %>/schema">Schema of feature collections</a>
         </div>
       </div>
       <% } %>
