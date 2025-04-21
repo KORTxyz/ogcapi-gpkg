@@ -72,7 +72,7 @@
 
   <kortxyz-maplibre 
     style="width:100%;display:block;background:whitesmoke;" 
-    mapstyle="http://127.0.0.1:3000/styles/3857_skaermkort_moerkt?f=mbs">
+    mapstyle="<%= it.baseurl %>/styles/default?f=mbs">
     <kortxyz-maplibre-source id="items" type="geojson" store="items" autolayers fit></kortxyz-maplibre-source>
   </kortxyz-maplibre>
 
