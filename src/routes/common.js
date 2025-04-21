@@ -8,7 +8,7 @@ async function getLandingpage(req, reply) {
   if (contentType == "json") {
     reply.send(templates.landingPage(baseurl))
   }
-  else if (contentType == "html") return reply.view("landingpage", {});
+  else if (contentType == "html") return reply.view("landingpage", {baseurl});
 };
 
 
@@ -23,16 +23,20 @@ async function getConformance(req, reply) {
 
 
 async function getAPI(req, reply) {
+  const { baseurl } = this;
+
   const { contentType } = req;
 
   if (contentType == "json") {
     reply.send(this.api)
   }
-  else if (contentType == "html") return reply.view("redoc", { baseurl: this.baseurl });
+  else if (contentType == "html") return reply.view("redoc", {baseurl});
 };
 
 
 async function getCollections(req, reply) {
+  const { baseurl } = this;
+
   const { contentType } = req;
   const { q, keywords, limit, offset, bbox } = req.query;
 
@@ -42,20 +46,22 @@ async function getCollections(req, reply) {
     
     reply.send(templates.collections(this.baseurl, templatedCollections))
   }
-  else if (contentType == "html") return reply.view("collections");
+  else if (contentType == "html") return reply.view("collections",{baseurl});
 };
 
 
 async function getCollection(req, reply) {
+  const { baseurl, db } = this;
+
   const { contentType } = req;
   const { collectionId } = req.params;
 
-  const collection = model.getCollection(this.db, collectionId);
+  const collection = model.getCollection(db, collectionId);
   if (collection == undefined) return reply.callNotFound();
   if (contentType == "json") {
-    reply.send(templates.collection(this.baseurl, collection))
+    reply.send(templates.collection(baseurl, collection))
   }
-  else if (contentType == "html") return reply.view("collection",{collection});
+  else if (contentType == "html") return reply.view("collection",{collection,baseurl});
 };
 
 

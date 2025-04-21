@@ -6,17 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link href="../../assets/tailwind.css" rel="stylesheet" />
-<script src='https://unpkg.com/maplibre-gl@3.0.1/dist/maplibre-gl.js'></script>
-<link href='https://unpkg.com/maplibre-gl@3.0.1/dist/maplibre-gl.css' rel='stylesheet' />
-<script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
-  
-<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@30.0.0/dist/ag-grid-community.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/ag-grid-community@29.2.0/styles/ag-theme-alpine.min.css" rel="stylesheet">
-
+  <script type="module" src="../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
 
   <style>
-    .highlight {
-      background-color: sandybrown !important;
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    kortxyz-maplibre {
+      flex: 1;
+    }
+
+    kortxyz-aggrid {
+      flex: 300px 0 0;
     }
   </style>
 </head>
@@ -28,19 +34,19 @@
         <path
           d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
       </svg>
-      <a class="hover:text-neutral-100" href="/">home</a>
+      <a class="hover:text-neutral-100" href="<%= it.baseurl %>">home</a>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
         stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
       </svg>
 
-      <a class="hover:text-neutral-100" href="/collections">collections</a>
+      <a class="hover:text-neutral-100" href="<%= it.baseurl %>/collections">collections</a>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
         stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
       </svg>
 
-      <a class="hover:text-neutral-100" href="/collections/<%= it.collectionId %>">
+      <a class="hover:text-neutral-100" href="<%= it.baseurl %>/collections/<%= it.collectionId %>">
         <%= it.collectionId %>
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
@@ -53,240 +59,25 @@
     <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
       target="_blank">JSON</a>
   </header>
-  <div id="map" class="basis-1/2 grow-0	shrink-0"></div>
-  <div id="resizer" class="basis-1 grow-0	shrink-0	bg-black cursor-ns-resize" onmousedown="initResize(event)"></div>
-  <div id="myGrid" class="grow ag-theme-alpine-dark"></div>
 
   <script>
-    Resize = e => {
-      document.querySelector("#map").style.flexBasis = e.clientY + "px";
-      map.resize()
-    }
-
-    initResize = _ => {
-      document.body.style.cursor = 'ns-resize';
-      window.addEventListener('mousemove', this.Resize, false);
-      window.addEventListener('mouseup', this.stopResize, false);
-    }
-
-    stopResize = _ => {
-      document.body.style.cursor = '';
-      window.removeEventListener('mousemove', this.Resize, false);
-      window.removeEventListener('mouseup', this.stopResize, false);
-    }
-  </script>
-
-  <script>
-
-    let schemaDef;
-
-    fetch(location.href.split("/").slice(0, -1).join("/") + "/schema").then(e => e.json())
-      .then(schema => {
-        schemaDef = schema;
-        const { properties } = schema.properties.properties;
-        const columnDefs = Object.entries(properties)
-          .map(property => {
-            return {
-              field: property[0],
-              tooltipField: property[0], 
-              headerName: property[1].title, 
-              headerTooltip: property[1].description, 
-              filter: property[1].type == "integer" || property[1].type == "number" ? "agNumberColumnFilter" : "agTextColumnFilter"
-            }
-          });
-
-        const gridOptions = {
-          columnDefs: columnDefs,
-          rowData: [],
-          defaultColDef: {
-            filter: true,
-            sortable: true,
-            resizable: true,
-            //editable: true,
-          },
-          tooltipShowDelay: 10,
-          tooltipHideDelay: 200000,
-          //pagination: true,
-          onRowClicked: e => map.fitBounds(turf.bbox(e.data.geometry)),
-          /*rowClassRules: {
-            'highlight': 'rowIndex < 8',
-          }*/
-        };
-
-        // setup the grid after the page has finished loading
-        const gridDiv = document.querySelector('#myGrid');
-        window.grid = new agGrid.Grid(gridDiv, gridOptions);
-        window.grid.gridOptions.api.showLoadingOverlay();
-      })
-
-
     let url = new URL(location.href);
     url.searchParams.set("f", "json")
-
-    fetch(url.href)
-      .then(e => e.json())
-      .then(geojson => {
-
-        if (geojson.features) {
-
-          if (map._loaded) {
-            map.getSource("items").setData(geojson)
-            map.fitBounds(turf.bbox(geojson));
-          }
-          else {
-            map.once('load', () => {
-              map.fitBounds(turf.bbox(geojson));
-              map.getSource("items").setData(geojson)
-            })
-          }
-          const rowData = geojson.features.map(e => { return { ...{ id: e.id }, ...e.properties, ...{ geometry: e.geometry } } });
-          window.grid.gridOptions.api.setRowData(rowData)
-
-        }
-        else window.grid.gridOptions.api.showNoRowsOverlay();
-
-
-      })
-
+    
+    const datastore = document.createElement("kortxyz-datastore");
+    datastore.store = "items";
+    datastore.data = url;
+    document.body.append(datastore);
   </script>
 
-  <script>
-    const map = new maplibregl.Map({
-      container: 'map',
-      style: {
-        "version": 8,
-        "name": "default",
-        "sources": {
-        },
-        "layers": [
-          {
-            "id": "background",
-            "type": "background",
-            "paint": {
-              "background-color": "#0f0f0f"
-            }
-          }
-        ]
-      }, // stylesheet location
-      center: [0, 0], // starting position [lng, lat]
-      zoom: 4 // starting zoom
-    });
+  <kortxyz-maplibre 
+    style="width:100%;display:block;background:whitesmoke;" 
+    mapstyle="http://127.0.0.1:3000/styles/3857_skaermkort_moerkt?f=mbs">
+    <kortxyz-maplibre-source id="items" type="geojson" store="items" autolayers fit></kortxyz-maplibre-source>
+  </kortxyz-maplibre>
 
+  <kortxyz-aggrid store="items"></kortxyz-aggrid>
 
-    map.on('load', function () {
-      //const layerColor = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99'][Math.random() * 11 | 0]
-      const layerColor = "red"
-
-      map.addSource('items', {
-        'type': 'geojson',
-        'data': {
-          'type': 'FeatureCollection',
-          'features': []
-        }
-      });
-
-      map.addLayer({
-        'id': 'items-polygons',
-        'type': 'fill',
-        "source": "items",
-        'filter': ["==", "$type", "Polygon"],
-        'layout': {},
-        'paint': {
-          'fill-opacity': ["case", ["boolean", ["feature-state", "hover"], false], 0.8, 0.4],
-          'fill-color': layerColor
-        }
-      });
-
-      map.addLayer({
-        'id': 'items-polygons-outline',
-        'type': 'line',
-        "source": "items",
-        'filter': ["==", "$type", "Polygon"],
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': layerColor,
-          'line-width': 1,
-          'line-opacity': 0.7
-        }
-      });
-
-      map.addLayer({
-        'id': 'items-lines',
-        'type': 'line',
-        "source": "items",
-        'filter': ["==", "$type", "LineString"],
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': layerColor,
-          'line-width': 2,
-          'line-opacity': ["case", ["boolean", ["feature-state", "hover"], false], 0.8, 0.4]
-        }
-      });
-
-      map.addLayer({
-        'id': 'items-pts',
-        'type': 'circle',
-        "source": "items",
-        'filter': ["==", "$type", "Point"],
-        'paint': {
-          'circle-color': layerColor,
-          'circle-radius': 5,
-          'circle-opacity': ["case", ["boolean", ["feature-state", "hover"], false], 0.8, 0.4]
-        }
-      });
-
-      let hoverId = null;
-      ['items-pts', 'items-lines', 'items-polygons'].forEach(layerId => {
-        map.on('mouseenter', layerId, () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.on('mousemove', layerId, e => {
-          if (hoverId !== null) {
-            map.setFeatureState(
-              { source: 'items', id: hoverId },
-              { hover: false }
-            );
-          }
-          hoverId = e.features[0].id;
-          map.setFeatureState(
-            { source: 'items', id: hoverId },
-            { hover: true }
-          );
-        })
-
-        // Change it back to a pointer when it leaves.
-        map.on('mouseleave', layerId, () => {
-          map.getCanvas().style.cursor = '';
-          if (hoverId !== null) {
-            map.setFeatureState(
-              { source: 'items', id: hoverId },
-              { hover: false }
-            );
-          }
-          hoverId = null;
-        });
-
-        map.on('click', layerId, (e) => {
-          grid.gridOptions.api.forEachNode(node => {
-            if (node.data.id === e.features[0].id) {
-              grid.gridOptions.api.ensureIndexVisible(node.rowIndex)
-              grid.gridOptions.api.flashCells({ rowNodes: [node] })
-            }
-          });
-        })
-
-      });
-
-
-    })
-  </script>
 </body>
 
 </html>

@@ -3,22 +3,26 @@ import * as templates from "../templates/features.js";
 
 
 async function getItems(req, reply) {
+    const { baseurl, db } = this;
+
     const { contentType } = req;
     const { collectionId } = req.params;
     const { f, limit, offset, bbox, properties, ...searchParams } = req.query;
     /* TODO: bbox-crs as a URL-parameter*/
 
     if (contentType == "json") {
-        let geojsonFeatures = await model.getItems(this.db, collectionId, limit, offset, bbox, properties, searchParams);
-        const templatedFeatures = templates.items(this.baseurl, collectionId, geojsonFeatures, limit, offset, searchParams);
+        let geojsonFeatures = await model.getItems(db, collectionId, limit, offset, bbox, properties, searchParams);
+        const templatedFeatures = templates.items(baseurl, collectionId, geojsonFeatures, limit, offset, searchParams);
 
         reply.send(templatedFeatures);
     }
-    else if (contentType == "html") return reply.view("items", { collectionId });
+    else if (contentType == "html") return reply.view("items", { baseurl, collectionId });
 };
 
 
 async function postItems(req, reply){
+    const { baseurl, db } = this;
+
     const { collectionId } = req.params;
     
     await model.postItems(collectionId, req.body)
@@ -27,13 +31,15 @@ async function postItems(req, reply){
 };
 
 async function getItem(req, reply) {
+    const { baseurl, db } = this;
+
     const { contentType } = req;
 
     const { collectionId, featureId } = req.params;
 
-    if(contentType == "html") return reply.view("items", { collectionId });
+    if(contentType == "html") return reply.view("item", { baseurl, collectionId });
 
-    const feature = await model.getItem(this.db, collectionId, featureId)
+    const feature = await model.getItem(db, collectionId, featureId)
     if(!feature) reply.status(404);
 
     reply.type('application/json').send(feature);

@@ -2,8 +2,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
 
-import fastifyAccepts from '@fastify/accepts'
 import fastifyView from '@fastify/view'
+import fastifyAccepts from '@fastify/accepts'
 import fastifyStatic from '@fastify/static'
 
 import fastifyPlugin from 'fastify-plugin'
@@ -22,10 +22,11 @@ async function readYaml() {
 }
 
 const ogcapi = async (fastify, options) => {
-    const { gpkg, skipLandingpage, baseurl="http://127.0.0.1:3000" } = options;
-
+    const { gpkg, skipLandingpage, baseurl="http://127.0.0.1:3000", prefix='' } = options;
+    
     fastify.decorate('api', await readYaml())
-    fastify.api.servers[0].url = baseurl;
+
+    fastify.api.servers[0].url = baseurl+prefix;
 
     if (skipLandingpage) delete fastify.api.paths["/"]
 
@@ -59,10 +60,15 @@ const ogcapi = async (fastify, options) => {
 
     fastify.register(openapiGlue, {
         specification: fastify.api,
-        serviceHandlers: new Service(fastify, baseurl),
+        serviceHandlers: new Service(fastify, baseurl+prefix),
     });
 
 }
 
 
-export default fastifyPlugin(ogcapi);
+export default fastifyPlugin(ogcapi, {
+    fastify: '5.x',
+    name: '@kortxyz/ogcapi',
+    dependencies:['@fastify/view'],
+    encapsulate:true
+});

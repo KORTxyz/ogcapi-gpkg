@@ -8,34 +8,38 @@ import { filetypemime } from 'magic-bytes.js';
 
 
 async function getCollectionTilesets(req, reply) {
+  const { baseurl, db } = this;
+
   const { contentType } = req;
   const { collectionId } = req.params;
 
-  const collection = modelCommon.getCollection(this.db, collectionId);
+  const collection = modelCommon.getCollection(db, collectionId);
 
   if (collection.data_type == "tiles") return reply.callNotFound();
-  if (contentType == "html") return reply.view("tilesets", { baseurl: this.baseurl, collectionId });
+  if (contentType == "html") return reply.view("tilesets", {baseurl, collectionId });
 
-  reply.send(templates.collectionTileSets(this.baseurl, collection));
+  reply.send(templates.collectionTileSets(baseurl, collection));
 };
 
 async function getCollectionTileset(req, reply) {
+  const { baseurl, db } = this;
+
   const { contentType } = req;
   const { collectionId } = req.params;
 
-  const collection = modelCommon.getCollection(this.db, collectionId)
+  const collection = modelCommon.getCollection(db, collectionId)
 
-  if (contentType == "html") return reply.view("tileset", { baseurl: this.baseurl, collectionId });
+  if (contentType == "html") return reply.view("tileset", { baseurl, collectionId });
 
-  const layers = collection.data_type == 'vector-tiles' ? await model.getVectorTilesSpec(this.db, collection.name) : [{"id": collection.name,"dataType":'vector'}];
+  const layers = collection.data_type == 'vector-tiles' ? await model.getVectorTilesSpec(db, collection.name) : [{"id": collection.name,"dataType":'vector'}];
   
-  if (contentType == "json") reply.send(templates.collectionTileSet(this.baseurl, collection, layers));
+  if (contentType == "json") reply.send(templates.collectionTileSet(baseurl, collection, layers));
 
 };
 
 async function getCollectionTile(req, reply) {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
-  const { limit = 100, properties = null } = req.query;
+  const { limit = 10000, properties = null } = req.query;
   
   const {data_type} = modelCommon.getCollection(this.db, collectionId)
 
