@@ -3,16 +3,13 @@ import * as templates from "../templates/styles.js";
 
 async function getStyles(req, reply) {
     const { baseurl, db } = this;
-
     const { contentType } = req;
 
-
-    const styles = await model.getStyles(db);
-
-    if (["JSON", "HTML"].includes(contentType)) reply.callNotFound();
-    else if (contentType == "html") return reply.view("styles",{baseurl});
-
-    else reply.send(templates.styles(baseurl, styles))
+    if (contentType == "html") return reply.view("styles",{baseurl});
+    else {
+        const styles = await model.getStyles(db);
+        reply.send(templates.styles(baseurl, styles));
+    }
 
 };
 
@@ -29,6 +26,10 @@ async function getStyle(req, reply) {
 
     else {
         let stylesheet = await model.getStylesheet(db, styleId)
+        if(!stylesheet && styleId == "default") return reply.send(templates.emptyStylesheet(baseurl))
+        if(!stylesheet) reply.callNotFound();
+
+
         stylesheet = stylesheet.replaceAll("{baseurl}", baseurl)
         reply.send(stylesheet)
     }

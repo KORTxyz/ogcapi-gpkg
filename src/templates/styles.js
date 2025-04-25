@@ -101,6 +101,13 @@ const collectionStyles = (baseurl, collectionId, styles) => ({
     ]
 });
 
+const emptyStylesheet = (baseurl) => ({
+    version: 8,
+    name: "Empty",
+    sources: {},
+    layers: []
+  });
+  
 const generateCollectionStyles = (baseurl, collectionId) => ({
     default: "default",
     styles: [{
@@ -239,9 +246,7 @@ const generateMapboxLayerStyle = (name, minzoom, maxzoom) => ([
             'circle-opacity': ["case", ["boolean", ["feature-state", "hover"], false], 0.8, 0.4]
         }
     }
-])
-
-
+]);
 
 const generateVectortilesStylesheet = (db, baseurl, collectionId, collection) => {
     const { name } = collection;
@@ -292,7 +297,7 @@ const generateVectortilesStylesheet = (db, baseurl, collectionId, collection) =>
             ...layers
         ]
     }
-}
+};
 
 const generateVectorStylesheet = (db, baseurl, collectionId, collection) => {
 
@@ -340,7 +345,7 @@ const generateVectorStylesheet = (db, baseurl, collectionId, collection) => {
             ...generateMapboxLayerStyle(name)
         ]
     }
-}
+};
 
 const convertStyleToMBS = async (baseurl, db, collectionId, styleId) => {
 
@@ -395,7 +400,6 @@ const convertStyleToMBS = async (baseurl, db, collectionId, styleId) => {
     }
 };
 
-
 const resources = (baseurl, resources) => ({
     "links": [
       {
@@ -430,6 +434,7 @@ export {
 
     generateCollectionStyles,
     generateDefaultStylesheet,
+    emptyStylesheet,
 
     convertStyleToMBS
 }

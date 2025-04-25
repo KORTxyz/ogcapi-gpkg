@@ -134,7 +134,10 @@ const getItem = async (db, collectionId, featureId) => {
     const feature = db.prepare(`SELECT *,ROWID as ROWID FROM ${collectionId} WHERE ROWID=?`).get(featureId);
 
     if (!feature) return;
-    return toGeoJSON(feature, geomCol)
+    return {
+        "type": "FeatureCollection",
+        "features": [toGeoJSON(feature, geomCol)]
+    }
 };
 
 
