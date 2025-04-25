@@ -36,8 +36,8 @@ async function getItem(req, reply) {
     const { contentType } = req;
 
     const { collectionId, featureId } = req.params;
-
-    if(contentType == "html") return reply.view("item", { baseurl, collectionId });
+    console.log(featureId)
+    if(contentType == "html") return reply.view("item", { baseurl, collectionId, featureId });
 
     const feature = await model.getItem(db, collectionId, featureId)
     if(!feature) reply.status(404);

@@ -8,23 +8,6 @@
   <link href="../../assets/tailwind.css" rel="stylesheet" />
   <script type="module" src="../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      width: 100vw;
-    }
-
-    kortxyz-maplibre {
-      flex: 1;
-    }
-
-    kortxyz-aggrid {
-      flex: 300px 0 0;
-    }
-  </style>
 </head>
 
 <body class="flex h-screen flex-col max-h-full text-neutral-400 bg-neutral-800 ">
@@ -70,14 +53,32 @@
     document.body.append(datastore);
   </script>
 
-  <kortxyz-maplibre 
-    style="width:100%;display:block;background:whitesmoke;" 
+  <kortxyz-maplibre class="basis-1/2 grow-0	shrink-0"
     mapstyle="<%= it.baseurl %>/styles/default?f=mbs">
     <kortxyz-maplibre-source id="items" type="geojson" store="items" autolayers fit></kortxyz-maplibre-source>
   </kortxyz-maplibre>
+  <div id="resizer" class="basis-1 grow-0	shrink-0	bg-gray-900 cursor-ns-resize" onmousedown="initResize(event)"></div>
 
-  <kortxyz-aggrid store="items"></kortxyz-aggrid>
+  <kortxyz-aggrid store="items" class="grow shrink"></kortxyz-aggrid>
 
+  <script>
+    Resize = e => {
+      document.querySelector("kortxyz-maplibre").style.flexBasis = e.clientY + "px";
+      map.resize()
+    }
+
+    initResize = _ => {
+      document.body.style.cursor = 'ns-resize';
+      window.addEventListener('mousemove', this.Resize, false);
+      window.addEventListener('mouseup', this.stopResize, false);
+    }
+
+    stopResize = _ => {
+      document.body.style.cursor = '';
+      window.removeEventListener('mousemove', this.Resize, false);
+      window.removeEventListener('mouseup', this.stopResize, false);
+    }
+  </script>
 </body>
 
 </html>
