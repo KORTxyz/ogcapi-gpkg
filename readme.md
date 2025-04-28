@@ -109,18 +109,25 @@ This is an example of how to use this Fastify plugin in your own project.
 2. Create a index.js
 
     ```js
-      const fastify = require('fastify')({
-        logger: true
-      })
+      import Fastify from 'fastify';
+      import ogcapi from '@kortxyz/ogcapi-gpkg';
 
-      fastify.register(require('@kortxyz/ogcapi-gpkg'))
+      const app = Fastify();
 
-      fastify.listen({ port: 3000 }, (err, address) => {
-        if (err) {
-          fastify.log.error(err)
-          process.exit(1)
-        }
-      })
+      app.register(ogcapi, {
+        baseurl: process.env.BASEURL,
+        gpkg: process.env.GPKG, 
+        skipLandingpage: false
+      });
+
+      // Run the server!
+      try {
+        await fastify.listen({ port: 3000, host:'0.0.0.0' })
+      } catch (err) {
+        fastify.log.error(err)
+        process.exit(1)
+      }
+
     ```
 
 3. Start the server
@@ -171,8 +178,8 @@ This is an example of how to use this Fastify plugin in your own project.
   - [ ] part 7: Geometry Simplification
 - [x] OGC API - Tiles
   - [x] part 1: Core
-- [ ] OGC API - Styles
-  - [ ] part 1: Core
+- [x] OGC API - Styles
+  - [x] part 1: Core
 - [ ] OGC API - Maps
   - [ ] part 1: Core
 
