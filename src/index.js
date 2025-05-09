@@ -69,6 +69,5 @@ const ogcapi = async (fastify, options) => {
 export default fastifyPlugin(ogcapi, {
     fastify: '5.x',
     name: '@kortxyz/ogcapi',
-    dependencies:['@fastify/view'],
     encapsulate:true
 });
