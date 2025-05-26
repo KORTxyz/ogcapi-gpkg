@@ -3,21 +3,12 @@
 
 <head>
   <title>Style</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      width: 100vw;
-    }
-  </style>
-
-  <script type="module"
-    src="../../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
+  <script type="module" src="../../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
   <link href="../../../assets/tailwind.css" rel="stylesheet" />
 </head>
 
-<body>
-  <header class="absolute z-10 mx-1 flex text-xs items-center justify-between">
+<body class="flex h-screen flex-col max-h-full text-neutral-400 bg-neutral-800 ">
+  <header class="w-full flex text-xs items-center justify-between z-10 absolute">
     <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
         <path
@@ -53,9 +44,12 @@
 
       <a class="cursor-default"><%= it.styleId %></a>
     </div>
+        <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=mbs"
+      target="_blank">JSON</a>
   </header>
-  <kortxyz-maplibre style="width:100%;height:100%;display:block"
-    mapstyle="<%=it.baseurl%>/collections/<%=it.collectionId%>/styles/<%=it.styleId%>?f=mbs"></kortxyz-maplibre>
+  <kortxyz-maplibre class="w-full h-full block"
+    mapstyle="<%=it.baseurl%>/collections/<%=it.collectionId%>/styles/<%=it.styleId%>?f=mbs">
+  </kortxyz-maplibre>
 </body>
 
 </html>

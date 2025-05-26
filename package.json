@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --env-file=.env --watch ./test/server",
     "compileTailwind": "npx tailwindcss -o ./src/assets/tailwind.css --minify",
-    "test": "node --env-file=.env --test ./test/common.test.js ./test/features.test.js"
+    "test": "node --env-file=.env --test ./test/common.test.js ./test/features.test.js ./test/tiles.test.js ./test/styles.test.js"
   },
   "keywords": [],
   "author": "Tino Kastbjerg Stigsen",

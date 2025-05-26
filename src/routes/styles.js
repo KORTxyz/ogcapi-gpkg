@@ -1,6 +1,6 @@
 import * as model from "../database/styles.js";
 import * as templates from "../templates/styles.js";
-import * as helpers from "../templates/styles.js";
+import * as helpers from "../helpers/styles.js";
 
 
 async function getStyles(req, reply) {
@@ -71,7 +71,7 @@ async function getCollectionStyles(req, reply) {
         const styles = await model.getCollectionStyles(db, collectionId).catch((err) => ({}));
 
         if (styles.length > 0) reply.send(templates.collectionStyles(baseurl, collectionId, styles));
-        else reply.send(templates.generateCollectionStyles(baseurl, collectionId));
+        else reply.send(helpers.generateCollectionStyles(baseurl, collectionId));
     }
 
 };
