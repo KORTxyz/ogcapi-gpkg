@@ -1,23 +1,25 @@
 import * as model from "../database/styles.js";
 import * as templates from "../templates/styles.js";
+import * as helpers from "../templates/styles.js";
+
 
 async function getStyles(req, reply) {
     const { baseurl, db } = this;
     const { contentType } = req;
 
-    if (contentType == "html") return reply.view("styles",{baseurl});
+    if (contentType == "html") return reply.view("styles", { baseurl });
     else {
         const styles = await model.getStyles(db);
         reply.send(templates.styles(baseurl, styles));
     }
-
 };
 
 async function getStyle(req, reply) {
     const { baseurl, db } = this;
     const { contentType } = req;
+
     const format = contentType.toUpperCase();
-    
+
     const { styleId } = req.params;
 
     if (!["MBS", "HTML"].includes(format)) reply.callNotFound();
@@ -26,39 +28,37 @@ async function getStyle(req, reply) {
 
     else {
         let stylesheet = await model.getStylesheet(db, styleId)
-        if(!stylesheet && styleId == "default") return reply.send(templates.emptyStylesheet(baseurl))
-        if(!stylesheet) reply.callNotFound();
-
+        if (!stylesheet && styleId == "default") return reply.send(templates.emptyStylesheet(baseurl))
+        if (!stylesheet) reply.callNotFound();
 
         stylesheet = stylesheet.replaceAll("{baseurl}", baseurl)
         reply.send(stylesheet)
     }
-
 };
+
 
 async function getResources(req, reply) {
     const { baseurl, db } = this;
+    const { contentType } = req;
 
-    const { f } = req.query;
-
-    if (f == "json") {
-        const resources = model.getResources(this.db);
-        reply.type('application/json').send(templates.resources(this.baseurl,resources));
+    if (contentType == "json") {
+        const resources = model.getResources(db);
+        reply.type('application/json').send(templates.resources(this.baseurl, resources));
     }
     else {
-        return reply.view("resources", {baseurl});
+        return reply.view("resources", { baseurl });
     }
 };
 
 async function getResource(req, reply) {
-    const { baseurl, db } = this;
-
+    const { db } = this;
     const { resourceId } = req.params;
 
-    const resources = model.getResource(this.db, resourceId);
+    const resources = model.getResource(db, resourceId);
 
     reply.send(resources);
 };
+
 
 async function getCollectionStyles(req, reply) {
     const { baseurl, db } = this;
@@ -88,8 +88,8 @@ async function getCollectionStyle(req, reply) {
 
     else {
         let stylesheet;
-        if (styleId == "default") stylesheet = templates.generateDefaultStylesheet(db, baseurl, collectionId)
-        else if (format == "MBS") stylesheet = await templates.convertStyleToMBS(baseurl, db, collectionId, styleId)
+        if (styleId == "default") stylesheet = helpers.generateDefaultStylesheet(db, baseurl, collectionId)
+        else if (format == "MBS") stylesheet = await helpers.convertStyleToMBS(baseurl, db, collectionId, styleId)
         else stylesheet = model.getCollectionStylesheet(db, collectionId, styleId, format)
 
         reply.send(stylesheet)

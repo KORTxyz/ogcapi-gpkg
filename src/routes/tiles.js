@@ -1,7 +1,9 @@
 import * as model from "../database/tiles.js"
+import * as helpers from "../helpers/tiles.js"
+import * as templates from "../templates/tiles.js"
+
 import * as modelCommon from "../database/common.js"
 
-import * as templates from "../templates/tiles.js"
 
 import isGzip from 'is-gzip';
 import { filetypemime } from 'magic-bytes.js';
@@ -44,7 +46,7 @@ async function getCollectionTile(req, reply) {
   const {data_type} = modelCommon.getCollection(this.db, collectionId)
 
   let tile;
-  if (data_type == 'features') tile = await model.getAsVectorTile(this.db, collectionId, tileMatrix, tileRow, tileCol, limit, properties)
+  if (data_type == 'features') tile = await helpers.getAsVectorTile(this.db, collectionId, tileMatrix, tileRow, tileCol, limit, properties)
 
   else tile = await model.getCollectionTile(this.db,collectionId, tileMatrix, tileRow, tileCol)
   if (tile) {
