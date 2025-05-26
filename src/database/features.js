@@ -1,115 +1,16 @@
-import { GeoPackageGeometryData } from '@ngageoint/geopackage'
-import { Projections } from '@ngageoint/projections-js'
-import { GeometryTransform } from '@ngageoint/simple-features-proj-js'
-import { FeatureConverter } from '@ngageoint/simple-features-geojson-js'
+import * as helpers from '../helpers/features.js'
 
 const getGeomMetadata = (db, collectionId) => db.prepare('SELECT column_name as geomColName, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
 
-const formatSelect = (properties, geomColName) => properties == undefined ? 'c.*,c.ROWID as ROWID ' : ["c.ROWID as ROWID", geomColName, properties].filter(Boolean).join(',');
-
-const noOptions = (options) => Object.keys(options).length > 0 && options.constructor === Object;
-
-const getWhereStatement = (options) => noOptions(options) ? Object.entries(options).map(e => e[0] + " = '" + decodeURI(e[1]) + "'").join(" AND ") : '1=1';
-
-const appendRthreeFilter = (whereStatement, bbox, srsId) => {
-    let [minX, minY, maxX, maxY] = bbox?.split(",").map(e => Number(e))
-
-    if (srsId != 4326) {
-        const geometryTransform = new GeometryTransform(
-            Projections.getWGS84Projection(),
-            Projections.getProjectionForName("EPSG:" + srsId)
-        )
-
-        bbox = geometryTransform.transformBounds(minX, minY, maxX, maxY)
-        return `${!whereStatement ? '' : whereStatement + ' AND '} ${bbox[2]} >= r.minx AND ${bbox[0]} <= r.maxx AND ${bbox[3]} >= r.miny AND ${bbox[1]} <= r.maxy`
-    }
-
-    return `${!whereStatement ? '' : whereStatement + ' AND '} ${maxX} >= r.minx AND ${minX} <= r.maxx AND ${maxY} >= r.miny AND ${minY} <= r.maxy`
-};
-
-const toGeoJSON = (feature, geomColName) => {
-    const { [geomColName]: geom, ROWID, ...properties } = feature;
-
-    let geoPackageGeometryData = new GeoPackageGeometryData(geom)
-    let geometry = geoPackageGeometryData.getGeometry();
-
-    if (!geometry) return;
-
-    const srid = geoPackageGeometryData.getSrsId();
-
-    if (srid != 4326) {
-        const geometryTransform = new GeometryTransform(
-            Projections.getProjectionForName("EPSG:" + srid),
-            Projections.getWGS84Projection()
-        )
-        geometry = geometryTransform.transformGeometry(geometry)
-    }
-
-    const featureGeometry = FeatureConverter.toFeatureGeometry(geometry)
-
-    return {
-        id: ROWID,
-        type: "Feature",
-        geometry: featureGeometry || null,
-        properties
-    }
-};
-
-const convertSQLITEtype = (type) => {
-    let datatype = type.match(/\w+/g);
-    const datatypes = {
-        "default": { type: "string" },
-        "INT": { type: "integer" },
-        "INTEGER": { type: "integer" },
-        "TINYINT": { type: "integer" },
-        "SMALLINT": { type: "integer" },
-        "MEDIUMINT": { type: "integer" },
-        "BIGINT": { type: "integer" },
-        "UNSIGNED BIG INT": { type: "integer" },
-        "INT2": { type: "integer" },
-        "INT8": { type: "integer" },
-        "CHARACTER(20)": { type: "string" },
-        "VARCHAR(255)": { type: "string" },
-        "VARYING CHARACTER(255)": { type: "string" },
-        "NCHAR": { type: "string" },
-        "NATIVE CHARACTER)": { type: "string" },
-        "NVARCHAR": { type: "string" },
-        "TEXT": { type: "string" },
-        "CLOB": { type: "string" },
-        "BLOB": { type: "string", "contentEncoding": "binary" },
-        "REAL": { type: "number" },
-        "DOUBLE": { type: "number" },
-        "DOUBLE PRECISION": { type: "number" },
-        "FLOAT": { type: "number" },
-        "NUMERIC": { type: "number" },
-        "DECIMAL": { type: "number" },
-        "BOOLEAN": { type: "boolean" },
-        "DATE": { type: "string", format: "date" },
-        "DATETIME": { type: "string", format: "date-time" }
-    }
-    let schemaDef = datatypes[datatype[0]] || datatypes["default"]
-    if (datatype[1]) schemaDef.maxLength = Number(datatype[1])
-    return schemaDef
-}
-
-const isGeometryType = type => ["POINT", "CURVE", "LINESTRING", "SURFACE", "CURVEPOLYGON", "POLYGON", "GEOMETRYCOLLECTION", "MULTISURFACE", "MULTIPOLYGON", "MULTICURVE", "MULTILINESTRING", "MULTIPOINT"].includes(type);
-
-const partition = (array, filter) => {
-    let pass = [], fail = [];
-    array.forEach((e, idx, arr) => (filter(e, idx, arr) ? pass : fail).push(e));
-    return [pass, fail];
-}
-
-
 const getItems = async (db, collectionId, limit, offset, bbox, properties, options) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
-    const select = formatSelect(properties, geomColName);
+    const select = helpers.formatSelect(properties, geomColName);
     let fromStatement = `${collectionId} c`;
 
-    let whereStatement = getWhereStatement(options);
+    let whereStatement = helpers.getWhereStatement(options);
     if (bbox) {
         fromStatement = `rtree_${collectionId}_${geomColName} r LEFT JOIN ${collectionId} c ON r.id=c.ROWID`;
-        whereStatement = appendRthreeFilter(whereStatement, bbox, srsId)
+        whereStatement = helpers.appendRthreeFilter(whereStatement, bbox, srsId)
     }
 
     const sql = `
@@ -121,7 +22,7 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
     `;
 
     const features = db.prepare(sql).all();
-    const geojsonfeatures = features.map(feature => toGeoJSON(feature, geomColName))
+    const geojsonfeatures = features.map(feature => helpers.toGeoJSON(feature, geomColName))
 
     return geojsonfeatures
 }
@@ -136,7 +37,7 @@ const getItem = async (db, collectionId, featureId) => {
     if (!feature) return;
     return {
         "type": "FeatureCollection",
-        "features": [toGeoJSON(feature, geomCol)]
+        "features": [helpers.toGeoJSON(feature, geomCol)]
     }
 };
 
@@ -145,13 +46,13 @@ const getSchema = (db, collectionId) => {
 
     let table_info = db.prepare(`SELECT name, type FROM pragma_table_info('${collectionId}')`).all()
 
-    let [geometryType, properties] = partition(table_info, column => isGeometryType(column.type));
+    let [geometryType, properties] = helpers.partition(table_info, column => helpers.isGeometryType(column.type));
 
     properties = properties.reduce((next, column) => {
-        return { ...next, [column.name]: { title: column.name, ...convertSQLITEtype(column.type) } };
+        return { ...next, [column.name]: { title: column.name, ...helpers.convertSQLITEtype(column.type) } };
     }, {})
 
-    geometryType = table_info.filter(column => isGeometryType(column.type))[0].type;
+    geometryType = table_info.filter(column => helpers.isGeometryType(column.type))[0].type;
 
     const existGpkgSchema = db.prepare("SELECT * from gpkg_extensions where extension_name='gpkg_schema'").get();
 
