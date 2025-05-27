@@ -42,6 +42,7 @@
     <h2 class="text-3xl font-bold">Links to the main resources</h2>
     <div class="flex flex-col">
       <a class="text-blue-500 text-xl" href="<%= it.baseurl %>/collections">Access the data</a>
+      <a class="text-blue-500 text-xl" href="<%= it.baseurl %>/tiles">Access the dataset as vector tiles</a>
       <a class="text-blue-500 text-xl" href="<%= it.baseurl %>/styles">Styles to render the data in maps</a>
       <a class="text-blue-500 text-xl" href="<%= it.baseurl %>/processes">Processing services</a>
     </div>

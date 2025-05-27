@@ -8,6 +8,8 @@ const getCollections = (db, q, keywords, limit, offset, bbox) => {
           ${whereClause} 
         AND 
           data_type != 'attributes'
+        AND
+          c.table_name != 'tiles'
       LIMIT ${limit || 999}
       OFFSET ${offset || 0}
     `).all();

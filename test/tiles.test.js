@@ -10,6 +10,14 @@ test('Testing OGC API - Tiles spec', async (t) => {
     // completes, it will cancel any outstanding subtests.
     const app = build()
 
+    await t.test('requests the "/tiles" route', async t => {
+        const response = await app.inject({
+            method: 'GET',
+            url: '/tiles'
+        })
+        assert.equal(response.statusCode, 200, 'returns a status code of 200')
+    });
+
     await t.test('requests the "/collections/points/tiles" route', async t => {
         const response = await app.inject({
             method: 'GET',
