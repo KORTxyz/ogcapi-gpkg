@@ -8,6 +8,53 @@ import * as modelCommon from "../database/common.js"
 import isGzip from 'is-gzip';
 import { filetypemime } from 'magic-bytes.js';
 
+async function getTilesets(req, reply) {
+  const { baseurl, db } = this;
+
+  const { contentType } = req;
+
+  const collection = modelCommon.getCollection(db, "tiles");
+
+  if (collection.data_type == "tiles") return reply.callNotFound();
+  if (contentType == "html") return reply.view("tilesets", {baseurl });
+
+  reply.send(templates.collectionTileSets(baseurl, collection));
+};
+
+async function getTileset(req, reply) {
+  const { baseurl, db } = this;
+
+  const { contentType } = req;
+
+  const collection = modelCommon.getCollection(db, "tiles")
+
+  if (contentType == "html") return reply.view("tileset", { baseurl });
+
+  const layers = collection.data_type == 'vector-tiles' ? await model.getVectorTilesSpec(db, collection.name) : [{"id": collection.name,"dataType":'vector'}];
+  
+  if (contentType == "json") reply.send(templates.collectionTileSet(baseurl, collection, layers));
+
+};
+
+async function getTile(req, reply) {
+  const { tileMatrix, tileRow, tileCol } = req.params;
+
+  let tile = await model.getCollectionTile(this.db,"tiles", tileMatrix, tileRow, tileCol);
+  
+  if (tile) {
+    if (typeof tile == "object") tile = Buffer.from(tile)
+    const gzip = await isGzip(tile)
+
+    reply
+      .header('Content-Type', 'application/vnd.mapbox-vector-tile')
+      .header('Content-Encoding', gzip ? 'gzip' : 'none')
+      .send(tile)
+  }
+  else {
+    reply.status(404).send()
+  }
+
+};
 
 async function getCollectionTilesets(req, reply) {
   const { baseurl, db } = this;
@@ -18,7 +65,7 @@ async function getCollectionTilesets(req, reply) {
   const collection = modelCommon.getCollection(db, collectionId);
 
   if (collection.data_type == "tiles") return reply.callNotFound();
-  if (contentType == "html") return reply.view("tilesets", {baseurl, collectionId });
+  if (contentType == "html") return reply.view("collectiontilesets", {baseurl, collectionId });
 
   reply.send(templates.collectionTileSets(baseurl, collection));
 };
@@ -141,6 +188,10 @@ async function getTileMatrixSet(req, reply) {
 
 
 export {
+  getTilesets,
+  getTileset,
+  getTile,
+
   getCollectionTilesets,
   getCollectionTileset,
   getCollectionTile,

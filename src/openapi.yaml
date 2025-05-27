@@ -26,6 +26,9 @@ tags:
     x-displayName: Tile Matrix Sets
   - name: Tiles
     description: Data partitioned into a hierarchy of tiles of a collection
+    x-displayName: Dataset Tiles
+  - name: Tiles
+    description: Data partitioned into a hierarchy of tiles of a collection
     x-displayName: Collection Tiles
   - name: Styles
     description: Styles to render a map
@@ -44,6 +47,7 @@ x-tagGroups:
   - name: OGC API - Tiles
     tags:
       - Tile Matrix Sets
+      - Dataset Tiles
       - Collection Tiles
   - name: OGC API - Styles
     tags:
@@ -475,6 +479,94 @@ paths:
       description: Fetches a single tile from a collection
       parameters:
         - $ref: "#/components/parameters/collectionId"
+        - $ref: "#/components/parameters/tileMatrixSetId"
+        - $ref: "#/components/parameters/tileMatrix"
+        - $ref: "#/components/parameters/tileRow"
+        - $ref: "#/components/parameters/tileCol"
+      responses:
+        200:
+          description: Tile
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        400:
+          $ref: "#/components/responses/ServerError"
+      security:
+        - {}
+  /tiles:
+    get:
+      operationId: getTilesets
+      tags:
+        - Dataset Tiles
+      summary: get Tilesets
+      description: Fetch a list of tilematrixsets
+      responses:
+        200:
+          description: List of available tilesets.
+          content:
+            text/html:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: object
+                required:
+                  - tilesets
+                properties:
+                  links:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/link"
+                  tilesets:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/tileSet"
+        400:
+          $ref: "#/components/responses/ServerError"
+      security:
+        - {}
+  /tiles/{tileMatrixSetId}:
+    get:
+      operationId: getTileset
+      tags:
+        - Dataset Tiles
+      summary: get Tileset
+      description: Fetch description of a specific tilematrixset
+      parameters:
+        - $ref: "#/components/parameters/tileMatrixSetId"
+        - $ref: "#/components/parameters/fTileset"
+      responses:
+        200:
+          description: Description of the tileset
+          content:
+            text/html:
+              schema:
+                type: string
+            application/tilejson:
+              schema:
+                type: object
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tileSet"
+              examples:
+                tileSet:
+                  $ref: "#/components/examples/tileSet"
+
+        400:
+          $ref: "#/components/responses/ServerError"
+
+      security:
+        - {}
+  /tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      operationId: getTile
+      tags:
+        - Dataset Tiles
+      summary: get Tile
+      description: Fetches a single tile from a collection
+      parameters:
         - $ref: "#/components/parameters/tileMatrixSetId"
         - $ref: "#/components/parameters/tileMatrix"
         - $ref: "#/components/parameters/tileRow"
