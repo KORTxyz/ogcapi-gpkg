@@ -6,8 +6,7 @@
 
   <link href="../../assets/tailwind.css" rel="stylesheet" />
 
-  <script nonce="swZ7bunhoIt1ZuQOntvNmJYbP/ra7XRwL7WVEgsg8iE=" type="module"
-    src="../../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
+  <script type="module" src="../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
 
 </head>
 
