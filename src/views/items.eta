@@ -59,7 +59,10 @@
   </kortxyz-maplibre>
   <div id="resizer" class="basis-1 grow-0	shrink-0	bg-gray-900 cursor-ns-resize" onmousedown="initResize(event)"></div>
 
-  <kortxyz-aggrid store="items" class="grow shrink"></kortxyz-aggrid>
+  <kortxyz-aggrid class="grow shrink"
+    store="items"
+    schema="<%= it.baseurl %>/collections/<%= it.collectionId %>/schema"
+  ></kortxyz-aggrid>
 
   <script>
     Resize = e => {
