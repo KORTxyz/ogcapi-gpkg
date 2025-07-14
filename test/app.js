@@ -10,12 +10,7 @@ import { Eta } from "eta"
 
 const build = (opts = {}) => {
     const app = Fastify({
-        ...opts,
-        ajv: {
-            customOptions: {
-                keywords: ["example"]
-            },
-        }
+        ...opts
     })
     const __dirname = dirname(fileURLToPath(import.meta.url));
     
