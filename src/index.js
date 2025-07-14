@@ -21,6 +21,8 @@ async function readYaml() {
     return yaml.load(openapiFile);
 }
 
+const removeExampletags = obj => JSON.parse(JSON.stringify(obj, (k, v) => k === "example" ? undefined : v));
+
 const ogcapi = async (fastify, options) => {
     const { gpkg, skipLandingpage, baseurl="http://127.0.0.1:3000", prefix='' } = options;
     
@@ -57,9 +59,9 @@ const ogcapi = async (fastify, options) => {
     fastify.addContentTypeParser('application/geo+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
     fastify.addContentTypeParser('application/tilejson', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
     fastify.addContentTypeParser('application/vnd.mapbox.style+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
-
+    
     fastify.register(openapiGlue, {
-        specification: fastify.api,
+        specification: removeExampletags(fastify.api),
         serviceHandlers: new Service(fastify, baseurl+prefix),
     });
 
