@@ -36,7 +36,6 @@ async function getItem(req, reply) {
     const { contentType } = req;
 
     const { collectionId, featureId } = req.params;
-    console.log(featureId)
     if(contentType == "html") return reply.view("item", { baseurl, collectionId, featureId });
 
     const feature = await model.getItem(db, collectionId, featureId)

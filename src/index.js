@@ -22,12 +22,11 @@ async function readYaml() {
 }
 
 const ogcapi = async (fastify, options) => {
-    const { gpkg, skipLandingpage, baseurl="http://127.0.0.1:3000", prefix='' } = options;
-    
+    const { gpkg, skipLandingpage, webapp, baseurl="http://127.0.0.1:3000", prefix='' } = options;
     fastify.decorate('api', await readYaml())
-
+    
     fastify.api.servers[0].url = baseurl+prefix;
-
+    
     if (skipLandingpage) delete fastify.api.paths["/"]
 
     fastify.decorate('db', await initDb(gpkg))
@@ -60,7 +59,7 @@ const ogcapi = async (fastify, options) => {
 
     fastify.register(openapiGlue, {
         specification: fastify.api,
-        serviceHandlers: new Service(fastify, baseurl+prefix),
+        serviceHandlers: new Service(fastify, fastify.api.servers[0].url,webapp),
     });
 
 }

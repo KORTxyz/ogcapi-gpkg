@@ -26,8 +26,9 @@ const build = (opts = {}) => {
 
     app.register(ogcapi, {
         baseurl: process.env.BASEURL,
-        gpkg: process.env.GPKG, 
-        skipLandingpage: false
+        gpkg: process.env.GPKG,
+        skipLandingpage: false,
+        webapp:true
     });
 
     return app

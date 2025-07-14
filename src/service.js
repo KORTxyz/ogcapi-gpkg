@@ -4,11 +4,13 @@ import * as Tiles from "./routes/tiles.js";
 import * as Styles from "./routes/styles.js";
 
 class Service {
-    constructor(fastify, baseurl) {
+    constructor(fastify, baseurl, webapp) {
         this.db = fastify.db;
         this.api = fastify.api;
-        this.baseurl = baseurl;
         this.fastify = fastify;
+
+        this.baseurl = baseurl;
+        this.webapp = webapp;
     }
 }
 

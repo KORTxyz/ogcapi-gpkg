@@ -2,13 +2,16 @@ import * as model from '../database/common.js';
 import * as templates from '../templates/common.js';
 
 async function getLandingpage(req, reply) {
-  const { baseurl } = this;
+  const { baseurl, webapp} = this;
   const { contentType } = req;
 
   if (contentType == "json") {
     reply.send(templates.landingPage(baseurl))
   }
-  else if (contentType == "html") return reply.view("landingpage", {baseurl});
+  else if (contentType == "html") {
+    if(webapp) return reply.view("webapp", {baseurl})
+    else return reply.view("landingpage", {baseurl})
+  };
 };
 
 

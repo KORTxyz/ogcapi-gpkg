@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="<%= it.baseurl %>/assets/tailwind.css" rel="stylesheet" />
+
+  <script type="module" src="<%= it.baseurl %>/assets/kortxyz-components/kortxyz-components.esm.js"></script>
+  <link rel="stylesheet" href="<%= it.baseurl %>/assets/kortxyz-components/kortxyz-components.css" />
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    kortxyz-shell {
+      height: 100vh;
+      width: 100vw;
+      position: absolute;
+      z-index: 10;
+    }
+  </style>
+  <title>OGC API</title>
+</head>
+
+<body class="bg-neutral-800 text-neutral-400 flex h-screen">
+    <kortxyz-shell>
+    <kortxyz-sidebar slot="left">
+
+      <kortxyz-sidebar-button title="Add collection from a OGCAPI" panel="Collections" icon="collections"></kortxyz-sidebar-button>
+      <kortxyz-sidebar-panel id="Collections">
+        <kortxyz-ogcapi-collectionlist url="<%= it.baseurl %>"></kortxyz-ogcapi-collectionlist>
+      </kortxyz-sidebar-panel>
+
+      <kortxyz-sidebar-button title="Show layers on the map" panel="Layers" icon="layers"></kortxyz-sidebar-button>
+      <kortxyz-sidebar-panel id="Layers">
+        <kortxyz-maplibre-layerlist></kortxyz-maplibre-layerlist>
+      </kortxyz-sidebar-panel>
+
+    </kortxyz-sidebar>
+
+  </kortxyz-shell>
+  <kortxyz-maplibre class="flex-1" 
+    mapstyle="<%=it.baseurl%>/styles/default?f=mbs">
+  </kortxyz-maplibre>
+
+  <script>
+
+  </script>
+</body>
+
+</html>
