@@ -27,7 +27,26 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
     return geojsonfeatures
 }
 
+const postItems = async (db, collectionId, geojson) => {
+    const { geomCol, srsId } = db.prepare('SELECT column_name as geomCol, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?', [collectionId]).get(collectionId);
 
+    for (const feature of geojson.features) {
+
+        const geometryData = helpers.toGPGKgeometry(feature,srsId);
+
+        const sql = `
+            INSERT INTO ${collectionId}(${[...Object.keys(feature.properties), geomCol].join(",")})
+            VALUES (${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")});
+        `
+        db.prepare(sql).run(Object.values(feature.properties), geometryData);
+
+        
+
+    }
+    //TODO: add update of gpkg_content metadata last_change, bbox
+    
+    return {}
+}
 
 const getItem = async (db, collectionId, featureId) => {
     const { geomCol } = db.prepare('SELECT column_name as geomCol FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
@@ -81,6 +100,7 @@ const getSchema = (db, collectionId) => {
 
 export {
     getItems,
+    postItems,
     getItem,
     getSchema
 }

@@ -1,7 +1,8 @@
-import { GeoPackageGeometryData } from '@ngageoint/geopackage'
+import { GeoPackageGeometryData  } from '@ngageoint/geopackage'
 import { Projections } from '@ngageoint/projections-js'
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js'
 import { FeatureConverter } from '@ngageoint/simple-features-geojson-js'
+
 
 const formatSelect = (properties, geomColName) => properties == undefined ? 'c.*,c.ROWID as ROWID ' : ["c.ROWID as ROWID", geomColName, properties].filter(Boolean).join(',');
 
@@ -100,12 +101,32 @@ const partition = (array, filter) => {
     return [pass, fail];
 }
 
+const toGPGKgeometry = (feature, srsId) => {
+    const geometry = FeatureConverter.toSimpleFeaturesGeometry(feature);
+    
+    if(srsId != 4326){
+        const geometryTransform = new GeometryTransform(
+            Projections.getWGS84Projection(),
+            Projections.getProjectionForName("EPSG:" + srsId),
+        );
+        geometry = geometryTransform.transformGeometry(geometry);
+    }
+
+    const geomData = new GeoPackageGeometryData(null);
+    geomData.setSrsId(srsId);
+    geomData.setGeometry(geometry);
+    const gpkgBuffer = geomData.toBuffer();
+
+    return gpkgBuffer
+}
+
 
 export {
     formatSelect,
     getWhereStatement,
     appendRthreeFilter,
     toGeoJSON,
+    toGPGKgeometry,
     convertSQLITEtype,
     isGeometryType,
     partition

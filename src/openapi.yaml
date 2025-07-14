@@ -195,11 +195,11 @@ paths:
         description: features to be added as geojson
         required: true
         content:
-          application/json:
+          application/geo+json:
             schema:
               $ref: "#/components/schemas/featureCollectionGeoJSON"
       responses:
-        200:
+        201:
           description: Success
         400:
           $ref: "#/components/responses/ServerError"
@@ -218,6 +218,75 @@ paths:
       responses:
         200:
           $ref: "#/components/responses/Feature"
+        400:
+          $ref: "#/components/responses/ServerError"
+      security:
+        - {}
+    put:
+      operationId: putItem
+      tags:
+        - Features
+      summary: put Item
+      description: Replace a specific feature in the collection
+      parameters:
+        - $ref: "#/components/parameters/collectionId"
+        - $ref: "#/components/parameters/featureId"
+      requestBody:
+        description: features to be added as geojson
+        required: true
+        content:
+          application/geo+json:
+            schema:
+              $ref: "#/components/schemas/featureCollectionGeoJSON"
+      responses:
+        200:
+          description: Success
+        400:
+          $ref: "#/components/responses/ServerError"
+      security:
+        - {}
+    patch:
+      operationId: patchItem
+      tags:
+        - Features
+      summary: patch Item
+      description: Modify a specific feature in the collection
+      parameters:
+        - $ref: "#/components/parameters/collectionId"
+        - $ref: "#/components/parameters/featureId"
+      requestBody:
+        description: features to be added as geojson
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/featureCollectionGeoJSON"
+      responses:
+        200:
+          description: Success
+        400:
+          $ref: "#/components/responses/ServerError"
+      security:
+        - {}
+    delete:
+      operationId: deleteItem
+      tags:
+        - Features
+      summary: delete Item
+      description: Delete a specific feature in the collection
+      parameters:
+        - $ref: "#/components/parameters/collectionId"
+        - $ref: "#/components/parameters/featureId"
+      requestBody:
+        description: features to be added as geojson
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/featureCollectionGeoJSON"
+      responses:
+        200:
+          description: Success
         400:
           $ref: "#/components/responses/ServerError"
       security:
@@ -289,8 +358,8 @@ paths:
 
       security:
         - {}
-  ? /collections/{collectionId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileCol}/{tileRow}
-  : get:
+  /collections/{collectionId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileCol}/{tileRow}: 
+    get:
       operationId: getCollectionMapTile
       tags:
         - Collection Tiles
@@ -1979,10 +2048,6 @@ components:
           allOf:
             - description: Last layer change/revision
             - $ref: '#/components/schemas/timeStamp'
-        #style:
-        #  allOf:
-        #    - description: Style used to generate the layer in the tileset
-        #    - $ref: 'style.yaml'
         geoDataClasses:
           description: URI identifying a class of data contained in this layer (useful
             to determine compatibility with styles or processes)

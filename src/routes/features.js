@@ -24,10 +24,10 @@ async function postItems(req, reply){
     const { baseurl, db } = this;
 
     const { collectionId } = req.params;
-    
-    await model.postItems(collectionId, req.body)
+    console.log(collectionId, req.body)
+    await model.postItems(db, collectionId, req.body)
 
-    reply.status(200).send({ ok: true })
+    reply.status(201).send({ Location: baseurl+'/collections/oakland_buildings/items/OB.2' })
 };
 
 async function getItem(req, reply) {
@@ -65,6 +65,7 @@ async function getSchema(req, reply){
 
 export {
     getItems,
+    postItems,
     getItem,
     getSchema
 }
