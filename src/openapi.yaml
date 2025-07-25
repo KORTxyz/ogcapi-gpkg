@@ -237,7 +237,7 @@ paths:
         content:
           application/geo+json:
             schema:
-              $ref: "#/components/schemas/featureCollectionGeoJSON"
+              $ref: "#/components/schemas/featureGeoJSON"
       responses:
         200:
           description: Success
@@ -260,9 +260,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/featureCollectionGeoJSON"
+              $ref: "#/components/schemas/featureGeoJSON"
       responses:
-        200:
+        204:
           description: Success
         400:
           $ref: "#/components/responses/ServerError"
@@ -277,15 +277,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/collectionId"
         - $ref: "#/components/parameters/featureId"
-      requestBody:
-        description: features to be added as geojson
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/featureCollectionGeoJSON"
       responses:
-        200:
+        204:
           description: Success
         400:
           $ref: "#/components/responses/ServerError"
@@ -1348,6 +1341,7 @@ components:
             $ref: "#/components/schemas/collection"
     pointGeoJSON:
       type: object
+      nullable: true
       required:
         - type
         - coordinates
@@ -1478,6 +1472,7 @@ components:
           enum:
             - Feature
         geometry:
+          nullable: true
           $ref: "#/components/schemas/geometryGeoJSON"
         properties:
           type: object

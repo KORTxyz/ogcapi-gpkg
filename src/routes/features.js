@@ -22,12 +22,11 @@ async function getItems(req, reply) {
 
 async function postItems(req, reply){
     const { baseurl, db } = this;
-
     const { collectionId } = req.params;
-    console.log(collectionId, req.body)
-    await model.postItems(db, collectionId, req.body)
 
-    reply.status(201).send({ Location: baseurl+'/collections/oakland_buildings/items/OB.2' })
+    const featureid = await model.postItems(db, collectionId, req.body)
+
+    reply.status(201).send({ Location: baseurl+'/collections/'+collectionId+'/items/'+featureid })
 };
 
 async function getItem(req, reply) {
@@ -36,7 +35,6 @@ async function getItem(req, reply) {
     const { contentType } = req;
 
     const { collectionId, featureId } = req.params;
-    console.log(featureId)
     if(contentType == "html") return reply.view("item", { baseurl, collectionId, featureId });
 
     const feature = await model.getItem(db, collectionId, featureId)
@@ -47,9 +45,26 @@ async function getItem(req, reply) {
 
 //putItem
 
-//patchItem
 
-//deleteItem
+async function patchItem(req, reply){
+    const { db } = this;
+    const { collectionId, featureId } = req.params;
+
+    const {changes} = await model.patchItem(db, collectionId, featureId, req.body)
+
+    if(changes === 0 ) return reply.status(404).send({ error: 'Feature not found.' });
+    reply.status(204).send();
+};
+
+async function deleteItem(req, reply){
+    const { db } = this;
+    const { collectionId, featureId } = req.params;
+
+    const {changes} = await model.deleteItem(db, collectionId, featureId)
+
+    if(changes === 0 ) return reply.status(404).send({ error: 'Feature not found.' });
+    reply.status(204).send();
+};
 
 async function getSchema(req, reply){
     const { collectionId } = req.params;
@@ -67,5 +82,7 @@ export {
     getItems,
     postItems,
     getItem,
+    patchItem,
+    deleteItem,
     getSchema
 }

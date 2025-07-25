@@ -27,38 +27,61 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
     return geojsonfeatures
 }
 
-const postItems = async (db, collectionId, geojson) => {
-    const { geomCol, srsId } = db.prepare('SELECT column_name as geomCol, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?', [collectionId]).get(collectionId);
+const postItems = async (db, collectionId, feature) => {
+    const { geomColName, srsId } = getGeomMetadata(db, collectionId);
 
-    for (const feature of geojson.features) {
+    const geometryData = helpers.toGPGKgeometry(feature, srsId);
 
-        const geometryData = helpers.toGPGKgeometry(feature,srsId);
+    const sql = `
+        INSERT INTO ${collectionId}(${[...Object.keys(feature.properties), geomColName].join(",")})
+        VALUES (${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")});
+    `;
+    const stmt = db.prepare(sql);
 
-        const sql = `
-            INSERT INTO ${collectionId}(${[...Object.keys(feature.properties), geomCol].join(",")})
-            VALUES (${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")});
-        `
-        db.prepare(sql).run(Object.values(feature.properties), geometryData);
+    const result = stmt.run(Object.values(feature.properties), geometryData);
 
-        
+    //TODO: add update of gpkg_content metadata last_change, bbox, Rthree.
 
-    }
-    //TODO: add update of gpkg_content metadata last_change, bbox
-    
-    return {}
+    return result.lastInsertRowid
 }
 
 const getItem = async (db, collectionId, featureId) => {
-    const { geomCol } = db.prepare('SELECT column_name as geomCol FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
+    const { geomColName } = getGeomMetadata(db, collectionId);
 
     const feature = db.prepare(`SELECT *,ROWID as ROWID FROM ${collectionId} WHERE ROWID=?`).get(featureId);
 
     if (!feature) return;
     return {
         "type": "FeatureCollection",
-        "features": [helpers.toGeoJSON(feature, geomCol)]
+        "features": [helpers.toGeoJSON(feature, geomColName)]
     }
 };
+
+const patchItem = async (db, collectionId, featureId, feature) => {
+
+    let fields = Object.keys(feature.properties).map(key => `${key} = @${key}`);
+
+    let params = {
+        ...feature.properties,
+        rowid: featureId
+    };
+
+    if (feature.geometry !== null) {
+        const { geomColName, srsId } = getGeomMetadata(db, collectionId);
+        fields = [...fields, `${geomColName} = @geom`]
+        params.geom = helpers.toGPGKgeometry(feature, srsId);
+    }
+
+    const stmt = db.prepare(`
+        UPDATE ${collectionId}
+        SET ${fields.join(', ')}
+        WHERE rowid = @rowid
+    `);
+
+    return stmt.run(params);
+};
+
+const deleteItem = async (db, collectionId, featureId) => db.prepare(`DELETE FROM ${collectionId} WHERE rowid = ?`).run(featureId);
 
 
 const getSchema = (db, collectionId) => {
@@ -102,5 +125,7 @@ export {
     getItems,
     postItems,
     getItem,
+    patchItem,
+    deleteItem,
     getSchema
 }
