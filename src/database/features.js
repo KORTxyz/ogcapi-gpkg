@@ -1,6 +1,8 @@
 import * as helpers from '../helpers/features.js'
 
+
 const getGeomMetadata = (db, collectionId) => db.prepare('SELECT column_name as geomColName, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
+
 
 const getItems = async (db, collectionId, limit, offset, bbox, properties, options) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
@@ -27,6 +29,7 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
     return geojsonfeatures
 }
 
+
 const postItems = async (db, collectionId, feature) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
 
@@ -38,12 +41,11 @@ const postItems = async (db, collectionId, feature) => {
     `;
     const stmt = db.prepare(sql);
 
-    const result = stmt.run(Object.values(feature.properties), geometryData);
-
     //TODO: add update of gpkg_content metadata last_change, bbox, Rthree.
 
-    return result.lastInsertRowid
+    return stmt.run(Object.values(feature.properties), geometryData);
 }
+
 
 const getItem = async (db, collectionId, featureId) => {
     const { geomColName } = getGeomMetadata(db, collectionId);
@@ -56,6 +58,22 @@ const getItem = async (db, collectionId, featureId) => {
         "features": [helpers.toGeoJSON(feature, geomColName)]
     }
 };
+
+
+const putItem = async (db, collectionId, featureId, feature) => {
+    const { geomColName, srsId } = getGeomMetadata(db, collectionId);
+
+    const geometryData = helpers.toGPGKgeometry(feature, srsId);
+
+    const sql = `
+        INSERT OR REPLACE INTO ${collectionId}(rowid, ${[...Object.keys(feature.properties), geomColName].join(",")})
+        VALUES (${featureId}, ${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")});
+    `;
+    const stmt = db.prepare(sql);
+
+    return stmt.run(Object.values(feature.properties), geometryData);
+};
+
 
 const patchItem = async (db, collectionId, featureId, feature) => {
 
@@ -80,6 +98,7 @@ const patchItem = async (db, collectionId, featureId, feature) => {
 
     return stmt.run(params);
 };
+
 
 const deleteItem = async (db, collectionId, featureId) => db.prepare(`DELETE FROM ${collectionId} WHERE rowid = ?`).run(featureId);
 
@@ -125,6 +144,7 @@ export {
     getItems,
     postItems,
     getItem,
+    putItem,
     patchItem,
     deleteItem,
     getSchema
