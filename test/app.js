@@ -13,7 +13,7 @@ const build = (opts = {}) => {
         ...opts
     })
     const __dirname = dirname(fileURLToPath(import.meta.url));
-    
+
     app.register(fastifyView, {
         engine: { eta: new Eta() },
         templates: `${__dirname}/views2`,
@@ -21,8 +21,9 @@ const build = (opts = {}) => {
 
     app.register(ogcapi, {
         baseurl: process.env.BASEURL,
-        gpkg: process.env.GPKG, 
-        skipLandingpage: false
+        gpkg: process.env.GPKG,
+        skipLandingpage: false,
+        readonly: false
     });
 
     return app

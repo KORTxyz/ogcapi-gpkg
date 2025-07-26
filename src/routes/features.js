@@ -20,15 +20,15 @@ async function getItems(req, reply) {
 };
 
 
-async function postItems(req, reply){
+async function postItems(req, reply) {
     const { baseurl, db } = this;
-
     const { collectionId } = req.params;
-    
-    await model.postItems(collectionId, req.body)
 
-    reply.status(200).send({ ok: true })
+    const { lastInsertRowid } = await model.postItems(db, collectionId, req.body)
+
+    reply.status(201).send({ Location: baseurl + '/collections/' + collectionId + '/items/' + lastInsertRowid })
 };
+
 
 async function getItem(req, reply) {
     const { baseurl, db } = this;
@@ -36,28 +36,54 @@ async function getItem(req, reply) {
     const { contentType } = req;
 
     const { collectionId, featureId } = req.params;
-    console.log(featureId)
-    if(contentType == "html") return reply.view("item", { baseurl, collectionId, featureId });
+    if (contentType == "html") return reply.view("item", { baseurl, collectionId, featureId });
 
     const feature = await model.getItem(db, collectionId, featureId)
-    if(!feature) reply.status(404);
+    if (!feature) reply.status(404);
 
     reply.type('application/json').send(feature);
 };
 
-//putItem
 
-//patchItem
+async function putItem(req, reply) {
+    const { baseurl, db } = this;
+    const { collectionId, featureId } = req.params;
 
-//deleteItem
+    const { lastInsertRowid } = await model.putItem(db, collectionId, featureId, req.body)
 
-async function getSchema(req, reply){
+    reply.status(201).send({ Location: baseurl + '/collections/' + collectionId + '/items/' + lastInsertRowid })
+};
+
+
+async function patchItem(req, reply) {
+    const { db } = this;
+    const { collectionId, featureId } = req.params;
+
+    const { changes } = await model.patchItem(db, collectionId, featureId, req.body)
+
+    if (changes === 0) return reply.status(404).send({ error: 'Feature not found.' });
+    reply.status(204).send();
+};
+
+
+async function deleteItem(req, reply) {
+    const { db } = this;
+    const { collectionId, featureId } = req.params;
+
+    const { changes } = await model.deleteItem(db, collectionId, featureId)
+
+    if (changes === 0) return reply.status(404).send({ error: 'Feature not found.' });
+    reply.status(204).send();
+};
+
+
+async function getSchema(req, reply) {
     const { collectionId } = req.params;
     const { f } = req.query;
 
     const { properties, geometryType } = await model.getSchema(this.db, collectionId)
 
-    reply.type('application/json').send(templates.schema(this.baseurl,collectionId, properties, geometryType));
+    reply.type('application/json').send(templates.schema(this.baseurl, collectionId, properties, geometryType));
 
 };
 
@@ -65,6 +91,10 @@ async function getSchema(req, reply){
 
 export {
     getItems,
+    postItems,
     getItem,
+    putItem,
+    patchItem,
+    deleteItem,
     getSchema
 }

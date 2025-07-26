@@ -1,4 +1,4 @@
-import GeoPackageGeometryData from '@ngageoint/geopackage'
+import { GeoPackageGeometryData  } from '@ngageoint/geopackage'
 import Database from 'better-sqlite3';
 
 const initDb = async (databasePath) => {

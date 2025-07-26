@@ -43,45 +43,40 @@
       target="_blank">JSON</a>
   </header>
 
-  <script>
-    let url = new URL(location.href);
-    url.searchParams.set("f", "json")
-    
-    const datastore = document.createElement("kortxyz-datastore");
-    datastore.store = "items";
-    datastore.data = url;
-    document.body.append(datastore);
-  </script>
+  <body>
 
-  <kortxyz-maplibre class="basis-1/2 grow-0	shrink-0"
-    mapstyle="<%= it.baseurl %>/styles/default?f=mbs">
-    <kortxyz-maplibre-source id="items" type="geojson" store="items" autolayers fit></kortxyz-maplibre-source>
-  </kortxyz-maplibre>
-  <div id="resizer" class="basis-1 grow-0	shrink-0	bg-gray-900 cursor-ns-resize" onmousedown="initResize(event)"></div>
+    <kortxyz-datastore store="items"
+      data="<%= it.baseurl %>/collections/<%= it.collectionId %>/items?f=json"></kortxyz-datastore>
 
-  <kortxyz-aggrid class="grow shrink"
-    store="items"
-    schema="<%= it.baseurl %>/collections/<%= it.collectionId %>/schema"
-  ></kortxyz-aggrid>
+    <kortxyz-maplibre class="basis-1/2 grow-0	shrink-0" mapstyle="<%= it.baseurl %>/styles/default?f=mbs">
+      <kortxyz-maplibre-source type="geojson" store="items" fit></kortxyz-maplibre-source>
+    </kortxyz-maplibre>
 
-  <script>
-    Resize = e => {
-      document.querySelector("kortxyz-maplibre").style.flexBasis = e.clientY + "px";
-      map.resize()
-    }
+    <div id="resizer" class="basis-1 grow-0	shrink-0	bg-gray-900 cursor-ns-resize" onmousedown="initResize(event)">
+    </div>
 
-    initResize = _ => {
-      document.body.style.cursor = 'ns-resize';
-      window.addEventListener('mousemove', this.Resize, false);
-      window.addEventListener('mouseup', this.stopResize, false);
-    }
+    <kortxyz-aggrid class="grow shrink" store="items"
+      schema="<%= it.baseurl %>/collections/<%= it.collectionId %>/schema">
+    </kortxyz-aggrid>
 
-    stopResize = _ => {
-      document.body.style.cursor = '';
-      window.removeEventListener('mousemove', this.Resize, false);
-      window.removeEventListener('mouseup', this.stopResize, false);
-    }
-  </script>
-</body>
+    <script>
+      Resize = e => {
+        document.querySelector("kortxyz-maplibre").style.flexBasis = e.clientY + "px";
+        map.resize()
+      }
+
+      initResize = _ => {
+        document.body.style.cursor = 'ns-resize';
+        window.addEventListener('mousemove', this.Resize, false);
+        window.addEventListener('mouseup', this.stopResize, false);
+      }
+
+      stopResize = _ => {
+        document.body.style.cursor = '';
+        window.removeEventListener('mousemove', this.Resize, false);
+        window.removeEventListener('mouseup', this.stopResize, false);
+      }
+    </script>
+  </body>
 
 </html>
