@@ -57,7 +57,7 @@
         return `
           <div class="bg-neutral-700 pl-5 pt-5 h-60 hover:cursor-pointer hover:bg-neutral-600 flex flex-col" onclick="window.location='collections/${collection.id}'">
             <div class="text-xs mb-2 capitalize">${collection.itemType}</div>
-            <div class="text-neutral-100 hover:underline shrink-0 text-xl mb-4 font-bold truncate pr-5" title=${collection.title} >${collection.title}</div>
+            <div class="text-neutral-100 hover:underline shrink-0 text-xl mb-4 font-bold truncate pr-5" title=${collection.title || collection.id} >${collection.title || collection.id}</div>
             <div class="pr-5 text-sm overflow-clip" title="${collection.description}">${collection.description || "No description"}</div>
             <div id="spacer" class="flex-1"></div>
             <div id="toolbar" class="flex justify-end">
