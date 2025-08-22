@@ -10,10 +10,10 @@ const initDb = async (databasePath) => {
     process.on('SIGTERM', () => process.exit(128 + 15));
 
     db.function('ST_IsEmpty', (geom) => geom === null ? 1 : 0);
-    db.function('ST_MinX', (geom) => GeometryReader.readGeometry(geom.slice(40).getEnvelope())._minX);
-    db.function('ST_MinY', (geom) => GeometryReader.readGeometry(geom.slice(40).getEnvelope())._minY);
-    db.function('ST_MaxX', (geom) => GeometryReader.readGeometry(geom.slice(40).getEnvelope())._maxX);
-    db.function('ST_MaxY', (geom) => GeometryReader.readGeometry(geom.slice(40).getEnvelope())._maxY);
+    db.function('ST_MinX', (geom) => GeometryReader.readGeometry(geom.slice(40)).getEnvelope()._minX);
+    db.function('ST_MinY', (geom) => GeometryReader.readGeometry(geom.slice(40)).getEnvelope()._minY);
+    db.function('ST_MaxX', (geom) => GeometryReader.readGeometry(geom.slice(40)).getEnvelope()._maxX);
+    db.function('ST_MaxY', (geom) => GeometryReader.readGeometry(geom.slice(40)).getEnvelope()._maxY);
 
     db.pragma('journal_mode = WAL');
 

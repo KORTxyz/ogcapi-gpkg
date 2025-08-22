@@ -82,7 +82,7 @@ async function getSchema(req, reply) {
     const { f } = req.query;
 
     const { properties, geometryType } = await model.getSchema(this.db, collectionId)
-
+    console.log(properties,geometryType)
     reply.type('application/json').send(templates.schema(this.baseurl, collectionId, properties, geometryType));
 
 };
