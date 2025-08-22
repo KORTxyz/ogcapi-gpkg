@@ -14,9 +14,11 @@ const server = build({
   // https: { key: pems.private, cert: pems.cert }
 })
 
-await server.register(cors)
+await server.register(cors,{
+  methods:['GET', 'PUT', 'POST', 'PATCH','OPTIONS']
+})
 
-server.listen({ port: 3000, host: '127.0.0.1' }, (err, address) => {
+server.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {
   //console.log(server.printRoutes())
   if (err) {
     server.log.error(err)

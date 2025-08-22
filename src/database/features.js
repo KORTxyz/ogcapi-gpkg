@@ -1,12 +1,35 @@
 import * as helpers from '../helpers/features.js'
 
-
 const getGeomMetadata = (db, collectionId) => db.prepare('SELECT column_name as geomColName, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
 
+const getTableinfo = (db, collectionId) => db.prepare('SELECT name, type, pk FROM pragma_table_info(?)').all(collectionId);
+
+const getDataColumns = (db, collectionId) => {
+    db.prepare(`
+            SELECT a.column_name, a.title, a.description,'[' || group_concat('{"type": "string", "const":"' || b.value || '","description":"' || b.description || '"}', ',') || ']' as "values" 
+            FROM gpkg_data_columns a
+            LEFT JOIN gpkg_data_column_constraints b ON a.constraint_name=b.constraint_name 
+            WHERE a.table_name = ?
+            GROUP BY a.column_name, a.title, a.description
+        `).all(collectionId);
+
+    return data_columns.map(column => ({
+        name: column.column_name,
+        properties: {
+            title: column.title,
+            description: column.description,
+            ...(column.values ? { oneOf: JSON.parse(column.values) } : {})
+        }
+    }));
+}
 
 const getItems = async (db, collectionId, limit, offset, bbox, properties, options) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
-    const select = helpers.formatSelect(properties, geomColName);
+    const tableinfo = getTableinfo(db, collectionId);
+
+    const primaryKey = tableinfo.find(e => e.pk == 1).name;
+
+    const select = helpers.formatSelect(properties, primaryKey, geomColName);
     let fromStatement = `${collectionId} c`;
 
     let whereStatement = helpers.getWhereStatement(options);
@@ -24,7 +47,7 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
     `;
 
     const features = db.prepare(sql).all();
-    const geojsonfeatures = features.map(feature => helpers.toGeoJSON(feature, geomColName))
+    const geojsonfeatures = features.map(feature => helpers.toGeoJSON(feature, primaryKey, geomColName))
 
     return geojsonfeatures
 }
@@ -41,7 +64,7 @@ const postItems = async (db, collectionId, feature) => {
     `;
     const stmt = db.prepare(sql);
 
-    //TODO: add update of gpkg_content metadata last_change, bbox, Rthree.
+    //TODO: add update of gpkg_content metadata last_change, bbox.
 
     return stmt.run(Object.values(feature.properties), geometryData);
 }
@@ -76,7 +99,6 @@ const putItem = async (db, collectionId, featureId, feature) => {
 
 
 const patchItem = async (db, collectionId, featureId, feature) => {
-
     let fields = Object.keys(feature.properties).map(key => `${key} = @${key}`);
 
     let params = {
@@ -84,7 +106,7 @@ const patchItem = async (db, collectionId, featureId, feature) => {
         rowid: featureId
     };
 
-    if (feature.geometry !== null) {
+    if (feature.geometry) {
         const { geomColName, srsId } = getGeomMetadata(db, collectionId);
         fields = [...fields, `${geomColName} = @geom`]
         params.geom = helpers.toGPGKgeometry(feature, srsId);
@@ -105,34 +127,28 @@ const deleteItem = async (db, collectionId, featureId) => db.prepare(`DELETE FRO
 
 const getSchema = (db, collectionId) => {
 
-    let table_info = db.prepare(`SELECT name, type FROM pragma_table_info('${collectionId}')`).all()
+    const tableinfo = getTableinfo(db, collectionId);
+    const geometryColumn = tableinfo.find(column => helpers.isGeometryType(column.type));
+    const geometryType = geometryColumn?.type;
 
-    let [geometryType, properties] = helpers.partition(table_info, column => helpers.isGeometryType(column.type));
 
-    properties = properties.reduce((next, column) => {
-        return { ...next, [column.name]: { title: column.name, ...helpers.convertSQLITEtype(column.type) } };
-    }, {})
+    let properties = tableinfo
+        .filter(column => column.name != geometryColumn.name)
+        .filter(column => column.pk != 1)
+        .reduce((acc, column) => (
+            acc[column.name] = { title: column.name, ...helpers.convertSQLITEtype(column.type) }, acc
+        ), {});
 
-    geometryType = table_info.filter(column => helpers.isGeometryType(column.type))[0].type;
+    // If gpkg_schema extension exists, enrich properties with gpkg_data_columns
+    const existGpkgSchema = db.prepare("SELECT * FROM gpkg_extensions WHERE extension_name='gpkg_schema'").get();
 
-    const existGpkgSchema = db.prepare("SELECT * from gpkg_extensions where extension_name='gpkg_schema'").get();
-
-    if (existGpkgSchema != undefined) {
-        const data_columns = db.prepare(`
-            SELECT a.column_name, a.title, a.description,'[' || group_concat('{"type": "string", "const":"' || b.value || '","description":"' || b.description || '"}', ',') || ']' as "values" 
-            FROM gpkg_data_columns a
-            LEFT JOIN gpkg_data_column_constraints b ON a.constraint_name=b.constraint_name 
-            WHERE a.table_name = '${collectionId}'
-            GROUP BY a.column_name, a.title, a.description
-        `).all();
-
-        data_columns.map(column => {
-            let schema = { name: column.column_name, properties: { title: column.title, description: column.description } }
-            if (column.values) schema.properties.oneOf = JSON.parse(column.values)
-            return schema
-        }).forEach(column => {
-            const type = properties[column.name].type
-            properties[column.name] = { type: type, ...column.properties }
+    if (existGpkgSchema) {
+        const dataColumns = getDataColumns(db,collectionId);
+        
+        dataColumns.forEach(dataColumn => {
+            properties[dataColumn.name] = { 
+                type: properties[dataColumn.name].type, 
+                ...dataColumn.properties }
         })
     }
 

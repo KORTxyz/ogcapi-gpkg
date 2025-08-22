@@ -45,19 +45,23 @@
 
   <body>
 
-    <kortxyz-datastore store="items"
-      data="<%= it.baseurl %>/collections/<%= it.collectionId %>/items?f=json"></kortxyz-datastore>
+    <kortxyz-datastore 
+      store="items"
+      data="<%= it.baseurl %>/collections/<%= it.collectionId %>/items?f=json"
+    ></kortxyz-datastore>
 
-    <kortxyz-maplibre class="basis-1/2 grow-0	shrink-0" mapstyle="<%= it.baseurl %>/styles/default?f=mbs">
+    <kortxyz-maplibre 
+      class="basis-1/2 grow-0	shrink-0"
+      basemaps="<%= it.baseurl %>/styles"
+    >
       <kortxyz-maplibre-source type="geojson" store="items" fit></kortxyz-maplibre-source>
     </kortxyz-maplibre>
 
     <div id="resizer" class="basis-1 grow-0	shrink-0	bg-gray-900 cursor-ns-resize" onmousedown="initResize(event)">
     </div>
 
-    <kortxyz-aggrid class="grow shrink" store="items"
-      schema="<%= it.baseurl %>/collections/<%= it.collectionId %>/schema">
-    </kortxyz-aggrid>
+    <kortxyz-aggrid class="grow shrink" editable store="items"
+      schema="<%= it.baseurl %>/collections/<%= it.collectionId %>/schema"></kortxyz-aggrid>
 
     <script>
       Resize = e => {

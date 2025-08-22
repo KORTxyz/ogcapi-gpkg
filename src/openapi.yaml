@@ -260,7 +260,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/featureGeoJSON"
+              type: object
       responses:
         204:
           description: Success

@@ -3,7 +3,7 @@ import { GeometryTransform } from '@ngageoint/simple-features-proj-js'
 import { FeatureConverter } from '@ngageoint/simple-features-geojson-js'
 import { GeometryReader, GeometryWriter } from '@ngageoint/simple-features-wkb-js';
 
-const formatSelect = (properties, geomColName) => properties == undefined ? 'c.*,c.ROWID as ROWID ' : ["c.ROWID as ROWID", geomColName, properties].filter(Boolean).join(',');
+const formatSelect = (properties, primaryKey, geomColName) => properties == undefined ? 'c.*' : [ geomColName, primaryKey, properties].filter(Boolean).join(',');
 
 const hasOptions = (options) => Object.keys(options).length > 0 && options.constructor === Object;
 
@@ -53,9 +53,8 @@ function getGpkgHeader(data) {
     }
 }
 
-const toGeoJSON = (feature, geomColName) => {
-    const { [geomColName]: geom, ROWID, ...properties } = feature;
-
+const toGeoJSON = (feature, primaryKey, geomColName) => {
+    const { [geomColName]: geom, [primaryKey]:pk, ...properties } = feature;
     const data = geom instanceof ArrayBuffer ? new Uint8Array(geom) : geom;
 
     const {wkbOffset,srid} = getGpkgHeader(data)
@@ -75,7 +74,7 @@ const toGeoJSON = (feature, geomColName) => {
     const featureGeometry = FeatureConverter.toFeatureGeometry(geometry)
 
     return {
-        id: ROWID,
+        id: pk,
         type: "Feature",
         geometry: featureGeometry || null,
         properties
@@ -122,37 +121,11 @@ const convertSQLITEtype = (type) => {
 
 const isGeometryType = type => ["POINT", "CURVE", "LINESTRING", "SURFACE", "CURVEPOLYGON", "POLYGON", "GEOMETRYCOLLECTION", "MULTISURFACE", "MULTIPOLYGON", "MULTICURVE", "MULTILINESTRING", "MULTIPOINT"].includes(type);
 
-const partition = (array, filter) => {
-    let pass = [], fail = [];
-    array.forEach((e, idx, arr) => (filter(e, idx, arr) ? pass : fail).push(e));
-    return [pass, fail];
-}
-/*
-const toGPGKgeometry = (feature, srsId) => {
-    const geometry = FeatureConverter.toSimpleFeaturesGeometry(feature);
+const partition = (array, predicate) => [
+  array.filter(predicate),
+  array.filter(e => !predicate(e))
+];
 
-    if (srsId != 4326) {
-        const geometryTransform = new GeometryTransform(
-            Projections.getWGS84Projection(),
-            Projections.getProjectionForName("EPSG:" + srsId),
-        );
-        geometry = geometryTransform.transformGeometry(geometry);
-    }
-
-    const geomData = new GeoPackageGeometryData(null);
-    geomData.setSrsId(srsId);
-    geomData.setGeometry(geometry);
-    
-    console.log(
-        geomData.toBuffer(),
-        GeometryWriter.writeGeometry(geometry)
-    )
-
-    const gpkgBuffer = geomData.toBuffer();
-
-    return gpkgBuffer
-}
-*/
 
 /**
  * Encode a feature (GeoJSON-like) into GeoPackage geometry BLOB
