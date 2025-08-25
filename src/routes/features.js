@@ -24,9 +24,12 @@ async function postItems(req, reply) {
     const { baseurl, db } = this;
     const { collectionId } = req.params;
 
-    const { lastInsertRowid } = await model.postItems(db, collectionId, req.body)
+    const newFeature = await model.postItems(db, collectionId, req.body)
 
-    reply.status(201).send({ Location: baseurl + '/collections/' + collectionId + '/items/' + lastInsertRowid })
+    reply
+        .status(201)
+        .header("Location", baseurl + '/collections/' + collectionId + '/items/' + newFeature.id)
+        .send(newFeature);
 };
 
 
@@ -49,20 +52,27 @@ async function putItem(req, reply) {
     const { baseurl, db } = this;
     const { collectionId, featureId } = req.params;
 
-    const { lastInsertRowid } = await model.putItem(db, collectionId, featureId, req.body)
+    const editedFeature = await model.putItem(db, collectionId, featureId, req.body);
 
-    reply.status(201).send({ Location: baseurl + '/collections/' + collectionId + '/items/' + lastInsertRowid })
+    reply
+    .status(201)
+    .header("Location", baseurl + '/collections/' + collectionId + '/items/' + editedFeature.id)
+    .send(editedFeature);
+
 };
 
 
 async function patchItem(req, reply) {
-    const { db } = this;
+    const { baseurl, db } = this;
     const { collectionId, featureId } = req.params;
 
-    const { changes } = await model.patchItem(db, collectionId, featureId, req.body)
+    const editedFeature = await model.patchItem(db, collectionId, featureId, req.body)
 
-    if (changes === 0) return reply.status(404).send({ error: 'Feature not found.' });
-    reply.status(204).send();
+    reply
+    .status(200)
+    .header("Location", baseurl + '/collections/' + collectionId + '/items/' + editedFeature.id)
+    .send(editedFeature);
+
 };
 
 
@@ -82,7 +92,6 @@ async function getSchema(req, reply) {
     const { f } = req.query;
 
     const { properties, geometryType } = await model.getSchema(this.db, collectionId)
-    console.log(properties,geometryType)
     reply.type('application/json').send(templates.schema(this.baseurl, collectionId, properties, geometryType));
 
 };
