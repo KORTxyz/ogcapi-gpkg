@@ -25,8 +25,8 @@ const getDataColumns = (db, collectionId) => {
 
 const getItems = async (db, collectionId, limit, offset, bbox, properties, options) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
-    const tableinfo = getTableinfo(db, collectionId);
 
+    const tableinfo = getTableinfo(db, collectionId);
     const primaryKey = tableinfo.find(e => e.pk == 1).name;
 
     const select = helpers.formatSelect(properties, primaryKey, geomColName);
@@ -55,6 +55,8 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
 
 const postItems = async (db, collectionId, feature) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
+    const tableinfo = getTableinfo(db, collectionId);
+    const primaryKey = tableinfo.find(e => e.pk == 1).name;
 
     const geometryData = helpers.toGPGKgeometry(feature, srsId);
 
@@ -63,51 +65,60 @@ const postItems = async (db, collectionId, feature) => {
         VALUES (${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")});
     `;
     const stmt = db.prepare(sql);
-
+    const info = stmt.run(Object.values(feature.properties), geometryData);
+    const newFeature = db.prepare(`SELECT * FROM ${collectionId} WHERE rowid = ?`).get(info.lastInsertRowid);
     //TODO: add update of gpkg_content metadata last_change, bbox.
 
-    return stmt.run(Object.values(feature.properties), geometryData);
+    return helpers.toGeoJSON(newFeature, primaryKey, geomColName);
 }
 
 
 const getItem = async (db, collectionId, featureId) => {
     const { geomColName } = getGeomMetadata(db, collectionId);
+    const tableinfo = getTableinfo(db, collectionId);
+    const primaryKey = tableinfo.find(e => e.pk == 1).name;
 
     const feature = db.prepare(`SELECT *,ROWID as ROWID FROM ${collectionId} WHERE ROWID=?`).get(featureId);
 
     if (!feature) return;
     return {
         "type": "FeatureCollection",
-        "features": [helpers.toGeoJSON(feature, geomColName)]
+        "features": [helpers.toGeoJSON(feature, primaryKey, geomColName)]
     }
 };
 
 
 const putItem = async (db, collectionId, featureId, feature) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
-
+    const tableinfo = getTableinfo(db, collectionId);
+    const primaryKey = tableinfo.find(e => e.pk == 1).name;
     const geometryData = helpers.toGPGKgeometry(feature, srsId);
 
     const sql = `
         INSERT OR REPLACE INTO ${collectionId}(rowid, ${[...Object.keys(feature.properties), geomColName].join(",")})
-        VALUES (${featureId}, ${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")});
+        VALUES (${featureId}, ${[...Object.keys(feature.properties).map(() => '?'), '?'].join(",")})
+        RETURNING *;
     `;
     const stmt = db.prepare(sql);
+    const info = stmt.run(Object.values(feature.properties), geometryData);
+    const editedFeature = db.prepare(`SELECT * FROM ${collectionId} WHERE rowid = ?`).get(featureId);
 
-    return stmt.run(Object.values(feature.properties), geometryData);
+    return helpers.toGeoJSON(editedFeature, primaryKey, geomColName);
 };
 
 
 const patchItem = async (db, collectionId, featureId, feature) => {
-    let fields = Object.keys(feature.properties).map(key => `${key} = @${key}`);
+    const { geomColName, srsId } = getGeomMetadata(db, collectionId);
+    const tableinfo = getTableinfo(db, collectionId);
+    const primaryKey = tableinfo.find(e => e.pk == 1).name;
 
+    let fields = Object.keys(feature.properties).map(key => `${key} = @${key}`);
     let params = {
         ...feature.properties,
         rowid: featureId
     };
 
     if (feature.geometry) {
-        const { geomColName, srsId } = getGeomMetadata(db, collectionId);
         fields = [...fields, `${geomColName} = @geom`]
         params.geom = helpers.toGPGKgeometry(feature, srsId);
     }
@@ -117,8 +128,10 @@ const patchItem = async (db, collectionId, featureId, feature) => {
         SET ${fields.join(', ')}
         WHERE rowid = @rowid
     `);
+    const info = stmt.run(params);
+    const editedFeature = db.prepare(`SELECT * FROM ${collectionId} WHERE rowid = ?`).get(featureId);
 
-    return stmt.run(params);
+    return helpers.toGeoJSON(editedFeature, primaryKey, geomColName);
 };
 
 
