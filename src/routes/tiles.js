@@ -14,6 +14,7 @@ async function getTilesets(req, reply) {
   const { contentType } = req;
 
   const collection = modelCommon.getCollection(db, "tiles");
+  if(!collection) return reply.callNotFound();
 
   if (collection.data_type == "tiles") return reply.callNotFound();
   if (contentType == "html") return reply.view("tilesets", {baseurl });

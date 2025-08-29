@@ -1,5 +1,5 @@
 const styles = (baseurl, styles) => ({
-    default: styles[0].style,
+    default: styles[0]?.style || null,
     styles: styles.map(style =>
     ({
         id: style.style,

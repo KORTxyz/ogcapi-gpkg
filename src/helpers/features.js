@@ -18,11 +18,10 @@ const appendRthreeFilter = (whereStatement, bbox, srsId) => {
             Projections.getProjectionForName("EPSG:" + srsId)
         )
 
-        bbox = geometryTransform.transformBounds(minX, minY, maxX, maxY)
-        return `${!whereStatement ? '' : whereStatement + ' AND '} ${bbox[2]} >= r.minx AND ${bbox[0]} <= r.maxx AND ${bbox[3]} >= r.miny AND ${bbox[1]} <= r.maxy`
+        bbox = geometryTransform.transformBounds(minX, minY, maxX, maxY) // [minX, minY, maxX, maxY]
+        return `${!whereStatement ? '' : whereStatement + ' AND '} r.maxx >= ${bbox[0]} AND r.minx <= ${bbox[2]} AND r.maxy >= ${bbox[1]} AND r.miny <= ${bbox[3]}`;
     }
-
-    return `${!whereStatement ? '' : whereStatement + ' AND '} ${maxX} >= r.minx AND ${minX} <= r.maxx AND ${maxY} >= r.miny AND ${minY} <= r.maxy`
+    return `${!whereStatement ? '' : whereStatement + ' AND '} r.maxx >= ${minX} AND r.minx <= ${maxX} AND r.maxy >= ${minY} AND r.miny <= ${maxY}`;
 };
 
 function getGpkgHeader(data) {
@@ -119,7 +118,7 @@ const convertSQLITEtype = (type) => {
     return schemaDef
 }
 
-const isGeometryType = type => ["POINT", "CURVE", "LINESTRING", "SURFACE", "CURVEPOLYGON", "POLYGON", "GEOMETRYCOLLECTION", "MULTISURFACE", "MULTIPOLYGON", "MULTICURVE", "MULTILINESTRING", "MULTIPOINT"].includes(type);
+const isGeometryType = type => ["POINT", "CURVE", "LINESTRING", "SURFACE", "CURVEPOLYGON", "POLYGON", "GEOMETRY", "GEOMETRYCOLLECTION", "MULTISURFACE", "MULTIPOLYGON", "MULTICURVE", "MULTILINESTRING", "MULTIPOINT"].includes(type);
 
 const partition = (array, predicate) => [
   array.filter(predicate),

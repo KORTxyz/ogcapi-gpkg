@@ -19,7 +19,7 @@
     "@fastify/view": "^11.1.0",
     "@kortxyz/geostyler-mapbox-parser": "^6.1.2",
     "@kortxyz/geostyler-sld-parser-esm": "^7.0.1",
-    "@kortxyz/kortxyz-components": "^0.4.0",
+    "@kortxyz/kortxyz-components": "^0.5.1",
     "@mapbox/sphericalmercator": "^2.0.1",
     "@ngageoint/projections-js": "^1.0.2",
     "@ngageoint/simple-features-geojson-js": "^1.1.1",

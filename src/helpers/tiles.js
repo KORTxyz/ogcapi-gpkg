@@ -14,7 +14,6 @@ const getAsVectorTile = async (db, collectionId, tileMatrix, tileRow, tileCol, l
     const bbox = merc.bbox(tileRow, tileCol, tileMatrix, false)
 
     const features = await featuresModel.getItems(db, collectionId, limit, 0, bbox.join(), properties, [])
-
     if (features?.length > 0) {
         const tileindex = geojsonVt({ type: 'FeatureCollection', features: features }, { maxZoom: 18, promoteId: Object.keys(features[0].properties)[0] })
         const tile = tileindex.getTile(Number(tileMatrix), Number(tileRow), Number(tileCol))

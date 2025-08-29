@@ -1,3 +1,4 @@
+import { table } from 'node:console';
 import * as helpers from '../helpers/features.js'
 
 const getGeomMetadata = (db, collectionId) => db.prepare('SELECT column_name as geomColName, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
@@ -5,20 +6,20 @@ const getGeomMetadata = (db, collectionId) => db.prepare('SELECT column_name as 
 const getTableinfo = (db, collectionId) => db.prepare('SELECT name, type, pk FROM pragma_table_info(?)').all(collectionId);
 
 const getDataColumns = (db, collectionId) => {
-    db.prepare(`
+    const data_columns = db.prepare(`
             SELECT a.column_name, a.title, a.description,'[' || group_concat('{"type": "string", "const":"' || b.value || '","description":"' || b.description || '"}', ',') || ']' as "values" 
             FROM gpkg_data_columns a
             LEFT JOIN gpkg_data_column_constraints b ON a.constraint_name=b.constraint_name 
             WHERE a.table_name = ?
             GROUP BY a.column_name, a.title, a.description
         `).all(collectionId);
-
+    
     return data_columns.map(column => ({
         name: column.column_name,
         properties: {
             title: column.title,
             description: column.description,
-            ...(column.values ? { oneOf: JSON.parse(column.values) } : {})
+            ...(column.values != null ? { oneOf: JSON.parse(column.values) } : {})
         }
     }));
 }
@@ -45,7 +46,6 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
         LIMIT ${limit || 999}
         OFFSET ${offset || 0}
     `;
-
     const features = db.prepare(sql).all();
     const geojsonfeatures = features.map(feature => helpers.toGeoJSON(feature, primaryKey, geomColName))
 
@@ -144,7 +144,6 @@ const getSchema = (db, collectionId) => {
     const geometryColumn = tableinfo.find(column => helpers.isGeometryType(column.type));
     const geometryType = geometryColumn?.type;
 
-
     let properties = tableinfo
         .filter(column => column.name != geometryColumn.name)
         .filter(column => column.pk != 1)
@@ -157,7 +156,6 @@ const getSchema = (db, collectionId) => {
 
     if (existGpkgSchema) {
         const dataColumns = getDataColumns(db,collectionId);
-        
         dataColumns.forEach(dataColumn => {
             properties[dataColumn.name] = { 
                 type: properties[dataColumn.name].type, 
