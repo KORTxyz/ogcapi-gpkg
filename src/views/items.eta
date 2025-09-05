@@ -47,8 +47,8 @@
 
     <kortxyz-datastore 
       store="items"
-      data="<%= it.baseurl %>/collections/<%= it.collectionId %>/items"
-      <%= it.readonly ? "" : sync %> 
+      data="<%= it.baseurl %>/collections/<%= it.collectionId %>/items?<%= it.extraParams %><%= it.properties?'&properties='+it.properties:'' %>"
+      <%= it.readonly ? "" : sync="true" %> 
     ></kortxyz-datastore>
 
     <kortxyz-maplibre 
@@ -65,7 +65,7 @@
     <kortxyz-aggrid class="grow shrink"  
       store="items"
       schema="<%= it.baseurl %>/collections/<%= it.collectionId %>/schema"
-      <%= it.readonly ? "" : editable %> 
+      <%= it.readonly ? "" : editable="true" %> 
     ></kortxyz-aggrid>
 
     <script>

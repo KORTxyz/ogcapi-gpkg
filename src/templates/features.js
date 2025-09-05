@@ -1,7 +1,6 @@
 
-const items = (baseurl, collectionId, features, limit, offset , searchParams) => {
+const items = (baseurl, collectionId, features, limit, offset, searchParams) => {
     const params = new URLSearchParams(searchParams);
-    
     return {
       "type": "FeatureCollection",
       "numberReturned": features.length,
@@ -9,20 +8,20 @@ const items = (baseurl, collectionId, features, limit, offset , searchParams) =>
       "features": features,
       "links": [
         {
-          "href": `${baseurl}/collections/${collectionId}/items?f=json&${params}limit=${limit}&offset=${offset}`,
+          "href": `${baseurl}/collections/${collectionId}/items?f=json&${params}&limit=${limit}&offset=${offset}`,
           "rel": "self",
           "type": "application/geo+json",
           "title": "This document"
         },
         {
-          "href": `${baseurl}/collections/${collectionId}/items?f=json&${params}limit=${limit}&offset=${offset}`,
+          "href": `${baseurl}/collections/${collectionId}/items?f=json&${params}&limit=${limit}&offset=${offset}`,
           "rel": "alternate",
           "type": "text/html",
           "title": "This document as HTML"
         },
         ...(offset? [
           {
-            href: `${baseurl}/collections/${collectionId}/items?f=json&${params}limit=${limit}&offset=${Math.max(0, offset - limit)}`,
+            href: `${baseurl}/collections/${collectionId}/items?f=json&${params}&limit=${limit}&offset=${Math.max(0, offset - limit)}`,
             rel: "prev",
             type: "application/geo+json",
             title: "Previous page",
@@ -30,7 +29,7 @@ const items = (baseurl, collectionId, features, limit, offset , searchParams) =>
         ]: []),
         ...(features.length==limit ? [
           {
-            "href": `${baseurl}/collections/${collectionId}/items?f=json&${params}limit=${limit}&offset=${limit + offset}`,
+            "href": `${baseurl}/collections/${collectionId}/items?f=json&${params}&limit=${limit}&offset=${limit + offset}`,
             "rel": "next",
             "type": "application/geo+json",
             "title": "This document as HTML"
