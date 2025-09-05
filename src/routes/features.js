@@ -3,7 +3,7 @@ import * as templates from "../templates/features.js";
 
 
 async function getItems(req, reply) {
-    const { baseurl, db } = this;
+    const { baseurl, db, fastify: { readonly } } = this;
 
     const { contentType } = req;
     const { collectionId } = req.params;
@@ -16,7 +16,7 @@ async function getItems(req, reply) {
 
         reply.send(templatedFeatures);
     }
-    else if (contentType == "html") return reply.view("items", { baseurl, collectionId });
+    else if (contentType == "html") return reply.view("items", { baseurl, collectionId, readonly });
 };
 
 
@@ -55,9 +55,9 @@ async function putItem(req, reply) {
     const editedFeature = await model.putItem(db, collectionId, featureId, req.body);
 
     reply
-    .status(201)
-    .header("Location", baseurl + '/collections/' + collectionId + '/items/' + editedFeature.id)
-    .send(editedFeature);
+        .status(201)
+        .header("Location", baseurl + '/collections/' + collectionId + '/items/' + editedFeature.id)
+        .send(editedFeature);
 
 };
 
@@ -69,9 +69,9 @@ async function patchItem(req, reply) {
     const editedFeature = await model.patchItem(db, collectionId, featureId, req.body)
 
     reply
-    .status(200)
-    .header("Location", baseurl + '/collections/' + collectionId + '/items/' + editedFeature.id)
-    .send(editedFeature);
+        .status(200)
+        .header("Location", baseurl + '/collections/' + collectionId + '/items/' + editedFeature.id)
+        .send(editedFeature);
 
 };
 

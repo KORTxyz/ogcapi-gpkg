@@ -901,7 +901,7 @@ components:
         type: integer
         minimum: 1
         maximum: 999999
-        default: 99
+        default: 1000
       style: form
       explode: false
     offset:
