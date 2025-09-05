@@ -27,6 +27,7 @@ const ogcapi = async (fastify, options) => {
     const { gpkg, readonly=true, skipLandingpage, baseurl="http://127.0.0.1:3000", prefix='', } = options;
     
     fastify.decorate('api', await readYaml())
+    fastify.decorate('readonly', readonly)
 
     fastify.api.servers[0].url = baseurl+prefix;
 
@@ -34,6 +35,9 @@ const ogcapi = async (fastify, options) => {
 
     if(readonly) {
         fastify.api = removeTags(fastify.api,"post")
+        fastify.api = removeTags(fastify.api,"put")
+        fastify.api = removeTags(fastify.api,"patch")
+        fastify.api = removeTags(fastify.api,"delete")
     }
 
     fastify.decorate('db', await initDb(gpkg))
