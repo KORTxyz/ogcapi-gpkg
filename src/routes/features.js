@@ -9,14 +9,12 @@ async function getItems(req, reply) {
     const { collectionId } = req.params;
     const { f, limit, offset, bbox, properties, ...searchParams } = req.query;
     /* TODO: bbox-crs as a URL-parameter*/
-
     if (contentType == "json") {
         let geojsonFeatures = await model.getItems(db, collectionId, limit, offset, bbox, properties, searchParams);
         const templatedFeatures = templates.items(baseurl, collectionId, geojsonFeatures, limit, offset, searchParams);
-
         reply.send(templatedFeatures);
     }
-    else if (contentType == "html") return reply.view("items", { baseurl, collectionId, readonly });
+    else if (contentType == "html") return reply.view("items", { baseurl, collectionId, readonly, properties, extraParams: new URLSearchParams( {limit, offset, ...searchParams}).toString()});
 };
 
 
