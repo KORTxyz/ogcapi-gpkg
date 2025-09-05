@@ -18,10 +18,18 @@ const initDb = async (databasePath) => {
     db.pragma('journal_mode = WAL');
 
     const sql = `
+        CREATE TABLE IF NOT EXISTS gpkg_extensions (
+            table_name TEXT,
+            column_name TEXT,
+            extension_name TEXT NOT NULL,
+            definition TEXT NOT NULL,
+            scope TEXT NOT NULL,
+            CONSTRAINT ge_tce UNIQUE (table_name, column_name, extension_name)
+        );
         INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
             Select 'gpkgext_styles', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_styles');
 
-        CREATE TABLE if not exists gpkgext_styles (
+        CREATE TABLE IF NOT EXISTS gpkgext_styles (
             id INTEGER PRIMARY KEY,
             style TEXT NOT NULL,
             description TEXT,
@@ -31,7 +39,7 @@ const initDb = async (databasePath) => {
         INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
             Select 'gpkgext_symbols', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_symbols');
 
-        CREATE TABLE if not exists gpkgext_symbols (
+        CREATE TABLE IF NOT EXISTS gpkgext_symbols (
             id INTEGER PRIMARY KEY,
             symbol TEXT NOT NULL,
             description TEXT,
@@ -41,7 +49,7 @@ const initDb = async (databasePath) => {
         INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
             Select 'gpkgext_stylesheets', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_stylesheets');
 
-        CREATE TABLE if not exists gpkgext_stylesheets (
+        CREATE TABLE IF NOT EXISTS gpkgext_stylesheets (
             id INTEGER PRIMARY KEY,
             style_id INTEGER NOT NULL,
             format TEXT NOT NULL,
@@ -51,7 +59,7 @@ const initDb = async (databasePath) => {
         INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
             Select 'gpkgext_symbol_images', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_stylesheets');
 
-        CREATE TABLE if not exists gpkgext_symbol_images (
+        CREATE TABLE IF NOT EXISTS gpkgext_symbol_images (
             id INTEGER PRIMARY KEY,
             symbol_id INTEGER NOT NULL,
             content_id INTEGER NOT NULL,
@@ -65,7 +73,7 @@ const initDb = async (databasePath) => {
         INSERT INTO gpkg_extensions (table_name, extension_name, definition, scope)
             Select 'gpkgext_symbol_content', 'gpkg_portrayal', 'https://gitlab.com/imagemattersllc/ogc-tb-16-gpkg/-/blob/master/extensions/5-portrayal.adoc','read-write' Where not exists(select * from gpkg_extensions where table_name='gpkgext_stylesheets');
 
-        CREATE TABLE if not exists gpkgext_symbol_content (
+        CREATE TABLE IF NOT EXISTS gpkgext_symbol_content (
             id INTEGER PRIMARY KEY,
             format TEXT NOT NULL,
             content BLOB NOT NULL,
