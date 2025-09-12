@@ -1,6 +1,6 @@
 {
   "name": "@kortxyz/ogcapi-gpkg",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "main": "src/index.js",
   "type": "module",
   "scripts": {

@@ -3,6 +3,7 @@
 
 <head>
   <title>Style</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="module" src="../../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
   <link href="../../../assets/tailwind.css" rel="stylesheet" />
 </head>
