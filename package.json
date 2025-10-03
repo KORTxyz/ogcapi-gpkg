@@ -1,8 +1,11 @@
 {
   "name": "@kortxyz/ogcapi-gpkg",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "src/index.js",
   "type": "module",
+  "bin": {
+    "@kortxyz/ogcapi-gpkg": "./bin.js"
+  },
   "scripts": {
     "start": "node --env-file=.env --watch ./test/server",
     "compileTailwind": "npx tailwindcss -o ./src/assets/tailwind.css --minify",
@@ -19,7 +22,7 @@
     "@fastify/view": "^11.1.0",
     "@kortxyz/geostyler-mapbox-parser": "^6.1.2",
     "@kortxyz/geostyler-sld-parser-esm": "^7.0.1",
-    "@kortxyz/kortxyz-components": "^0.5.2",
+    "@kortxyz/kortxyz-components": "^0.5.3",
     "@mapbox/sphericalmercator": "^2.0.1",
     "@ngageoint/projections-js": "^1.0.2",
     "@ngageoint/simple-features-geojson-js": "^1.1.1",
@@ -32,6 +35,7 @@
     "geojson-vt": "^4.0.2",
     "is-gzip": "^2.0.0",
     "magic-bytes.js": "^1.12.1",
+    "minimist": "^1.2.8",
     "simple-features-wkb-js": "^1.1.2",
     "vt-pbf": "^3.1.3",
     "wkx": "^0.5.0"
