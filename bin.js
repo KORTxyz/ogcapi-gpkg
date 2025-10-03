@@ -8,7 +8,7 @@ import selfsigned from 'selfsigned';
 import ogcapi from './src/index.js';
 
 const argv = minimist(process.argv.slice(2));
-console.log(argv)
+
 const port = argv.port || 3000;
 const baseurl = argv.baseurl || 'https://127.0.0.1:'+port;
 const gpkg = argv._[0];

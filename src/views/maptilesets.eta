@@ -7,7 +7,7 @@
 
   <link href="../../../assets/tailwind.css" rel="stylesheet" />
 
-  <script type="module" src="../../../assets/kortxyz-components/kortxyz-components.esm.js"></script>
+  <script type="module" src="../../../assets/kortxyz-components.esm.js"></script>
 
 </head>
 

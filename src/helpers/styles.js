@@ -268,14 +268,18 @@ const generateDefaultStylesheet = (db, baseurl, collectionId) => {
 
 
 const convertStyleToMBS = async (baseurl, db, collectionId, styleId) => {
-
+    console.log(baseurl, db, collectionId, styleId)
     let { min_x, min_y, max_x, max_y, srs_id } = getCollection(db, collectionId)
     if (srs_id !== 4326) [min_x, min_y, max_x, max_y] = convertBBOXtoWGS84(srs_id, min_x, min_y, max_x, max_y)
 
     const SLDsheet = getCollectionStylesheet(db, collectionId, styleId, "SLD");
     if (!SLDsheet) return;
+    //console.log(SLDsheet)
 
-    const { output: style } = await parser.readStyle(SLDsheet)
+    const { output: style, errors } = await parser.readStyle(SLDsheet)
+    if(errors) throw Error(errors)
+    console.log(style,  mbParser.geoStylerStyleToMapboxObject(style))
+
     let { layers } = mbParser.geoStylerStyleToMapboxObject(style)
 
     layers = layers.map(layer => ({

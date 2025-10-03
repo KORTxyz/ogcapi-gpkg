@@ -1,6 +1,7 @@
-import { dirname, join } from 'node:path';
+import { dirname, join, } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'module'
 
 import fastifyView from '@fastify/view'
 import fastifyAccepts from '@fastify/accepts'
@@ -14,6 +15,8 @@ import { Eta } from "eta"
 import { Service } from "./service.js";
 import { initDb } from "./database/init.js"
 
+const require = createRequire(import.meta.url)
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function readYaml() {
@@ -24,20 +27,20 @@ async function readYaml() {
 const removeTags = (APIspec, tag) => JSON.parse(JSON.stringify(APIspec, (k, v) => k === tag ? undefined : v));
 
 const ogcapi = async (fastify, options) => {
-    const { gpkg, readonly=true, skipLandingpage, baseurl="http://127.0.0.1:3000", prefix='', } = options;
-    
+    const { gpkg, readonly = true, skipLandingpage, baseurl = "http://127.0.0.1:3000", prefix = '', } = options;
+
     fastify.decorate('api', await readYaml())
     fastify.decorate('readonly', readonly)
 
-    fastify.api.servers[0].url = baseurl+prefix;
+    fastify.api.servers[0].url = baseurl + prefix;
 
     if (skipLandingpage) delete fastify.api.paths["/"]
 
-    if(readonly) {
-        fastify.api = removeTags(fastify.api,"post")
-        fastify.api = removeTags(fastify.api,"put")
-        fastify.api = removeTags(fastify.api,"patch")
-        fastify.api = removeTags(fastify.api,"delete")
+    if (readonly) {
+        fastify.api = removeTags(fastify.api, "post")
+        fastify.api = removeTags(fastify.api, "put")
+        fastify.api = removeTags(fastify.api, "patch")
+        fastify.api = removeTags(fastify.api, "delete")
     }
 
     fastify.decorate('db', await initDb(gpkg))
@@ -53,24 +56,26 @@ const ogcapi = async (fastify, options) => {
         templates: `${__dirname}/views`,
     });
 
+    const kortxyzEntryUrl = await import.meta.resolve('@kortxyz/kortxyz-components')
+    const kortxyzDist = dirname(fileURLToPath(kortxyzEntryUrl))
+
     fastify.register(fastifyStatic, {
         root: [
             `${__dirname}/assets`,
-            `${join(process.cwd(), 'node_modules/@kortxyz/kortxyz-components/dist')}`
+            kortxyzDist
         ],
         prefix: '/assets/',
     })
-
 
     fastify.addContentTypeParser('text/html', async (req, payload) => await htmlParser(payload))
     fastify.addContentTypeParser('image/*', async (req, payload) => await imageParser(payload))
     fastify.addContentTypeParser('application/geo+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
     fastify.addContentTypeParser('application/tilejson', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
     fastify.addContentTypeParser('application/vnd.mapbox.style+json', { parseAs: 'string' }, fastify.getDefaultJsonParser('ignore', 'ignore'))
-    
+
     fastify.register(openapiGlue, {
         specification: removeTags(fastify.api, "example"),
-        serviceHandlers: new Service(fastify, baseurl+prefix),
+        serviceHandlers: new Service(fastify, baseurl + prefix),
     });
 
 }
@@ -79,5 +84,5 @@ const ogcapi = async (fastify, options) => {
 export default fastifyPlugin(ogcapi, {
     fastify: '5.x',
     name: '@kortxyz/ogcapi',
-    encapsulate:true
+    encapsulate: true
 });
