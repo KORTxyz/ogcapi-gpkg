@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
 
 import fastifyView from '@fastify/view'
 import fastifyAccepts from '@fastify/accepts'
@@ -15,10 +15,9 @@ import { Service } from "./service.js";
 import { initDb } from "./database/init.js"
 
 const __dirname = import.meta.dirname;
-const require = createRequire(import.meta.url);
 
-const kortxyzDist = resolve(dirname(require.resolve('@kortxyz/kortxyz-components/package.json')), 'dist', 'kortxyz-components');
-const redocDist = resolve(dirname(require.resolve('redoc/package.json')), 'bundles');
+const kortxyzDist = resolve(dirname(fileURLToPath(import.meta.resolve('@kortxyz/kortxyz-components/package.json'))), 'dist', 'kortxyz-components');
+const redocDist = resolve(dirname(fileURLToPath(import.meta.resolve('redoc/package.json'))), 'bundles');
 
 const removeTags = (APIspec, tag) => JSON.parse(JSON.stringify(APIspec, (k, v) => k === tag ? undefined : v));
 

@@ -1,6 +1,6 @@
 {
   "name": "@kortxyz/ogcapi-gpkg",
-  "version": "0.4.1",
+  "version": "0.4.3",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -18,7 +18,7 @@
     "@fastify/view": "^11.1.1",
     "@kortxyz/geostyler-mapbox-parser": "^6.1.2",
     "@kortxyz/geostyler-sld-parser-esm": "^7.0.1",
-    "@kortxyz/kortxyz-components": "^0.5.4",
+    "@kortxyz/kortxyz-components": "^0.5.5",
     "@ngageoint/projections-js": "^1.0.2",
     "@ngageoint/simple-features-geojson-js": "^1.1.1",
     "@ngageoint/simple-features-proj-js": "^1.1.3",
