@@ -14,17 +14,17 @@ import { Eta } from "eta"
 import { Service } from "./service.js";
 import { initDb } from "./database/init.js"
 
+const __dirname = import.meta.dirname;
 
-const moduleDir = dirname(fileURLToPath(import.meta.url));
-const kortxyzDist = resolve( moduleDir, "..", 'node_modules', '@kortxyz', 'kortxyz-components', 'dist', 'kortxyz-components');
-const redocDist = resolve( moduleDir, "..", 'node_modules', 'redoc','bundles');
+const kortxyzDist = resolve(__dirname, "..", 'node_modules', '@kortxyz', 'kortxyz-components', 'dist', 'kortxyz-components');
+const redocDist = resolve(__dirname, "..", 'node_modules', 'redoc', 'bundles');
 
 const removeTags = (APIspec, tag) => JSON.parse(JSON.stringify(APIspec, (k, v) => k === tag ? undefined : v));
 
 const ogcapi = async (fastify, options) => {
     const { gpkg, readonly = true, skipLandingpage, baseurl = "http://127.0.0.1:3000", prefix = '', } = options;
 
-    const sourceData = await readFile("./src/openapi.yaml", "utf-8");
+    const sourceData = await readFile(`${__dirname}/openapi.yaml`, "utf-8");
     let api = load(sourceData, { schema: JSON_SCHEMA })
 
     fastify.decorate('api', api)
@@ -51,12 +51,12 @@ const ogcapi = async (fastify, options) => {
 
     fastify.register(fastifyView, {
         engine: { eta: new Eta() },
-        templates: resolve(moduleDir, 'views'),
+        templates: resolve(__dirname, 'views'),
     });
 
     fastify.register(fastifyStatic, {
         root: [
-            resolve(moduleDir, 'assets'),
+            resolve(__dirname, 'assets'),
             redocDist,
             kortxyzDist
         ],
