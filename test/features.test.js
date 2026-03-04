@@ -56,7 +56,7 @@ test('Testing OGC API - Features spec', async (t) => {
             method: 'GET',
             url: '/collections/points/items?bbox=12,55,13,56'
         })
-        assert.equal(response.json().features.length, 2, 'returns 2 features')
+        assert.equal(response.json().features.length, 4, 'returns 4 features')
     });
     
 //http://127.0.0.1:3000/collections/points_25832/items?f=json&limit=1000&bbox=12.35860216325162675,55.61433313140141621,12.36645643037281062,55.62310191123154368

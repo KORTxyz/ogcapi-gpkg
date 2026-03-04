@@ -10,9 +10,25 @@ async function getItems(req, reply) {
     const { f, limit, offset, bbox, properties, ...searchParams } = req.query;
     /* TODO: bbox-crs as a URL-parameter*/
     if (contentType == "json") {
+        reply.header('Content-Type', 'application/geo+json');
+        reply.raw.write('{"type":"FeatureCollection","features":[');
+
+        let first = true;
+
+        for (const feature of model.streamItems(db, collectionId, limit, offset, bbox, properties, searchParams)) {
+            if (!first) reply.raw.write(',');
+            first = false;
+            reply.raw.write(JSON.stringify(feature));
+        }
+
+        reply.raw.write(']}');
+        reply.raw.end();
+
+        /*
         let geojsonFeatures = await model.getItems(db, collectionId, limit, offset, bbox, properties, searchParams);
         const templatedFeatures = templates.items(baseurl, collectionId, geojsonFeatures, limit, offset, searchParams);
         reply.send(templatedFeatures);
+        */
     }
     else if (contentType == "html") return reply.view("items", { baseurl, collectionId, readonly, properties, extraParams: new URLSearchParams( {limit, offset, ...searchParams}).toString()});
 };

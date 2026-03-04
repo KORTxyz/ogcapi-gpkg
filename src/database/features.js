@@ -1,4 +1,3 @@
-import { table } from 'node:console';
 import * as helpers from '../helpers/features.js'
 
 const getGeomMetadata = (db, collectionId) => db.prepare('SELECT column_name as geomColName, srs_id as srsId FROM gpkg_geometry_columns WHERE table_name=?').get(collectionId);
@@ -23,6 +22,37 @@ const getDataColumns = (db, collectionId) => {
         }
     }));
 }
+
+function* streamItems(db, collectionId, limit, offset, bbox, properties, options) {
+  const {geomColName,srsId} = getGeomMetadata(db, collectionId);
+	const tableinfo = getTableinfo(db, collectionId);
+
+	const primaryKey = tableinfo.find(e => e.pk == 1).name;
+	const select = helpers.formatSelect(properties, primaryKey, geomColName);
+
+	let fromStatement = `${collectionId} c`;
+
+	let whereStatement = helpers.getWhereStatement(options);
+	if (bbox) {
+					fromStatement = `rtree_${collectionId}_${geomColName} r LEFT JOIN ${collectionId} c ON r.id=c.ROWID`;
+					whereStatement = helpers.appendRthreeFilter(whereStatement, bbox, srsId)
+	}
+
+	const sql = `
+					SELECT ${select}
+					FROM  ${fromStatement}
+					WHERE ${whereStatement}
+					LIMIT ${limit || 999}
+					OFFSET ${offset || 0}
+	`;
+
+	const stmt = db.prepare(sql);
+
+  for (const row of stmt.iterate()) {
+    yield helpers.toGeoJSON(row,primaryKey,geomColName);
+  }
+}
+
 
 const getItems = async (db, collectionId, limit, offset, bbox, properties, options) => {
     const { geomColName, srsId } = getGeomMetadata(db, collectionId);
@@ -169,6 +199,7 @@ const getSchema = (db, collectionId) => {
 
 export {
     getItems,
+    streamItems,
     postItems,
     getItem,
     putItem,

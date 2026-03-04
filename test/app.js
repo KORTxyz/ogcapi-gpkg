@@ -7,6 +7,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Eta } from "eta"
 
+  const faviconPng = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wwAAoMBgAGL1ioAAAAASUVORK5CYII=',
+    'base64'
+  );
 
 const build = (opts = {}) => {
     const app = Fastify({
@@ -19,6 +23,11 @@ const build = (opts = {}) => {
         templates: `${__dirname}/views2`,
     });
 
+    app.get('/favicon.ico', async (_req, reply) => {
+        reply.header('Cache-Control', 'public, max-age=86400');
+        return reply.type('image/png').send(faviconPng);
+    });
+    
     app.register(ogcapi, {
         baseurl: process.env.BASEURL,
         gpkg: process.env.GPKG,

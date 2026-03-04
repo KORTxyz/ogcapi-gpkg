@@ -1,7 +1,6 @@
-import { dirname, join, } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
-import { createRequire } from 'module'
 
 import fastifyView from '@fastify/view'
 import fastifyAccepts from '@fastify/accepts'
@@ -9,27 +8,26 @@ import fastifyStatic from '@fastify/static'
 
 import fastifyPlugin from 'fastify-plugin'
 import openapiGlue from "fastify-openapi-glue";
-import yaml from "js-yaml";
+import { load, JSON_SCHEMA } from "js-yaml";
 import { Eta } from "eta"
 
 import { Service } from "./service.js";
 import { initDb } from "./database/init.js"
 
-const require = createRequire(import.meta.url)
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-async function readYaml() {
-    const openapiFile = await readFile(`${__dirname}/openapi.yaml`, "binary");
-    return yaml.load(openapiFile);
-}
+const moduleDir = dirname(fileURLToPath(import.meta.url));
+const kortxyzDist = resolve( moduleDir, "..", 'node_modules', '@kortxyz', 'kortxyz-components', 'dist', 'kortxyz-components');
+const redocDist = resolve( moduleDir, "..", 'node_modules', 'redoc','bundles');
 
 const removeTags = (APIspec, tag) => JSON.parse(JSON.stringify(APIspec, (k, v) => k === tag ? undefined : v));
 
 const ogcapi = async (fastify, options) => {
     const { gpkg, readonly = true, skipLandingpage, baseurl = "http://127.0.0.1:3000", prefix = '', } = options;
 
-    fastify.decorate('api', await readYaml())
+    const sourceData = await readFile("./src/openapi.yaml", "utf-8");
+    let api = load(sourceData, { schema: JSON_SCHEMA })
+
+    fastify.decorate('api', api)
     fastify.decorate('readonly', readonly)
 
     fastify.api.servers[0].url = baseurl + prefix;
@@ -53,15 +51,13 @@ const ogcapi = async (fastify, options) => {
 
     fastify.register(fastifyView, {
         engine: { eta: new Eta() },
-        templates: `${__dirname}/views`,
+        templates: resolve(moduleDir, 'views'),
     });
-
-    const kortxyzEntryUrl = await import.meta.resolve('@kortxyz/kortxyz-components')
-    const kortxyzDist = dirname(fileURLToPath(kortxyzEntryUrl))
 
     fastify.register(fastifyStatic, {
         root: [
-            `${__dirname}/assets`,
+            resolve(moduleDir, 'assets'),
+            redocDist,
             kortxyzDist
         ],
         prefix: '/assets/',

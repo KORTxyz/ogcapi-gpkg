@@ -3,15 +3,26 @@ import * as featuresModel from "../database/features.js";
 import vtpbf from 'vt-pbf';
 import geojsonVt from 'geojson-vt';
 
-import { SphericalMercator } from '@mapbox/sphericalmercator';
 
-const merc = new SphericalMercator({
-    size: 512,
-    antimeridian: true
-});
+function tileToBBox(x, y, z) {
+  const n = Math.pow(2, z);
+
+  const west  = (x / n) * 360 - 180;
+  const east  = ((x + 1) / n) * 360 - 180;
+
+  const north = Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / n))) * (180 / Math.PI);
+  const south = Math.atan(Math.sinh(Math.PI * (1 - (2 * (y + 1)) / n))) * (180 / Math.PI);
+
+  return [west, south, east, north];
+}
+
+const isGzip = (buf) => {
+    if (!buf || buf.length < 3) return false;
+	return buf[0] === 0x1F && buf[1] === 0x8B && buf[2] === 0x08;
+}
 
 const getAsVectorTile = async (db, collectionId, tileMatrix, tileRow, tileCol, limit, properties) => {
-    const bbox = merc.bbox(tileRow, tileCol, tileMatrix, false)
+    const bbox = tileToBBox(tileRow, tileCol, tileMatrix)
 
     const features = await featuresModel.getItems(db, collectionId, limit, 0, bbox.join(), properties, [])
     if (features?.length > 0) {
@@ -31,5 +42,6 @@ const getAsVectorTile = async (db, collectionId, tileMatrix, tileRow, tileCol, l
 };
 
 export {
-    getAsVectorTile
+    getAsVectorTile,
+    isGzip
 }

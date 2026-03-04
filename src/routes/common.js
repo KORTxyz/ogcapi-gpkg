@@ -28,7 +28,7 @@ async function getAPI(req, reply) {
   const { contentType } = req;
 
   if (contentType == "json") {
-    reply.send(this.api)
+    reply.type('application/json').send(this.api)
   }
   else if (contentType == "html") return reply.view("redoc", {baseurl});
 };

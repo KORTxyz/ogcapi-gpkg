@@ -4,8 +4,6 @@ import * as templates from "../templates/tiles.js"
 
 import * as modelCommon from "../database/common.js"
 
-
-import isGzip from 'is-gzip';
 import { filetypemime } from 'magic-bytes.js';
 
 async function getTilesets(req, reply) {
@@ -44,7 +42,7 @@ async function getTile(req, reply) {
   
   if (tile) {
     if (typeof tile == "object") tile = Buffer.from(tile)
-    const gzip = await isGzip(tile)
+    const gzip = await helpers.isGzip(tile)
 
     reply
       .header('Content-Type', 'application/vnd.mapbox-vector-tile')
@@ -99,7 +97,7 @@ async function getCollectionTile(req, reply) {
   else tile = await model.getCollectionTile(this.db,collectionId, tileMatrix, tileRow, tileCol)
   if (tile) {
     if (typeof tile == "object") tile = Buffer.from(tile)
-    const gzip = await isGzip(tile)
+    const gzip = await helpers.isGzip(tile)
 
     reply
       .header('Content-Type', 'application/vnd.mapbox-vector-tile')
@@ -146,7 +144,7 @@ async function getCollectionMapTile(req, reply) {
   if (tile) {
     if (typeof tile == "object") tile = Buffer.from(tile)
     const format = await filetypemime(tile);
-    const gzip = await isGzip(tile)
+    const gzip = await helpers.isGzip(tile)
     reply
       .header('Content-Type', format[0] || 'application/vnd.mapbox-vector-tile')
       .header('Content-Encoding', gzip ? 'gzip' : 'none')
