@@ -1,0 +1,46 @@
+import { r as registerInstance, a as createEvent, d as getElement, h, e as Host } from './index-DoE5X9BW.js';
+
+const kortxyzSidebarCss = "/*! tailwindcss v4.1.11 | MIT License | https://tailwindcss.com */@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,::backdrop,:after,:before{--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000}}}@layer theme{:host,:root{--font-sans:ui-sans-serif,system-ui,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";--font-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono)}}@layer base{*,::backdrop,:after,:before{border:0 solid;box-sizing:border-box;margin:0;padding:0}::file-selector-button{appearance:button;background-color:#0000;border:0 solid;border-radius:0;box-sizing:border-box;color:inherit;font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;margin:0;margin-inline-end:4px;opacity:1;padding:0}:host,html{-webkit-text-size-adjust:100%;font-family:var(--default-font-family,ui-sans-serif,system-ui,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\");font-feature-settings:var(--default-font-feature-settings,normal);font-variation-settings:var(--default-font-variation-settings,normal);tab-size:4;-webkit-tap-highlight-color:transparent;line-height:1.5}hr{border-top-width:1px;color:inherit;height:0}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:var(--default-mono-font-family,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace);font-feature-settings:var(--default-mono-font-feature-settings,normal);font-size:1em;font-variation-settings:var(--default-mono-font-variation-settings,normal)}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{border-collapse:collapse;border-color:inherit;text-indent:0}:-moz-focusring{outline:auto}progress{vertical-align:baseline}summary{display:list-item}menu,ol,ul{list-style:none}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{height:auto;max-width:100%}button,input,optgroup,select,textarea{background-color:#0000;border-radius:0;color:inherit;font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;opacity:1}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::placeholder{opacity:1}@supports (not ((-webkit-appearance:-apple-pay-button))) or (contain-intrinsic-size:1px){::placeholder{color:currentColor}@supports (color:color-mix(in lab,red,red)){::placeholder{color:currentColor;color:color-mix(in oklab,currentcolor 50%,transparent)}}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex;padding-block:0}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-hour-field{padding-block:0}::-webkit-datetime-edit-minute-field,::-webkit-datetime-edit-second-field{padding-block:0}::-webkit-datetime-edit-meridiem-field,::-webkit-datetime-edit-millisecond-field{padding-block:0}:-moz-ui-invalid{box-shadow:none}button,input:where([type=button],[type=reset],[type=submit]){appearance:button}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden=until-found])){display:none!important}}@layer components;@layer utilities{.shadow{--tw-shadow:0 1px 3px 0 var(--tw-shadow-color,#0000001a),0 1px 2px -1px var(--tw-shadow-color,#0000001a);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}} /*! tailwindcss v4.1.11 | MIT License | https://tailwindcss.com */@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,::backdrop,:after,:before{--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000}}}@layer theme{:host,:root{--font-sans:ui-sans-serif,system-ui,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";--font-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono)}}@layer base{}@layer components;:host{display:flex;flex-direction:row;pointer-events:none;width:48px}iconbar[is-active]{background-color:#eee}iconbar>icons{pointer-events:all}iconbar{display:flex;flex-direction:column;justify-content:space-between}panel{background-color:#fff;height:100%;pointer-events:all}@property --tw-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:\"*\";inherits:false}@property --tw-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:\"*\";inherits:false}@property --tw-inset-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:\"*\";inherits:false}@property --tw-ring-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:\"*\";inherits:false}@property --tw-inset-ring-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:\"*\";inherits:false}@property --tw-ring-offset-width{syntax:\"<length>\";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:\"*\";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}";
+
+const KortxyzSidebar = class {
+    constructor(hostRef) {
+        registerInstance(this, hostRef);
+        this.openPanel = createEvent(this, "openPanel", 7);
+    }
+    get sidebarEl() { return getElement(this); }
+    panelActive = false;
+    openPanel;
+    activePanel;
+    activeIcon;
+    handleToggle = (e) => {
+        const clickedIcon = e.target;
+        // If the clicked icon is already active → deactivate it
+        if (this.activeIcon === clickedIcon) {
+            clickedIcon.classList.remove("active");
+            this.activeIcon = null;
+            this.activePanel.closed = true;
+            this.activePanel = null;
+            this.panelActive = false;
+            return;
+        }
+        // Deactivate the previous one
+        this.activeIcon?.classList.remove("active");
+        if (this.activePanel)
+            this.activePanel.closed = true;
+        // Activate the new one
+        this.activeIcon = clickedIcon;
+        this.activeIcon.classList.add("active");
+        const panelId = this.activeIcon.getAttribute("panel");
+        this.activePanel = this.sidebarEl.querySelector("kortxyz-sidebar-panel#" + panelId);
+        this.activePanel.closed = false;
+        this.panelActive = true;
+        this.openPanel.emit(panelId);
+    };
+    render() {
+        return (h(Host, { key: 'b7e46f16c37acc5b83b689f571f152bd0e8ee0ef' }, h("iconbar", { key: 'ea334da16ca46a41b573e45c22a4cb213a52b3d6', onToggleRequest: this.handleToggle, "is-active": this.panelActive }, h("icons", { key: 'ffdf5bcab38845ceed22c8a1168862079ab286c9' }, h("slot", { key: '825709d6ae6340ef52848b776e10dad3baf1e0c7', name: "icon-top" })), h("icons", { key: 'fec3b6f97e32954d9a7c6245bb424a174cdb095b' }, h("slot", { key: 'f145c742b38a49b9006df31eaae5bdfa12a36568', name: "icon-middle" })), h("icons", { key: 'c857d67300fbc5508eaed59b0bd6db9b461903e7' }, h("slot", { key: 'c08a6dd334ad0a8663aca9da8625436535802c37', name: "icon-bottom" }))), h("panel", { key: '21a9f75d26e7c5e269090088d315db6d1f8ef474' }, h("slot", { key: 'cd5de32eae2eb38febe6443acb4172cfd7637620', name: "panel" }))));
+    }
+};
+KortxyzSidebar.style = kortxyzSidebarCss;
+
+export { KortxyzSidebar as kortxyz_sidebar };
+//# sourceMappingURL=kortxyz-sidebar.entry.esm.js.map
