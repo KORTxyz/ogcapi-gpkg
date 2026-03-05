@@ -34,14 +34,7 @@ function getGpkgHeader(data) {
     const littleEndian = (flags & 1) === 1; // bit 0
     const srid = view.getInt32(4, littleEndian);
     const envelopeIndicator = (flags >> 1) & 0x07;
-
-    const envelopeSizes = {
-        0: 0,
-        1: 32,
-        2: 48,
-        3: 48,
-        4: 64
-    };
+    const envelopeSizes = Object.freeze([0, 32, 48, 48, 64]);
 
     return {
         wkbOffset: 8 + (envelopeSizes[envelopeIndicator] || 0),
@@ -81,50 +74,48 @@ const toGeoJSON = (feature, primaryKey, geomColName) => {
 };
 
 
+const SQLITE_DATATYPES = Object.freeze({
+  "default": { type: "string" },
+  "INT": { type: "integer" },
+  "INTEGER": { type: "integer" },
+  "TINYINT": { type: "integer" },
+  "SMALLINT": { type: "integer" },
+  "MEDIUMINT": { type: "integer" },
+  "BIGINT": { type: "integer" },
+  "UNSIGNED BIG INT": { type: "integer" },
+  "INT2": { type: "integer" },
+  "INT8": { type: "integer" },
+  "CHARACTER": { type: "string" },
+  "VARCHAR": { type: "string" },
+  "VARYING CHARACTER": { type: "string" },
+  "NCHAR": { type: "string" },
+  "NATIVE CHARACTER": { type: "string" },
+  "NVARCHAR": { type: "string" },
+  "TEXT": { type: "string" },
+  "CLOB": { type: "string" },
+  "BLOB": { type: "string", "contentEncoding": "binary" },
+  "REAL": { type: "number" },
+  "DOUBLE": { type: "number" },
+  "DOUBLE PRECISION": { type: "number" },
+  "FLOAT": { type: "number" },
+  "NUMERIC": { type: "number" },
+  "DECIMAL": { type: "number" },
+  "BOOLEAN": { type: "boolean" },
+  "DATE": { type: "string", format: "date" },
+  "DATETIME": { type: "string", format: "date-time" }
+});
+
 const convertSQLITEtype = (type) => {
-    let datatype = type.match(/\w+/g);
-    const datatypes = {
-        "default": { type: "string" },
-        "INT": { type: "integer" },
-        "INTEGER": { type: "integer" },
-        "TINYINT": { type: "integer" },
-        "SMALLINT": { type: "integer" },
-        "MEDIUMINT": { type: "integer" },
-        "BIGINT": { type: "integer" },
-        "UNSIGNED BIG INT": { type: "integer" },
-        "INT2": { type: "integer" },
-        "INT8": { type: "integer" },
-        "CHARACTER(20)": { type: "string" },
-        "VARCHAR(255)": { type: "string" },
-        "VARYING CHARACTER(255)": { type: "string" },
-        "NCHAR": { type: "string" },
-        "NATIVE CHARACTER)": { type: "string" },
-        "NVARCHAR": { type: "string" },
-        "TEXT": { type: "string" },
-        "CLOB": { type: "string" },
-        "BLOB": { type: "string", "contentEncoding": "binary" },
-        "REAL": { type: "number" },
-        "DOUBLE": { type: "number" },
-        "DOUBLE PRECISION": { type: "number" },
-        "FLOAT": { type: "number" },
-        "NUMERIC": { type: "number" },
-        "DECIMAL": { type: "number" },
-        "BOOLEAN": { type: "boolean" },
-        "DATE": { type: "string", format: "date" },
-        "DATETIME": { type: "string", format: "date-time" }
-    }
-    let schemaDef = datatypes[datatype[0]] || datatypes["default"]
-    if (datatype[1]) schemaDef.maxLength = Number(datatype[1])
-    return schemaDef
+  const normalizedType = String(type || "").toUpperCase().replace(/\s+/g, " ").trim();
+  const maxLength = normalizedType.match(/\((\d+)\)/)?.[1];
+  const baseType = normalizedType.replace(/\(\d+\)/g, "").trim();
+  const schemaDef = { ...(SQLITE_DATATYPES[baseType] || SQLITE_DATATYPES["default"]) };
+
+  if (maxLength) schemaDef.maxLength = Number(maxLength);
+  return schemaDef;
 }
 
 const isGeometryType = type => ["POINT", "CURVE", "LINESTRING", "SURFACE", "CURVEPOLYGON", "POLYGON", "GEOMETRY", "GEOMETRYCOLLECTION", "MULTISURFACE", "MULTIPOLYGON", "MULTICURVE", "MULTILINESTRING", "MULTIPOINT"].includes(type);
-
-const partition = (array, predicate) => [
-  array.filter(predicate),
-  array.filter(e => !predicate(e))
-];
-
 
 /**
  * Encode a feature (GeoJSON-like) into GeoPackage geometry BLOB
@@ -148,7 +139,7 @@ function toGPGKgeometry(feature, srsId = 4326, envelopeIndicator = 1) {
   const littleEndian = true;
 
   // Envelope sizes by indicator
-  const envelopeSizes = { 0: 0, 1: 32, 2: 48, 3: 48, 4: 64 };
+  const envelopeSizes = Object.freeze([0, 32, 48, 48, 64]);
   const envelopeSize = envelopeSizes[envelopeIndicator] || 0;
 
   const headerSize = 8 + envelopeSize;
@@ -156,16 +147,13 @@ function toGPGKgeometry(feature, srsId = 4326, envelopeIndicator = 1) {
   const view = new DataView(buffer.buffer);
 
   // Magic
-  buffer[0] = "G".charCodeAt(0);
-  buffer[1] = "P".charCodeAt(0);
+  buffer.set([0x47, 0x50], 0); //G P
 
   // Version
   buffer[2] = 0;
 
   // Flags: little endian + envelopeIndicator
-  let flags = 0;
-  if (littleEndian) flags |= 1; // bit 0
-  flags |= (envelopeIndicator & 0x07) << 1; // bits 1–3
+  const flags = (littleEndian ? 1 : 0) | ((envelopeIndicator & 0x07) << 1);
   buffer[3] = flags;
 
   // SRS ID
@@ -175,19 +163,15 @@ function toGPGKgeometry(feature, srsId = 4326, envelopeIndicator = 1) {
   if (envelopeIndicator > 0) {
     const env = geometry.getEnvelope(); // { minX, maxX, minY, maxY, minZ?, maxZ?, minM?, maxM? }
     let offset = 8;
-    view.setFloat64(offset, env.minX, littleEndian); offset += 8;
-    view.setFloat64(offset, env.maxX, littleEndian); offset += 8;
-    view.setFloat64(offset, env.minY, littleEndian); offset += 8;
-    view.setFloat64(offset, env.maxY, littleEndian); offset += 8;
 
-    if (envelopeIndicator === 2 || envelopeIndicator === 4) {
-      view.setFloat64(offset, env.minZ ?? 0, littleEndian); offset += 8;
-      view.setFloat64(offset, env.maxZ ?? 0, littleEndian); offset += 8;
-    }
-    if (envelopeIndicator === 3 || envelopeIndicator === 4) {
-      view.setFloat64(offset, env.minM ?? 0, littleEndian); offset += 8;
-      view.setFloat64(offset, env.maxM ?? 0, littleEndian); offset += 8;
-    }
+    const writeF64 = (value) => {
+      view.setFloat64(offset, value, littleEndian);
+      offset += 8;
+    };
+
+    [env.minX, env.maxX, env.minY, env.maxY].forEach(writeF64);
+    if (envelopeIndicator === 2 || envelopeIndicator === 4) [env.minZ ?? 0, env.maxZ ?? 0].forEach(writeF64);
+    if (envelopeIndicator === 3 || envelopeIndicator === 4) [env.minM ?? 0, env.maxM ?? 0].forEach(writeF64);
   }
 
   // Append WKB
@@ -203,6 +187,5 @@ export {
     toGeoJSON,
     toGPGKgeometry,
     convertSQLITEtype,
-    isGeometryType,
-    partition
+    isGeometryType
 }

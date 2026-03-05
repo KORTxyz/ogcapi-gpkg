@@ -1,16 +1,14 @@
 {
   "name": "@kortxyz/ogcapi-gpkg",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "main": "src/index.js",
-  "type": "module",
-    "bin": "test/server.js",
-
+  "type": "module",    
+  "bin": "test/server.js",
   "scripts": {
     "start": "node --env-file=.env --watch ./test/server",
     "compileTailwind": "npx tailwindcss -o ./src/assets/tailwind.css --minify",
     "copy-redoc": "cp node_modules/redoc/bundles/redoc.standalone.js src/assets/",
     "copy-kc": "cp -r node_modules/@kortxyz/kortxyz-components/dist/kortxyz-components/* src/assets/",
-    "postinstall": "npm run copy-redoc && npm run copy-kc",
     "test": "node --env-file=.env --test ./test/common.test.js ./test/features.test.js ./test/tiles.test.js ./test/styles.test.js",
     "build": "pkg --targets node22-win-x64 -o KORTxyz.exe ."
   },

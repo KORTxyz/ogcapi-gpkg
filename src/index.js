@@ -20,8 +20,7 @@ const removeTags = (APIspec, tag) => JSON.parse(JSON.stringify(APIspec, (k, v) =
 
 const ogcapi = async (fastify, options) => {
     const { gpkg, readonly = true, skipLandingpage, baseurl = "http://127.0.0.1:3000", prefix = '', } = options;
-
-    const sourceData = await readFile("./src/openapi.yaml", "utf-8");
+    const sourceData = await readFile(`${moduleDir}/openapi.yaml`, "utf-8");
     let api = load(sourceData, { schema: JSON_SCHEMA })
 
     fastify.decorate('api', api)
