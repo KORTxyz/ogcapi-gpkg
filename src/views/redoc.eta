@@ -17,7 +17,7 @@
     </style>
   </head>
   <body>
-    <redoc spec-url='<% it.baseurl %>/api?f=json'></redoc>
+    <redoc spec-url='<%= it.baseurl %>/api?f=json'></redoc>
     <script src="../assets/redoc.standalone.js"> </script>
   </body>
 </html>

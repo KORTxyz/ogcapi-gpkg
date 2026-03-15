@@ -4,7 +4,8 @@ import * as helpers from "../helpers/styles.js";
 
 
 async function getStyles(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
     const { contentType } = req;
 
     if (contentType == "html") return reply.view("styles", { baseurl });
@@ -15,7 +16,8 @@ async function getStyles(req, reply) {
 };
 
 async function getStyle(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
     const { contentType } = req;
 
     const format = contentType.toUpperCase();
@@ -38,12 +40,13 @@ async function getStyle(req, reply) {
 
 
 async function getResources(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
     const { contentType } = req;
 
     if (contentType == "json") {
         const resources = model.getResources(db);
-        reply.type('application/json').send(templates.resources(this.baseurl, resources));
+        reply.type('application/json').send(templates.resources(baseurl, resources));
     }
     else {
         return reply.view("resources", { baseurl });
@@ -51,7 +54,7 @@ async function getResources(req, reply) {
 };
 
 async function getResource(req, reply) {
-    const { db } = this;
+    const db = req.db || req.server.db;
     const { resourceId } = req.params;
 
     const resources = model.getResource(db, resourceId);
@@ -61,7 +64,8 @@ async function getResource(req, reply) {
 
 
 async function getCollectionStyles(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
     const { contentType } = req;
     const { collectionId } = req.params;
@@ -77,7 +81,8 @@ async function getCollectionStyles(req, reply) {
 };
 
 async function getCollectionStyle(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
     const { collectionId, styleId } = req.params;
     const { contentType } = req;

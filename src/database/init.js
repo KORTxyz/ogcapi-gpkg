@@ -1,3 +1,5 @@
+import { readdir } from 'node:fs/promises';
+import { join, basename } from 'node:path';
 import Database from 'better-sqlite3';
 import { GeometryReader } from '@ngageoint/simple-features-wkb-js';
 
@@ -87,6 +89,19 @@ const initDb = async (databasePath) => {
 }
 
 
+const initDbMap = async (folderPath) => {
+    const files = await readdir(folderPath);
+    const gpkgFiles = files.filter(f => f.endsWith('.gpkg'));
+    const map = new Map();
+    for (const file of gpkgFiles) {
+        const key = basename(file, '.gpkg');
+        const db = await initDb(join(folderPath, file));
+        map.set(key, db);
+    }
+    return map;
+};
+
 export {
-    initDb
+    initDb,
+    initDbMap
 }

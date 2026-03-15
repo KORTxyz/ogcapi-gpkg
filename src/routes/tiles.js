@@ -7,7 +7,8 @@ import * as modelCommon from "../database/common.js"
 import { filetypemime } from 'magic-bytes.js';
 
 async function getTilesets(req, reply) {
-  const { baseurl, db } = this;
+  const db = req.db || req.server.db;
+  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
   const { contentType } = req;
 
@@ -21,7 +22,8 @@ async function getTilesets(req, reply) {
 };
 
 async function getTileset(req, reply) {
-  const { baseurl, db } = this;
+  const db = req.db || req.server.db;
+  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
   const { contentType } = req;
 
@@ -37,8 +39,9 @@ async function getTileset(req, reply) {
 
 async function getTile(req, reply) {
   const { tileMatrix, tileRow, tileCol } = req.params;
+  const db = req.db || req.server.db;
 
-  let tile = await model.getCollectionTile(this.db,"tiles", tileMatrix, tileRow, tileCol);
+  let tile = await model.getCollectionTile(db,"tiles", tileMatrix, tileRow, tileCol);
   
   if (tile) {
     if (typeof tile == "object") tile = Buffer.from(tile)
@@ -56,7 +59,8 @@ async function getTile(req, reply) {
 };
 
 async function getCollectionTilesets(req, reply) {
-  const { baseurl, db } = this;
+  const db = req.db || req.server.db;
+  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
   const { contentType } = req;
   const { collectionId } = req.params;
@@ -70,7 +74,8 @@ async function getCollectionTilesets(req, reply) {
 };
 
 async function getCollectionTileset(req, reply) {
-  const { baseurl, db } = this;
+  const db = req.db || req.server.db;
+  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
   const { contentType } = req;
   const { collectionId } = req.params;
@@ -88,13 +93,14 @@ async function getCollectionTileset(req, reply) {
 async function getCollectionTile(req, reply) {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
   const { limit = 10000, properties = null } = req.query;
-  
-  const {data_type} = modelCommon.getCollection(this.db, collectionId)
+  const db = req.db || req.server.db;
+
+  const {data_type} = modelCommon.getCollection(db, collectionId)
 
   let tile;
-  if (data_type == 'features') tile = await helpers.getAsVectorTile(this.db, collectionId, tileMatrix, tileRow, tileCol, limit, properties)
+  if (data_type == 'features') tile = await helpers.getAsVectorTile(db, collectionId, tileMatrix, tileRow, tileCol, limit, properties)
 
-  else tile = await model.getCollectionTile(this.db,collectionId, tileMatrix, tileRow, tileCol)
+  else tile = await model.getCollectionTile(db,collectionId, tileMatrix, tileRow, tileCol)
   if (tile) {
     if (typeof tile == "object") tile = Buffer.from(tile)
     const gzip = await helpers.isGzip(tile)
@@ -115,32 +121,38 @@ async function getCollectionTile(req, reply) {
 async function getCollectionMapTilesets(req, reply) {
   const { collectionId } = req.params;
   const { contentType } = req;
+  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const db = req.db || req.server.db;
 
-  if (contentType == "html") return reply.view("maptilesets", { baseurl: this.baseurl, collectionId });
+  if (contentType == "html") return reply.view("maptilesets", { baseurl, collectionId });
 
   let collection ={ 
-    ...modelCommon.getCollection(this.db, collectionId),
-    tileMatrixSetLimits: model.getTileMatrixSetLimits(this.db, collectionId)
+    ...modelCommon.getCollection(db, collectionId),
+    tileMatrixSetLimits: model.getTileMatrixSetLimits(db, collectionId)
   };
 
-  reply.send(templates.collectionMapTileSets(this.baseurl, collection));
+  reply.send(templates.collectionMapTileSets(baseurl, collection));
 };
 
 
 async function getCollectionMapTileset(req, reply) {
   const { collectionId } = req.params;
+  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const db = req.db || req.server.db;
 
   let collection ={ 
-    ...modelCommon.getCollection(this.db, collectionId),
-    tileMatrixSetLimits: model.getTileMatrixSetLimits(this.db, collectionId)
+    ...modelCommon.getCollection(db, collectionId),
+    tileMatrixSetLimits: model.getTileMatrixSetLimits(db, collectionId)
   };
 
-  reply.send(templates.collectionMapTileSet(this.baseurl, collection));
+  reply.send(templates.collectionMapTileSet(baseurl, collection));
 };
 
 async function getCollectionMapTile(req, reply) {
   const { collectionId, tileMatrix, tileRow, tileCol } = req.params;
-  let tile = await model.getCollectionTile(this.db, collectionId, tileMatrix, tileRow, tileCol)
+  const db = req.db || req.server.db;
+
+  let tile = await model.getCollectionTile(db, collectionId, tileMatrix, tileRow, tileCol)
   if (tile) {
     if (typeof tile == "object") tile = Buffer.from(tile)
     const format = await filetypemime(tile);
@@ -160,26 +172,28 @@ async function getCollectionMapTile(req, reply) {
 
 async function getTileMatrixSets(req, reply) {
   const { f } = req.query;
+  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
   const contentType = f || req.accepts().type(['json', 'html']) || "json";
-  if (contentType == "html") reply.view("tileMatrixSets", { baseurl: this.baseurl });
+  if (contentType == "html") reply.view("tileMatrixSets", { baseurl });
 
   const tileMatrixSets = await model.getTileMatrixSets()
-  reply.send(templates.tileMatrixSets(this.baseurl, tileMatrixSets))
+  reply.send(templates.tileMatrixSets(baseurl, tileMatrixSets))
 
 };
 
 async function getTileMatrixSet(req, reply) {
   const { f } = req.query;
   const { tileMatrixSetId } = req.params;
+  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
   const tileMatrixSet = await model.getTileMatrixSet(tileMatrixSetId)
   const tileMatrices = await model.getTileMatrices(tileMatrixSetId);
 
-  const templated = templates.tileMatrixSet(this.baseurl, tileMatrixSet, tileMatrices)
+  const templated = templates.tileMatrixSet(baseurl, tileMatrixSet, tileMatrices)
 
   const contentType = f || req.accepts().type(['json', 'html']) || "json";
-  if (contentType == "html") reply.view("tileMatrixSet", { baseurl: this.baseurl, tileMatrixSetId, templated });
+  if (contentType == "html") reply.view("tileMatrixSet", { baseurl: baseurl, tileMatrixSetId, templated });
 
   reply.send(templated);
 

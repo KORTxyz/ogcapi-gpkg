@@ -1,2 +1,4 @@
 node_modules
 test/dummydata.gpkg*
+*.exe
+.github

@@ -3,7 +3,9 @@ import * as templates from "../templates/features.js";
 
 
 async function getItems(req, reply) {
-    const { baseurl, db, fastify: { readonly } } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+    const readonly = req.server.readonly;
 
     const { contentType } = req;
     const { collectionId } = req.params;
@@ -35,7 +37,8 @@ async function getItems(req, reply) {
 
 
 async function postItems(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
     const { collectionId } = req.params;
 
     const newFeature = await model.postItems(db, collectionId, req.body)
@@ -48,7 +51,8 @@ async function postItems(req, reply) {
 
 
 async function getItem(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
     const { contentType } = req;
 
@@ -63,7 +67,8 @@ async function getItem(req, reply) {
 
 
 async function putItem(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
     const { collectionId, featureId } = req.params;
 
     const editedFeature = await model.putItem(db, collectionId, featureId, req.body);
@@ -77,7 +82,8 @@ async function putItem(req, reply) {
 
 
 async function patchItem(req, reply) {
-    const { baseurl, db } = this;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
     const { collectionId, featureId } = req.params;
 
     const editedFeature = await model.patchItem(db, collectionId, featureId, req.body)
@@ -91,7 +97,7 @@ async function patchItem(req, reply) {
 
 
 async function deleteItem(req, reply) {
-    const { db } = this;
+    const db = req.db || req.server.db;
     const { collectionId, featureId } = req.params;
 
     const { changes } = await model.deleteItem(db, collectionId, featureId)
@@ -104,9 +110,11 @@ async function deleteItem(req, reply) {
 async function getSchema(req, reply) {
     const { collectionId } = req.params;
     const { f } = req.query;
+    const db = req.db || req.server.db;
+    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
 
-    const { properties, geometryType } = await model.getSchema(this.db, collectionId)
-    reply.type('application/json').send(templates.schema(this.baseurl, collectionId, properties, geometryType));
+    const { properties, geometryType } = await model.getSchema(db, collectionId)
+    reply.type('application/json').send(templates.schema(baseurl, collectionId, properties, geometryType));
 
 };
 

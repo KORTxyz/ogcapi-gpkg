@@ -3,7 +3,7 @@ import Fastify from 'fastify'
 import ogcapi from '../src/index.js';
 
 import fastifyView from '@fastify/view'
-import { dirname, join } from 'node:path';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Eta } from "eta"
 
@@ -27,12 +27,10 @@ const build = (opts = {}) => {
         reply.header('Cache-Control', 'public, max-age=86400');
         return reply.type('image/png').send(faviconPng);
     });
-    
+
     app.register(ogcapi, {
         baseurl: process.env.BASEURL,
-        gpkg: process.env.GPKG,
-        skipLandingpage: false,
-        readonly: false
+        gpkg: process.env.GPKG
     });
 
     return app

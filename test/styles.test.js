@@ -10,42 +10,42 @@ test('Testing OGC API - Styles spec', async (t) => {
     // completes, it will cancel any outstanding subtests.
     const app = build()
 
-    await t.test('requests the "/styles" route', async t => {
+    await t.test('requests the "/dummydata/styles" route', async t => {
         const response = await app.inject({
             method: 'GET',
-            url: '/styles'
+            url: '/dummydata/styles'
         })
         assert.equal(response.statusCode, 200, 'returns a status code of 200')
     });
 
-    await t.test('requests the "/collections/building/styles" route', async t => {
+    await t.test('requests the "/dummydata/collections/building/styles" route', async t => {
         const response = await app.inject({
             method: 'GET',
-            url: '/collections/building/styles'
+            url: '/dummydata/collections/building/styles'
         })
         assert.equal(response.statusCode, 200, 'returns a status code of 200')
     });
 
-    await t.test('requests the "/collections/building/styles/building?f=html" route', async t => {
+    await t.test('requests the "/dummydata/collections/building/styles/building?f=html" route', async t => {
         const response = await app.inject({
             method: 'GET',
-            url: '/collections/building/styles/building?f=html'
+            url: '/dummydata/collections/building/styles/building?f=html'
         })
         assert.equal(response.statusCode, 200, 'returns a status code of 200')
     });
 
-    await t.test('requests the "/collections/building/styles/building?f=sld" route', async t => {
+    await t.test('requests the "/dummydata/collections/building/styles/building?f=sld" route', async t => {
         const response = await app.inject({
             method: 'GET',
-            url: '/collections/building/styles/building?f=sld'
+            url: '/dummydata/collections/building/styles/building?f=sld'
         })
         assert.equal(response.statusCode, 200, 'returns a status code of 200')
     });
     
-    await t.test('requests the "/collections/building/styles/building?f=mbs" route', async t => {
+    await t.test('requests the "/dummydata/collections/building/styles/building?f=mbs" route', async t => {
         const response = await app.inject({
             method: 'GET',
-            url: '/collections/building/styles/building?f=mbs'
+            url: '/dummydata/collections/building/styles/building?f=mbs'
         })
         assert.equal(response.statusCode, 200, 'returns a status code of 200')
     });

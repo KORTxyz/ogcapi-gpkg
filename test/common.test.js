@@ -18,10 +18,10 @@ test('Testing OGC API - common spec', async (t) => {
         assert.equal(response.statusCode, 200, 'returns a status code of 200')
     });
 
-    await t.test('requests the "/collections" route', async t => {
+    await t.test('requests the "/dummydata/collections" route', async t => {
         const response = await app.inject({
             method: 'GET',
-            url: '/collections'
+            url: '/dummydata/collections'
         })
         assert.equal(response.statusCode, 200, 'returns a status code of 200')
     });
