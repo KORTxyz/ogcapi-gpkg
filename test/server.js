@@ -8,7 +8,7 @@ import selfsigned from 'selfsigned';
 const attrs = [{ name: 'commonName', value: 'localhost.com' }];
 const pems = selfsigned.generate(attrs, { days: 365 });
 */
-const server = build({
+const server = await build({
   logger: true,
  // http2: true,
   // https: { key: pems.private, cert: pems.cert }
@@ -17,6 +17,12 @@ const server = build({
 await server.register(cors,{
   methods:['GET', 'PUT', 'POST', 'PATCH','OPTIONS']
 })
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, () => {
+    server.close().finally(() => process.exit());
+  });
+}
 
 server.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {
   //console.log(server.printRoutes())

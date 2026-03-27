@@ -51,12 +51,13 @@ const toGeoJSON = (feature, primaryKey, geomColName) => {
 
     const {wkbOffset,srid} = getGpkgHeader(data)
     const wkb = data.slice(wkbOffset);
-    
+
     let geometry = GeometryReader.readGeometry(wkb);
     if (!geometry) return;
 
     if (srid != 4326) {
         const geometryTransform = new GeometryTransform(
+          //TODO: Application breaks then srid is 999999
             Projections.getProjectionForName("EPSG:" + srid),
             Projections.getWGS84Projection()
         )

@@ -8,7 +8,7 @@ import { filetypemime } from 'magic-bytes.js';
 
 async function getTilesets(req, reply) {
   const db = req.db || req.server.db;
-  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
 
   const { contentType } = req;
 
@@ -23,7 +23,7 @@ async function getTilesets(req, reply) {
 
 async function getTileset(req, reply) {
   const db = req.db || req.server.db;
-  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
 
   const { contentType } = req;
 
@@ -60,7 +60,7 @@ async function getTile(req, reply) {
 
 async function getCollectionTilesets(req, reply) {
   const db = req.db || req.server.db;
-  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
 
   const { contentType } = req;
   const { collectionId } = req.params;
@@ -75,7 +75,7 @@ async function getCollectionTilesets(req, reply) {
 
 async function getCollectionTileset(req, reply) {
   const db = req.db || req.server.db;
-  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
 
   const { contentType } = req;
   const { collectionId } = req.params;
@@ -121,7 +121,7 @@ async function getCollectionTile(req, reply) {
 async function getCollectionMapTilesets(req, reply) {
   const { collectionId } = req.params;
   const { contentType } = req;
-  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
   const db = req.db || req.server.db;
 
   if (contentType == "html") return reply.view("maptilesets", { baseurl, collectionId });
@@ -137,7 +137,7 @@ async function getCollectionMapTilesets(req, reply) {
 
 async function getCollectionMapTileset(req, reply) {
   const { collectionId } = req.params;
-  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
   const db = req.db || req.server.db;
 
   let collection ={ 
@@ -172,7 +172,7 @@ async function getCollectionMapTile(req, reply) {
 
 async function getTileMatrixSets(req, reply) {
   const { f } = req.query;
-  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
 
   const contentType = f || req.accepts().type(['json', 'html']) || "json";
   if (contentType == "html") reply.view("tileMatrixSets", { baseurl });
@@ -185,7 +185,7 @@ async function getTileMatrixSets(req, reply) {
 async function getTileMatrixSet(req, reply) {
   const { f } = req.query;
   const { tileMatrixSetId } = req.params;
-  const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+  const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
 
   const tileMatrixSet = await model.getTileMatrixSet(tileMatrixSetId)
   const tileMatrices = await model.getTileMatrices(tileMatrixSetId);

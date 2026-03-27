@@ -30,7 +30,7 @@ function* streamItems(db, collectionId, limit, offset, bbox, properties, options
 	const primaryKey = tableinfo.find(e => e.pk == 1).name;
 	const select = helpers.formatSelect(properties, primaryKey, geomColName);
 
-	let fromStatement = `${collectionId} c`;
+	let fromStatement = `"${collectionId}" c`;
 
 	let whereStatement = helpers.getWhereStatement(options);
 	if (bbox) {
@@ -46,7 +46,7 @@ function* streamItems(db, collectionId, limit, offset, bbox, properties, options
 					OFFSET ${offset || 0}
 	`;
 
-	const stmt = db.prepare(sql);
+    const stmt = db.prepare(sql);
 
   for (const row of stmt.iterate()) {
     yield helpers.toGeoJSON(row,primaryKey,geomColName);
@@ -65,7 +65,7 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
 
     let whereStatement = helpers.getWhereStatement(options);
     if (bbox) {
-        fromStatement = `rtree_${collectionId}_${geomColName} r LEFT JOIN ${collectionId} c ON r.id=c.ROWID`;
+        fromStatement = `"rtree_${collectionId}_${geomColName}" r LEFT JOIN "${collectionId}" c ON r.id=c.ROWID`;
         whereStatement = helpers.appendRthreeFilter(whereStatement, bbox, srsId)
     }
 

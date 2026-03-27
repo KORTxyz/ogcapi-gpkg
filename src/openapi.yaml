@@ -831,6 +831,31 @@ paths:
           $ref: "#/components/responses/ServerError"
       security:
         - {}
+    post:
+      tags:
+        - Resources
+      summary: create or replace a resource by id
+      operationId: postResource
+      parameters:
+        - $ref: "#/components/parameters/resourceId"
+      requestBody:
+        required: true
+        content:
+          image/*:
+            schema:
+              type: string
+              format: binary
+      responses:
+        201:
+          description: Resource created
+          headers:
+            Location:
+              schema:
+                type: string
+        400:
+          $ref: "#/components/responses/ServerError"
+      security:
+        - {}
 
 components:
   parameters:

@@ -1,4 +1,7 @@
 node_modules
-test/dummydata.gpkg*
+test/data/dummydata.gpkg*
 *.exe
 .github
+.temp
+test
+TODO

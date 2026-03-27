@@ -1,6 +1,6 @@
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, stat, rename, unlink } from 'node:fs/promises';
 
 import fastifyView from '@fastify/view'
 import fastifyAccepts from '@fastify/accepts'
@@ -12,7 +12,9 @@ import { load, JSON_SCHEMA } from "js-yaml";
 import { Eta } from "eta"
 
 import { Service } from "./service.js";
-import { initDb, initDbMap } from "./database/init.js"
+import { initDb, addThumbnail, getThumbnail } from "./database/init.js"
+import { postResource } from "./database/styles.js"
+import { expandAPI, initDbMap, addDb } from "./helpers/multipleDatasets.js"
 
 const moduleDir = dirname(fileURLToPath(import.meta.url));
 
@@ -26,8 +28,6 @@ const ogcapi = async (fastify, options) => {
     fastify.decorate('api', api)
     fastify.decorate('readonly', readonly)
     fastify.decorate('baseurl', baseurl + prefix)
-    
-
 
     fastify.api.servers[0].url = baseurl + prefix;
 
@@ -40,56 +40,51 @@ const ogcapi = async (fastify, options) => {
         fastify.api = removeTags(fastify.api, "delete")
     }
 
-    const isFolder = (await stat(gpkg)).isDirectory();
-    const dbResult = isFolder ? await initDbMap(gpkg) : await initDb(gpkg);
-    fastify.decorate('db', dbResult);
+    //Listen for new datasets
+    fastify.events.on('datasetUploaded', async uploadEvent => {
+        console.log("datasetUploaded", uploadEvent);
+        const { metadata, storage } = uploadEvent;
 
-    if (isFolder) {
-        // Add dataset path parameter to components
-        fastify.api.components = fastify.api.components || {};
-        fastify.api.components.parameters = fastify.api.components.parameters || {};
-        fastify.api.components.parameters.dataset = {
-            name: 'dataset',
-            in: 'path',
-            required: true,
-            schema: { type: 'string' },
-            description: 'Dataset identifier (GeoPackage filename without extension)'
-        };
-
-        const datasetRef = { $ref: '#/components/parameters/dataset' };
-        const existingPaths = Object.entries(fastify.api.paths);
-        const newPaths = {};
-
-        // Add root datasets listing
-        newPaths['/'] = {
-            get: {
-                summary: 'List available datasets',
-                operationId: 'getDatasets',
-                tags: ['Capabilities'],
-                parameters: [],
-                responses: { 200: { description: 'List of datasets' } }
-            }
-        };
-
-        for (const [path, pathItem] of existingPaths) {
-            const newPath = '/{dataset}' + (path === '/' ? '' : path);
-            const newPathItem = JSON.parse(JSON.stringify(pathItem));
-            for (const method of ['get','post','put','patch','delete','head','options']) {
-                if (newPathItem[method]) {
-                    newPathItem[method].parameters = [datasetRef, ...(newPathItem[method].parameters || [])];
-                }
-            }
-            newPaths[newPath] = newPathItem;
+        if (metadata.uploadType === 'thumbnail') {
+            const dataset = fastify.datasets.get(metadata.dataset);
+            if (!dataset) return;
+            const imageBuffer = await readFile(storage.path);
+            postResource(dataset.db, 'coverimage', imageBuffer, metadata.filetype);
+            addThumbnail(dataset.db, 'coverimage');
+            dataset.metadata.thumbnail = 'coverimage';
+            await unlink(storage.path).catch(() => {});
+            return;
         }
 
-        fastify.api.paths = newPaths;
+        const newPath = join(gpkg, metadata.filename);
+        await rename(storage.path,newPath);
+
+        addDb(fastify.datasets,newPath,{
+            "title":metadata.name,
+            "abstract":metadata.description,
+            "keywords":JSON.parse(metadata.tags)
+        })
+    })
+
+    const gpkgIsFolder = (await stat(gpkg)).isDirectory();
+
+    if (gpkgIsFolder) {
+        fastify.decorate('datasets', new Map());
+        await expandAPI(fastify.api)
+        await initDbMap(fastify.datasets, gpkg)
+
+       
+    }
+    else{
+        const {db} = await initDb(gpkg)
+        fastify.decorate("db",db)
     }
 
     fastify.addHook('preHandler', async (req, reply) => {
         req.contentType = req.query.f || req.accepts().type(['json', 'html']) || "json";
-        if (req.server.db instanceof Map) {
+        if (req.server.datasets instanceof Map) {
             if (req.params && req.params.dataset !== undefined) {
-                const db = req.server.db.get(req.params.dataset);
+                const {db} = req.server.datasets.get(req.params.dataset);
                 if (!db) return reply.status(404).send({ error: 'Dataset not found.' });
                 req.db = db;
             }
@@ -108,11 +103,17 @@ const ogcapi = async (fastify, options) => {
         prefix: '/assets/',
     })
 
-    if (isFolder) {
+    if (gpkgIsFolder) {
         fastify.get('/:dataset/assets/*', (req, reply) => {
             return reply.sendFile(req.params['*']);
         });
     }
+
+    const imageParser = async (payload) => {
+        const chunks = [];
+        for await (const chunk of payload) chunks.push(chunk);
+        return Buffer.concat(chunks);
+    };
 
     fastify.addContentTypeParser('text/html', async (req, payload) => await htmlParser(payload))
     fastify.addContentTypeParser('image/*', async (req, payload) => await imageParser(payload))
@@ -125,6 +126,13 @@ const ogcapi = async (fastify, options) => {
         serviceHandlers: Service,
     });
 
+    fastify.addHook('onClose', () => {
+        if (fastify.db instanceof Map) {
+            for (const db of fastify.db.values()) db.close();
+        } else {
+            fastify.db.close();
+        }
+    });
 }
 
 

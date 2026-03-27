@@ -1,22 +1,31 @@
-import Fastify from 'fastify'
-
-import ogcapi from '../src/index.js';
-
-import fastifyView from '@fastify/view'
-import { dirname } from 'node:path';
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import { dirname,join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import Fastify from 'fastify';
+import fastifyView from '@fastify/view'
 import { Eta } from "eta"
 
-  const faviconPng = Buffer.from(
+import ogcapi from '../src/index.js';
+import tusPlugin from "../src/plugins/upload.js";
+import eventsPlugin from "../src/plugins/events.js";
+
+
+const faviconPng = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wwAAoMBgAGL1ioAAAAASUVORK5CYII=',
     'base64'
-  );
+);
 
-const build = (opts = {}) => {
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const tempDir = os.tmpdir()
+const uploadDir = await fs.mkdtemp(join(tempDir, '.tmp'))
+
+const build = async (opts = {}) => {
     const app = Fastify({
         ...opts
     })
-    const __dirname = dirname(fileURLToPath(import.meta.url));
 
     app.register(fastifyView, {
         engine: { eta: new Eta() },
@@ -27,6 +36,10 @@ const build = (opts = {}) => {
         reply.header('Cache-Control', 'public, max-age=86400');
         return reply.type('image/png').send(faviconPng);
     });
+
+    app.register(eventsPlugin)
+
+    app.register(tusPlugin, { path:'/upload', directory: '.temp' })
 
     app.register(ogcapi, {
         baseurl: process.env.BASEURL,

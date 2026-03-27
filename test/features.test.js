@@ -8,7 +8,7 @@ test('Testing OGC API - Features spec', async (t) => {
     // The setTimeout() in the following subtest would cause it to outlive its
     // parent test if 'await' is removed on the next line. Once the parent test
     // completes, it will cancel any outstanding subtests.
-    const app = build()
+    const app = await build()
 
     await t.test('requests the "/dummydata/collections/points" route', async t => {
         const response = await app.inject({

@@ -5,7 +5,7 @@ import * as helpers from "../helpers/styles.js";
 
 async function getStyles(req, reply) {
     const db = req.db || req.server.db;
-    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+    const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
     const { contentType } = req;
 
     if (contentType == "html") return reply.view("styles", { baseurl });
@@ -17,7 +17,7 @@ async function getStyles(req, reply) {
 
 async function getStyle(req, reply) {
     const db = req.db || req.server.db;
-    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+    const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
     const { contentType } = req;
 
     const format = contentType.toUpperCase();
@@ -41,7 +41,7 @@ async function getStyle(req, reply) {
 
 async function getResources(req, reply) {
     const db = req.db || req.server.db;
-    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+    const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
     const { contentType } = req;
 
     if (contentType == "json") {
@@ -62,10 +62,24 @@ async function getResource(req, reply) {
     reply.send(resources);
 };
 
+async function postResource(req, reply) {
+    const db = req.db || req.server.db;
+    const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
+    const { resourceId } = req.params;
+    const contentType = req.headers['content-type'];
+
+    model.postResource(db, resourceId, req.body, contentType);
+
+    reply
+        .status(201)
+        .header("Location", baseurl + '/resources/' + resourceId)
+        .send({ id: resourceId });
+};
+
 
 async function getCollectionStyles(req, reply) {
     const db = req.db || req.server.db;
-    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+    const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
 
     const { contentType } = req;
     const { collectionId } = req.params;
@@ -82,7 +96,7 @@ async function getCollectionStyles(req, reply) {
 
 async function getCollectionStyle(req, reply) {
     const db = req.db || req.server.db;
-    const baseurl = [req.server.baseurl, req.params.dataset].join("/");
+    const baseurl = req.params.dataset ? [req.server.baseurl, req.params.dataset].join("/") : req.server.baseurl;
 
     const { collectionId, styleId } = req.params;
     const { contentType } = req;
@@ -109,6 +123,7 @@ export {
 
     getResources,
     getResource,
+    postResource,
 
     getCollectionStyles,
     getCollectionStyle

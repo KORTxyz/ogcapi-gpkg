@@ -19,6 +19,21 @@ const getResources = (db) => db.prepare("SELECT symbol, description, format FROM
 
 const getResource = (db, resourceId) => db.prepare("SELECT content FROM gpkgext_symbols s LEFT JOIN gpkgext_symbol_content c ON s.id=c.id WHERE symbol = ?").get(resourceId).content;
 
+const postResource = (db, resourceId, content, format) => {
+    const upsert = db.transaction(() => {
+        const existing = db.prepare('SELECT id FROM gpkgext_symbols WHERE symbol = ?').get(resourceId);
+        if (existing) {
+            db.prepare('UPDATE gpkgext_symbol_content SET format = ?, content = ? WHERE id = ?')
+                .run(format, content, existing.id);
+        } else {
+            const { lastInsertRowid } = db.prepare('INSERT INTO gpkgext_symbols (symbol) VALUES (?)').run(resourceId);
+            db.prepare('INSERT INTO gpkgext_symbol_content (id, format, content) VALUES (?, ?, ?)')
+                .run(lastInsertRowid, format, content);
+        }
+    });
+    upsert();
+};
+
 
 const getCollectionStyles = async (db, collectionId) => db.prepare(`
     SELECT styleName,useAsDefault, description
@@ -45,6 +60,7 @@ export {
 
   getResources,
   getResource,
+  postResource,
 
   getCollectionStyles,
   getCollectionStyle,
