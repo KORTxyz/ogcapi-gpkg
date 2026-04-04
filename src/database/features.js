@@ -4,6 +4,8 @@ const getGeomMetadata = (db, collectionId) => db.prepare('SELECT column_name as 
 
 const getTableinfo = (db, collectionId) => db.prepare('SELECT name, type, pk FROM pragma_table_info(?)').all(collectionId);
 
+const hasRtreeIndex = (db, collectionId, geomColName) => !!db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(`rtree_${collectionId}_${geomColName}`);
+
 const getDataColumns = (db, collectionId) => {
     const data_columns = db.prepare(`
             SELECT a.column_name, a.title, a.description,'[' || group_concat('{"type": "string", "const":"' || b.value || '","description":"' || b.description || '"}', ',') || ']' as "values" 
@@ -33,7 +35,7 @@ function* streamItems(db, collectionId, limit, offset, bbox, properties, options
 	let fromStatement = `"${collectionId}" c`;
 
 	let whereStatement = helpers.getWhereStatement(options);
-	if (bbox) {
+	if (bbox && hasRtreeIndex(db, collectionId, geomColName)) {
 					fromStatement = `rtree_${collectionId}_${geomColName} r LEFT JOIN ${collectionId} c ON r.id=c.ROWID`;
 					whereStatement = helpers.appendRthreeFilter(whereStatement, bbox, srsId)
 	}
@@ -64,7 +66,7 @@ const getItems = async (db, collectionId, limit, offset, bbox, properties, optio
     let fromStatement = `${collectionId} c`;
 
     let whereStatement = helpers.getWhereStatement(options);
-    if (bbox) {
+    if (bbox && hasRtreeIndex(db, collectionId, geomColName)) {
         fromStatement = `"rtree_${collectionId}_${geomColName}" r LEFT JOIN "${collectionId}" c ON r.id=c.ROWID`;
         whereStatement = helpers.appendRthreeFilter(whereStatement, bbox, srsId)
     }
@@ -187,7 +189,6 @@ const getSchema = (db, collectionId) => {
         dataColumns.
             filter(dataColumn => dataColumn.name != geometryColumn.name).
             forEach(dataColumn => {
-                console.log(dataColumn.name, properties[dataColumn.name])
                 properties[dataColumn.name] = { 
                     type: properties[dataColumn.name].type, 
                     ...dataColumn.properties }

@@ -128,7 +128,6 @@ const createNecessaryTables = db => {
 }
 
 const addMetadata = (db, metadata) => {
-    console.log(metadata)
     const insert = db.transaction((meta) => {
         const { lastInsertRowid: mdFileId } = db.prepare(`
             INSERT INTO gpkg_metadata (md_scope, md_standard_uri, mime_type, metadata)

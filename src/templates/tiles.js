@@ -120,7 +120,7 @@ const collectionTileSet = (baseurl, collection, layers) => {
   const { name, description, srs_id } = collection
   let { min_x, min_y, max_x, max_y } = collection;
 
-  if (srs_id !== 4326) {
+  if (srs_id && srs_id !== 4326) {
     const storageProjection = Projections.getProjectionForName("EPSG:" + srs_id);
     const wgs84Projection = Projections.getProjectionForName("EPSG:4326");
     const transformation = Projections.getProjectionTransformation(storageProjection, wgs84Projection);
@@ -208,7 +208,7 @@ const collectionMapTileSet = (baseurl, collection) => {
   const { name, description, srs_id, tileMatrixSetLimits } = collection
   let { min_x, min_y, max_x, max_y } = collection;
 
-  if (srs_id !== 4326) {
+  if (srs_id && srs_id !== 4326) {
     const storageProjection = Projections.getProjectionForName("EPSG:" + srs_id);
     const wgs84Projection = Projections.getProjectionForName("EPSG:4326");
     const transformation = Projections.getProjectionTransformation(storageProjection, wgs84Projection);

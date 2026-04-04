@@ -42,7 +42,6 @@ const ogcapi = async (fastify, options) => {
 
     //Listen for new datasets
     fastify.events.on('datasetUploaded', async uploadEvent => {
-        console.log("datasetUploaded", uploadEvent);
         const { metadata, storage } = uploadEvent;
 
         if (metadata.uploadType === 'thumbnail') {

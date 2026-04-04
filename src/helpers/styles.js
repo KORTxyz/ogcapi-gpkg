@@ -136,7 +136,7 @@ const generateVectortilesStylesheet = (db, baseurl, collectionId, collection) =>
     const { name } = collection;
 
     let { srs_id, min_x, min_y, max_x, max_y } = getCollection(db, collectionId)
-    if (srs_id !== 4326) [min_x, min_y, max_x, max_y] = convertBBOXtoWGS84(srs_id, min_x, min_y, max_x, max_y)
+    if (srs_id && srs_id !== 4326) [min_x, min_y, max_x, max_y] = convertBBOXtoWGS84(srs_id, min_x, min_y, max_x, max_y)
 
     const layers = getVectorTilesSpec(db, collectionId).map(layer => generateMapboxLayerStyle(layer.id, layer.minTileMatrix, layer.maxTileMatrix)).flat()
 
@@ -171,7 +171,7 @@ const generateVectorStylesheet = (db, baseurl, collectionId, collection) => {
     const { name } = collection;
 
     let { min_x, min_y, max_x, max_y, srs_id } = getCollection(db, collectionId)
-    if (srs_id !== 4326) [min_x, min_y, max_x, max_y] = convertBBOXtoWGS84(srs_id, min_x, min_y, max_x, max_y)
+    if (srs_id && srs_id !== 4326) [min_x, min_y, max_x, max_y] = convertBBOXtoWGS84(srs_id, min_x, min_y, max_x, max_y)
 
 
     return {
@@ -251,7 +251,7 @@ const generateDefaultStylesheet = (db, baseurl, collectionId) => {
 
 const convertStyleToMBS = async (baseurl, db, collectionId, styleId) => {
     let { min_x, min_y, max_x, max_y, srs_id } = getCollection(db, collectionId)
-    if (srs_id !== 4326) [min_x, min_y, max_x, max_y] = convertBBOXtoWGS84(srs_id, min_x, min_y, max_x, max_y)
+    if (srs_id && srs_id !== 4326) [min_x, min_y, max_x, max_y] = convertBBOXtoWGS84(srs_id, min_x, min_y, max_x, max_y)
 
     const SLDsheet = getCollectionStylesheet(db, collectionId, styleId, "SLD");
     if (!SLDsheet) return;
