@@ -1,79 +1,683 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="<%= it.baseurl %>/assets/tailwind.css" rel="stylesheet" />
-
+  <script type="module" src="<%= it.baseurl %>/assets/kortxyz-components.esm.js"></script>
   <title>OGC API</title>
+  <style>
+    [data-theme="dark"] {
+      --c-bg: #171717; --c-bg-header: #171717; --c-bg-card: #262626; --c-bg-input: #262626;
+      --c-bg-active: #404040; --c-bg-inactive: #262626; --c-bg-btn: #f5f5f5; --c-bg-btn-hover: #fff;
+      --c-bg-overlay: #262626; --c-bg-field: #171717;
+      --c-border: #404040; --c-border-card: #404040; --c-border-badge: #525252;
+      --c-text: #d4d4d4; --c-text-heading: #f5f5f5; --c-text-muted: #737373; --c-text-secondary: #a3a3a3;
+      --c-text-btn: #171717; --c-text-badge: #a3a3a3; --c-text-active: #e5e5e5; --c-text-inactive: #a3a3a3;
+      --c-ring: #525252;
+    }
+    [data-theme="light"] {
+      --c-bg: #ffffff; --c-bg-header: #ffffff; --c-bg-card: #ffffff; --c-bg-input: #f5f5f5;
+      --c-bg-active: #e5e5e5; --c-bg-inactive: #f5f5f5; --c-bg-btn: #171717; --c-bg-btn-hover: #262626;
+      --c-bg-overlay: #ffffff; --c-bg-field: #f5f5f5;
+      --c-border: #e5e5e5; --c-border-card: #e5e5e5; --c-border-badge: #d4d4d4;
+      --c-text: #404040; --c-text-heading: #171717; --c-text-muted: #737373; --c-text-secondary: #525252;
+      --c-text-btn: #ffffff; --c-text-badge: #525252; --c-text-active: #171717; --c-text-inactive: #737373;
+      --c-ring: #a3a3a3;
+    }
+    body { background: var(--c-bg); color: var(--c-text); }
+    .t-header { background: var(--c-bg-header); border-color: var(--c-border); }
+    .t-heading { color: var(--c-text-heading); }
+    .t-muted { color: var(--c-text-muted); }
+    .t-secondary { color: var(--c-text-secondary); }
+    .t-card { background: var(--c-bg-card); border-color: var(--c-border-card); }
+    .t-card:hover { border-color: var(--c-text-muted); }
+    .t-btn { background: var(--c-bg-btn); color: var(--c-text-btn); }
+    .t-btn:hover { background: var(--c-bg-btn-hover); }
+    .t-outline-btn { border-color: var(--c-border); color: var(--c-text); }
+    .t-outline-btn:hover { background: var(--c-bg-input); }
+    .t-toggle-active { background: var(--c-bg-active); color: var(--c-text-active); }
+    .t-toggle-inactive { background: var(--c-bg-inactive); color: var(--c-text-inactive); }
+    .t-toggle-inactive:hover, .t-toggle-active:hover { opacity: 0.85; }
+    .t-badge { border-color: var(--c-border-badge); color: var(--c-text-badge); }
+  </style>
 </head>
 
-<body class="bg-neutral-800 text-neutral-400">
-  <header class="mx-1 flex text-xs items-center justify-between">
-    <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-      </svg>
-      <a class="cursor-default">home</a>
+<body class="min-h-screen">
+
+  <!-- Navigation -->
+  <header class="t-header border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+        <a href="<%= it.baseurl %>" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <div class="flex items-center justify-center w-10 h-10 rounded-lg t-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M3 5V19A9 3 0 0 0 21 19V5"/>
+              <path d="M3 12A9 3 0 0 0 21 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="font-bold text-lg t-heading">KORTxyz</div>
+            <div class="text-xs t-muted">Dataset Repository</div>
+          </div>
+        </a>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="themeToggle" class="p-2 rounded-lg t-outline-btn border transition-colors" title="Toggle theme">
+            <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
-    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
-      target="_blank">JSON</a>
   </header>
 
-
-
-  <div class="p-10">
-
-    <h1 class="text-3xl font-bold  pb-2">
-      OGC API
-    </h1>
-    <div>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque aliquam ante ligula, a euismod leo sollicitudin in. Fusce sit amet luctus leo. Duis neque dolor, laoreet ut efficitur et, maximus sed nisi. Donec id lacinia mauris, vitae blandit nisi. Duis turpis nulla, faucibus in quam tristique, lacinia sagittis neque. Nam blandit turpis est, eu tincidunt ex tincidunt at. Sed quis sapien sed tellus varius ultricies a eu urna. Fusce a arcu a mauris aliquet tristique ac sed urna. Vivamus quis velit vitae nisl finibus eleifend. Etiam at mollis sem, sed condimentum ipsum. Maecenas dictum porttitor porta. Ut nec gravida metus, id tincidunt sapien. Fusce vel massa condimentum, pretium lectus ut, maximus magna. Nunc convallis lacus ut diam fringilla rhoncus. Proin non dapibus tellus. In vehicula euismod urna at faucibus.
-      <br><br>
-      Praesent velit lectus, cursus quis facilisis vitae, dignissim eu massa. Integer et condimentum mauris. Donec tellus augue, consectetur vel varius ac, vehicula ultrices ante. Fusce eu ante dolor. Sed lobortis magna eget euismod egestas. Nullam non orci tempus, dignissim lectus ac, suscipit quam. Aliquam convallis velit non massa sollicitudin finibus. Etiam eu malesuada nisl. Etiam efficitur, odio bibendum porta iaculis, elit ligula dignissim tortor, in elementum turpis enim et odio.
-      <br><br>
-      Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum et mattis dui, ac efficitur ex. Fusce interdum pulvinar lectus ac maximus. Phasellus at tincidunt lectus. Cras nec lorem id elit pulvinar commodo id quis erat. Phasellus et urna vel nunc ullamcorper ultrices id ac lectus. Fusce tempus iaculis augue. Nunc id tortor ut turpis venenatis ullamcorper. Integer molestie ante enim, rutrum fringilla est lobortis ut. Maecenas enim sem, auctor sed imperdiet sed, interdum eu mi.
-    </div>
-    <br />
-
-    <h2 class="text-3xl font-bold">Links to the main resources</h2>
-    <div class="flex flex-col">
-      <a class="text-blue-500 text-xl" href="<%= it.baseurl %>/collections">Access the data</a>
-      <a class="text-blue-500 text-xl" href="<%= it.baseurl %>/tiles">Access the dataset as vector tiles</a>
-      <a class="text-blue-500 text-xl" href="<%= it.baseurl %>/styles">Styles to render the data in maps</a>
-      <a class="text-blue-500 text-xl" href="<%= it.baseurl %>/processes">Processing services</a>
-    </div>
-
-    <br />
-
-    <h2 class="text-3xl font-bold">API information</h2>
-
-    <div class="flex">
-      <div class="basis-1/4 font-bold">API description</div>
-      <div class="basis-3/4	flex flex-col">
-            <a class="text-blue-500" href="<%= it.baseurl %>/api?f=json" target="_blank">Definition of the API in OpenAPI 3.0</a>
-            <a class="text-blue-500" href="<%= it.baseurl %>/api?f=html" target="_blank">Documentation of the API</a>
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 pt-8">
+    <!-- Breadcrumbs -->
+    <header class="mx-1 flex text-xs items-center justify-between mb-6">
+      <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+        </svg>
+        <% if(it.dataset){ %>
+          <a class="hover:text-neutral-100" href="<%= it.datasetsUrl %>">datasets</a>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+          <a class="cursor-default"><%= it.dataset %></a>
+        <% } else { %>
+          <a class="cursor-default">home</a>
+        <% } %>
       </div>
-    </div>
-    <br />
+      <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json" target="_blank">JSON</a>
+    </header>
 
-    <h2 class="text-3xl font-bold">Expert information</h2>
-
-    <div class="flex">
-      <div class="basis-1/4 font-bold">Additional Links</div>
-      <div class="basis-3/4 flex flex-col">
-        <a class="text-blue-500" href="<%= it.baseurl %>/conformance">OGC API conformance classes implemented by this  server</a>
-        <a class="text-blue-500" href="<%= it.baseurl %>/resources">Resources for rendering the data in maps</a>
-        <a class="text-blue-500" href="<%= it.baseurl %>/tileMatrixSets">List of tile matrix sets implemented by this  API</a>
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-1">
+        <h1 class="text-3xl font-bold t-heading"><%= it.title || "OGC API" %></h1>
+        <div class="flex items-center gap-1">
+          <button id="linksViewBtn" class="t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors" title="Links view">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+            </svg>
+          </button>
+          <button id="mapViewBtn" class="t-muted flex items-center justify-center w-7 h-7 rounded transition-colors" title="Map view">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div id="descriptionBlock">
+        <p id="description" class="t-muted line-clamp-1"><%= it.description || "Browse available OGC API datasets" %></p>
+        <button id="descToggle" class="text-sm t-muted hover:t-heading transition-colors hidden" onclick="toggleDesc()">Show more</button>
       </div>
     </div>
 
+    <!-- Links View -->
+    <div id="linksView">
+      <!-- Main Resources -->
+      <h2 class="text-xl font-semibold t-heading mb-4">Data Resources</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <a href="<%= it.baseurl %>/collections" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Collections</h3>
+            </div>
+            <p class="text-sm t-secondary">Browse and access the feature collections available in this dataset</p>
+          </div>
+        </a>
+        <a href="<%= it.baseurl %>/tiles" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Tiles</h3>
+            </div>
+            <p class="text-sm t-secondary">Access the dataset as vector tiles for use in web maps</p>
+          </div>
+        </a>
+        <a href="<%= it.baseurl %>/styles" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-1.5 4-3 4c-1.3 0-2.1-.8-2.6-1.5S15.7 14 15 14c-1.1 0-2 .9-2 2 0 2.8-1.3 6-1 6z"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Styles</h3>
+            </div>
+            <p class="text-sm t-secondary">Styles to render the data in maps, including Mapbox stylesheets</p>
+          </div>
+        </a>
+      </div>
 
+      <!-- API Information -->
+      <h2 class="text-xl font-semibold t-heading mb-4">API Information</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <a href="<%= it.baseurl %>/api?f=json" target="_blank" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">OpenAPI Definition</h3>
+            </div>
+            <p class="text-sm t-secondary">Definition of the API in OpenAPI 3.0 format</p>
+          </div>
+        </a>
+        <a href="<%= it.baseurl %>/api?f=html" target="_blank" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">API Documentation</h3>
+            </div>
+            <p class="text-sm t-secondary">Interactive documentation of the API endpoints</p>
+          </div>
+        </a>
+      </div>
 
-  </div>
+      <!-- Expert Information -->
+      <h2 class="text-xl font-semibold t-heading mb-4">Expert Information</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="<%= it.baseurl %>/conformance" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Conformance</h3>
+            </div>
+            <p class="text-sm t-secondary">OGC API conformance classes implemented by this server</p>
+          </div>
+        </a>
+        <a href="<%= it.baseurl %>/resources" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Resources</h3>
+            </div>
+            <p class="text-sm t-secondary">Resources for rendering the data in maps, including symbols and sprites</p>
+          </div>
+        </a>
+        <a href="<%= it.baseurl %>/tileMatrixSets" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Tile Matrix Sets</h3>
+            </div>
+            <p class="text-sm t-secondary">List of tile matrix sets implemented by this API</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Map View -->
+    <div id="mapView" class="hidden flex" style="height: calc(100vh - 15rem)">
+      <!-- Layer Panel -->
+      <div id="layerPanel" class="flex flex-col border-r" style="width: 320px; min-width: 320px; border-color: var(--c-border); background: var(--c-bg-card)">
+        <!-- Panel Header -->
+        <div class="flex items-center justify-between px-3 py-2 border-b" style="border-color: var(--c-border)">
+          <h3 class="text-sm font-semibold t-heading">Layers</h3>
+          <button id="layerPanelToggle" class="p-1 rounded hover:opacity-80" title="Collapse panel">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+        </div>
+        <!-- Search -->
+        <div class="px-3 py-2 border-b" style="border-color: var(--c-border)">
+          <div class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input id="layerSearch" type="search" placeholder="Search layers..." class="w-full h-8 pl-7 pr-3 rounded border text-xs" style="background: var(--c-bg-input); border-color: var(--c-border); color: var(--c-text-heading)">
+          </div>
+        </div>
+        <!-- Active Layers -->
+        <div id="activeLayers" class="border-b hidden" style="border-color: var(--c-border)">
+          <div class="px-3 py-1.5">
+            <span class="text-xs font-medium t-muted uppercase tracking-wide">Active</span>
+          </div>
+          <div id="activeLayersList" class="max-h-40 overflow-y-auto"></div>
+        </div>
+        <!-- Collection List -->
+        <div class="flex-1 overflow-y-auto">
+          <div class="px-3 py-1.5">
+            <span class="text-xs font-medium t-muted uppercase tracking-wide">Collections</span>
+          </div>
+          <div id="collectionsList"></div>
+          <div id="collectionsLoading" class="flex items-center justify-center py-8">
+            <span class="text-xs t-muted">Loading collections...</span>
+          </div>
+          <div id="collectionsEmpty" class="text-center py-8 hidden">
+            <span class="text-xs t-muted">No collections found</span>
+          </div>
+        </div>
+      </div>
+      <!-- Collapsed Panel Toggle -->
+      <!-- Map -->
+      <div class="flex-1 relative">
+        <button id="layerPanelOpen" class="hidden absolute top-3 left-3 z-10 items-center gap-1 px-2 py-1.5 rounded-lg shadow-lg text-xs font-medium" style="background: var(--c-bg-card); border: 1px solid var(--c-border); color: var(--c-text-heading)" title="Open layer panel">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          Layers
+        </button>
+        <kortxyz-maplibre id="mainMap" class="w-full h-full overflow-hidden" hoverpopup
+          mapstyle="<%= it.baseurl %>/styles/default?f=mbs"
+          basemaps="<%= it.baseurl %>/styles">
+        </kortxyz-maplibre>
+      </div>
+    </div>
+  </main>
+
+  <style>
+    .layer-item { padding: 0.25rem 0.75rem; cursor: pointer; transition: background 0.1s; }
+    .layer-item:hover { background: var(--c-bg-active); }
+    .layer-item .layer-styles { display: none; }
+    .layer-item.expanded .layer-styles { display: block; }
+    .style-btn { display: flex; align-items: center; gap: 0.375rem; width: 100%; padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; transition: background 0.1s; cursor: pointer; border: none; background: none; text-align: left; color: var(--c-text-secondary); }
+    .style-btn:hover { background: var(--c-bg-active); }
+    .style-btn.active { background: var(--c-bg-btn); color: var(--c-text-btn); }
+    .active-layer { display: flex; align-items: center; justify-content: space-between; padding: 0.25rem 0.75rem; font-size: 0.75rem; }
+    .active-layer:hover { background: var(--c-bg-active); }
+    .active-layer.dragging { opacity: 0.4; }
+    .active-layer.drag-over { border-top: 2px solid var(--c-text-heading); }
+    .drag-handle { cursor: grab; color: var(--c-text-muted); display: flex; align-items: center; padding: 0.125rem; flex-shrink: 0; }
+    .drag-handle:active { cursor: grabbing; }
+    .remove-layer-btn { background: none; border: none; cursor: pointer; color: var(--c-text-muted); padding: 0.125rem; border-radius: 0.25rem; display: flex; align-items: center; }
+    .remove-layer-btn:hover { color: var(--c-text-heading); }
+  </style>
+
+  <script>
+    const baseurl = "<%= it.baseurl %>";
+
+    // --- Layer Panel State ---
+    let allCollections = [];
+    const addedLayers = new Map(); // key: collectionId/styleId, value: { collection, style, layers[] }
+
+    // --- Layer Panel Toggle ---
+    const layerPanel = document.getElementById("layerPanel");
+    const layerPanelOpen = document.getElementById("layerPanelOpen");
+    const layerPanelToggle = document.getElementById("layerPanelToggle");
+
+    layerPanelToggle.addEventListener("click", () => {
+      layerPanel.classList.add("hidden");
+      layerPanelOpen.classList.remove("hidden");
+      layerPanelOpen.classList.add("flex");
+    });
+
+    layerPanelOpen.addEventListener("click", () => {
+      layerPanelOpen.classList.add("hidden");
+      layerPanelOpen.classList.remove("flex");
+      layerPanel.classList.remove("hidden");
+    });
+
+    // --- Fetch Collections ---
+    async function loadCollections() {
+      try {
+        const res = await fetch(baseurl + "/collections?f=json");
+        const data = await res.json();
+        allCollections = data.collections || [];
+        // Fetch styles for each collection
+        await Promise.all(allCollections.map(async (col) => {
+          try {
+            const stylesRes = await fetch(baseurl + "/collections/" + encodeURIComponent(col.id) + "/styles?f=json");
+            col._styles = (await stylesRes.json()).styles || [];
+          } catch { col._styles = []; }
+        }));
+        renderCollections();
+      } catch (err) {
+        console.error("Failed to load collections:", err);
+        document.getElementById("collectionsLoading").innerHTML = '<span class="text-xs" style="color:#f87171">Failed to load collections</span>';
+      }
+    }
+
+    // --- Render Collection List ---
+    function renderCollections() {
+      const query = (document.getElementById("layerSearch").value || "").toLowerCase();
+      const filtered = allCollections.filter(c =>
+        c.id.toLowerCase().includes(query) ||
+        (c.title || "").toLowerCase().includes(query) ||
+        (c.description || "").toLowerCase().includes(query)
+      );
+
+      document.getElementById("collectionsLoading").classList.add("hidden");
+      const empty = document.getElementById("collectionsEmpty");
+      const list = document.getElementById("collectionsList");
+
+      if (!filtered.length) {
+        empty.classList.remove("hidden");
+        list.innerHTML = "";
+        return;
+      }
+      empty.classList.add("hidden");
+
+      list.innerHTML = filtered.map(col => {
+        const styles = col._styles || [];
+        const typeIcon = col.itemType === "map"
+          ? '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>'
+          : '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>';
+        const stylesList = styles.length
+          ? styles.map(s => {
+            const key = col.id + "/" + s.id;
+            const isActive = addedLayers.has(key);
+            return '<button class="style-btn' + (isActive ? " active" : "") + '" data-collection="' + escapeAttr(col.id) + '" data-style="' + escapeAttr(s.id) + '" onclick="toggleStyle(this)">'
+              + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-1.5 4-3 4c-1.3 0-2.1-.8-2.6-1.5S15.7 14 15 14c-1.1 0-2 .9-2 2 0 2.8-1.3 6-1 6z"/></svg>'
+              + escapeHtml(s.title || s.id)
+              + '</button>';
+          }).join("")
+          : '<span class="text-xs t-muted px-2">No styles available</span>';
+
+        return '<div class="layer-item" onclick="toggleExpand(event, this)">'
+          + '<div class="flex items-center gap-2 py-1">'
+          + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + typeIcon + '</svg>'
+          + '<div class="flex-1 min-w-0">'
+          + '<div class="text-xs t-heading truncate">' + escapeHtml(col.title || col.id) + '</div>'
+          + (col.description ? '<div class="text-xs t-muted truncate">' + escapeHtml(col.description) + '</div>' : '')
+          + '</div>'
+          + '<svg class="w-3 h-3 shrink-0 t-muted expand-arrow" style="transition: transform 0.15s" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
+          + '</div>'
+          + '<div class="layer-styles pb-1 pl-4">' + stylesList + '</div>'
+          + '</div>';
+      }).join("");
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str || "";
+      return d.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      return (str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function toggleExpand(e, el) {
+      if (e.target.closest(".style-btn")) return;
+      el.classList.toggle("expanded");
+      const arrow = el.querySelector(".expand-arrow");
+      arrow.style.transform = el.classList.contains("expanded") ? "rotate(180deg)" : "";
+    }
+
+    // --- Add/Remove Style to Map ---
+    async function toggleStyle(btn) {
+      const collectionId = btn.dataset.collection;
+      const styleId = btn.dataset.style;
+      const key = collectionId + "/" + styleId;
+      const mapEl = document.querySelector("#mainMap");
+
+      if (addedLayers.has(key)) {
+        removeLayerFromMap(key);
+        btn.classList.remove("active");
+      } else {
+        await addStyleToMap(collectionId, styleId, key);
+        btn.classList.add("active");
+      }
+      renderActiveLayers();
+      renderCollections();
+    }
+
+    async function addStyleToMap(collectionId, styleId, key) {
+      try {
+        const res = await fetch(baseurl + "/collections/" + encodeURIComponent(collectionId) + "/styles/" + encodeURIComponent(styleId) + "?f=mbs");
+        const style = await res.json();
+        const mapEl = document.querySelector("#mainMap");
+        const map = mapEl.map || mapEl._map || window.map;
+        if (!map) return;
+
+        const addedLayerIds = [];
+
+        // Add sources
+        for (const [srcId, srcDef] of Object.entries(style.sources || {})) {
+          const uniqueSrcId = key + ":" + srcId;
+          if (!map.getSource(uniqueSrcId)) {
+            map.addSource(uniqueSrcId, srcDef);
+          }
+        }
+
+        // Add layers
+        for (const layer of (style.layers || [])) {
+          const uniqueLayerId = key + ":" + layer.id;
+          const srcKeys = Object.keys(style.sources || {});
+          const newLayer = { ...layer, id: uniqueLayerId };
+          if (layer.source && srcKeys.includes(layer.source)) {
+            newLayer.source = key + ":" + layer.source;
+          }
+          if (!map.getLayer(uniqueLayerId)) {
+            map.addLayer(newLayer);
+            addedLayerIds.push(uniqueLayerId);
+          }
+        }
+
+        addedLayers.set(key, { collectionId, styleId, layerIds: addedLayerIds, sourceIds: Object.keys(style.sources || {}).map(s => key + ":" + s) });
+
+        // Fly to the style's center/zoom if available
+        const flyOpts = {};
+        if (Array.isArray(style.center) && style.center.length >= 2) flyOpts.center = style.center;
+        if (style.zoom != null) flyOpts.zoom = style.zoom;
+        if (flyOpts.center || flyOpts.zoom != null) map.flyTo(flyOpts);
+      } catch (err) {
+        console.error("Failed to add style:", err);
+      }
+    }
+
+    function removeLayerFromMap(key) {
+      const entry = addedLayers.get(key);
+      if (!entry) return;
+      const mapEl = document.querySelector("#mainMap");
+      const map = mapEl.map || mapEl._map || window.map;
+      if (!map) return;
+
+      for (const layerId of entry.layerIds) {
+        if (map.getLayer(layerId)) map.removeLayer(layerId);
+      }
+      for (const srcId of entry.sourceIds) {
+        if (map.getSource(srcId)) map.removeSource(srcId);
+      }
+      addedLayers.delete(key);
+    }
+
+    // --- Active Layers Panel ---
+    let dragSrcKey = null;
+
+    function renderActiveLayers() {
+      const container = document.getElementById("activeLayers");
+      const list = document.getElementById("activeLayersList");
+      if (!addedLayers.size) {
+        container.classList.add("hidden");
+        return;
+      }
+      container.classList.remove("hidden");
+      list.innerHTML = "";
+      const entries = [...addedLayers.entries()].reverse();
+      for (const [key, entry] of entries) {
+        const el = document.createElement("div");
+        el.className = "active-layer";
+        el.draggable = true;
+        el.dataset.layerKey = key;
+        el.innerHTML = '<span class="drag-handle" title="Drag to reorder">'
+          + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>'
+          + '</span>'
+          + '<span class="t-heading truncate flex-1 mx-1">' + escapeHtml(entry.collectionId + " / " + entry.styleId) + '</span>'
+          + '<button class="remove-layer-btn" title="Remove layer">'
+          + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+          + '</button>';
+        el.querySelector(".remove-layer-btn").addEventListener("click", () => removeLayer(key));
+        el.addEventListener("dragstart", onDragStart);
+        el.addEventListener("dragover", onDragOver);
+        el.addEventListener("dragleave", onDragLeave);
+        el.addEventListener("drop", onDrop);
+        el.addEventListener("dragend", onDragEnd);
+        list.appendChild(el);
+      }
+    }
+
+    function onDragStart(e) {
+      dragSrcKey = e.currentTarget.dataset.layerKey;
+      e.currentTarget.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    }
+
+    function onDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      e.currentTarget.classList.add("drag-over");
+    }
+
+    function onDragLeave(e) {
+      e.currentTarget.classList.remove("drag-over");
+    }
+
+    function onDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.remove("drag-over");
+      const targetKey = e.currentTarget.dataset.layerKey;
+      if (!dragSrcKey || dragSrcKey === targetKey) return;
+      reorderLayers(dragSrcKey, targetKey);
+    }
+
+    function onDragEnd(e) {
+      e.currentTarget.classList.remove("dragging");
+      dragSrcKey = null;
+      document.querySelectorAll(".active-layer.drag-over").forEach(el => el.classList.remove("drag-over"));
+    }
+
+    function reorderLayers(fromKey, toKey) {
+      const keys = [...addedLayers.keys()];
+      const fromIdx = keys.indexOf(fromKey);
+      const toIdx = keys.indexOf(toKey);
+      if (fromIdx === -1 || toIdx === -1) return;
+
+      keys.splice(fromIdx, 1);
+      keys.splice(toIdx, 0, fromKey);
+
+      const reordered = new Map();
+      for (const k of keys) reordered.set(k, addedLayers.get(k));
+      addedLayers.clear();
+      for (const [k, v] of reordered) addedLayers.set(k, v);
+
+      syncMapLayerOrder();
+      renderActiveLayers();
+    }
+
+    function syncMapLayerOrder() {
+      const mapEl = document.querySelector("#mainMap");
+      const map = mapEl.map || mapEl._map || window.map;
+      if (!map) return;
+
+      // Move each layer group to the top in order, so the last entry draws on top
+      for (const [, entry] of addedLayers) {
+        for (const layerId of entry.layerIds) {
+          if (map.getLayer(layerId)) map.moveLayer(layerId);
+        }
+      }
+    }
+
+    function removeLayer(key) {
+      removeLayerFromMap(key);
+      renderActiveLayers();
+      renderCollections();
+    }
+
+    document.getElementById("layerSearch").addEventListener("input", renderCollections);
+
+    // --- View Toggle ---
+    const linksViewBtn = document.getElementById("linksViewBtn");
+    const mapViewBtn = document.getElementById("mapViewBtn");
+    const linksView = document.getElementById("linksView");
+    const mapView = document.getElementById("mapView");
+
+    function setView(mode) {
+      const descBlock = document.getElementById("descriptionBlock");
+      if (mode === "links") {
+        linksView.classList.remove("hidden");
+        mapView.classList.add("hidden");
+        descBlock.classList.remove("hidden");
+        linksViewBtn.className = "t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors";
+        mapViewBtn.className = "t-muted flex items-center justify-center w-7 h-7 rounded transition-colors";
+      } else {
+        linksView.classList.add("hidden");
+        mapView.classList.remove("hidden");
+        descBlock.classList.add("hidden");
+        linksViewBtn.className = "t-muted flex items-center justify-center w-7 h-7 rounded transition-colors";
+        mapViewBtn.className = "t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors";
+        if (!allCollections.length) loadCollections();
+      }
+    }
+
+    linksViewBtn.addEventListener("click", () => setView("links"));
+    mapViewBtn.addEventListener("click", () => setView("map"));
+
+    // --- Theme Toggle ---
+    const themeToggle = document.getElementById("themeToggle");
+    const iconMoon = document.getElementById("iconMoon");
+    const iconSun = document.getElementById("iconSun");
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      if (theme === "light") {
+        iconMoon.classList.add("hidden");
+        iconSun.classList.remove("hidden");
+      } else {
+        iconSun.classList.add("hidden");
+        iconMoon.classList.remove("hidden");
+      }
+    }
+
+    themeToggle.addEventListener("click", function() {
+      const current = localStorage.getItem("theme") || "dark";
+      const next = current === "dark" ? "light" : "dark";
+      localStorage.setItem("theme", next);
+      applyTheme(next);
+    });
+
+    applyTheme(localStorage.getItem("theme") || "dark");
+
+    // --- Description Toggle ---
+    const descEl = document.getElementById("description");
+    const descToggleBtn = document.getElementById("descToggle");
+    if (descEl.scrollHeight > descEl.clientHeight) descToggleBtn.classList.remove("hidden");
+
+    function toggleDesc() {
+      const expanded = descEl.classList.toggle("line-clamp-1");
+      descToggleBtn.textContent = expanded ? "Show more" : "Show less";
+    }
+  </script>
 </body>
 
 </html>

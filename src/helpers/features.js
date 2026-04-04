@@ -107,6 +107,7 @@ const SQLITE_DATATYPES = Object.freeze({
 });
 
 const convertSQLITEtype = (type) => {
+  console.log(type)
   const normalizedType = String(type || "").toUpperCase().replace(/\s+/g, " ").trim();
   const maxLength = normalizedType.match(/\((\d+)\)/)?.[1];
   const baseType = normalizedType.replace(/\(\d+\)/g, "").trim();

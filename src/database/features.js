@@ -173,7 +173,6 @@ const getSchema = (db, collectionId) => {
     const tableinfo = getTableinfo(db, collectionId);
     const geometryColumn = tableinfo.find(column => helpers.isGeometryType(column.type));
     const geometryType = geometryColumn?.type;
-
     let properties = tableinfo
         .filter(column => column.name != geometryColumn.name)
         .filter(column => column.pk != 1)
@@ -183,14 +182,16 @@ const getSchema = (db, collectionId) => {
 
     // If gpkg_schema extension exists, enrich properties with gpkg_data_columns
     const existGpkgSchema = db.prepare("SELECT * FROM gpkg_extensions WHERE extension_name='gpkg_schema'").get();
-
     if (existGpkgSchema) {
         const dataColumns = getDataColumns(db,collectionId);
-        dataColumns.forEach(dataColumn => {
-            properties[dataColumn.name] = { 
-                type: properties[dataColumn.name].type, 
-                ...dataColumn.properties }
-        })
+        dataColumns.
+            filter(dataColumn => dataColumn.name != geometryColumn.name).
+            forEach(dataColumn => {
+                console.log(dataColumn.name, properties[dataColumn.name])
+                properties[dataColumn.name] = { 
+                    type: properties[dataColumn.name].type, 
+                    ...dataColumn.properties }
+            })
     }
 
     return { properties, geometryType }

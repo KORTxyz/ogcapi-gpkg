@@ -8,7 +8,16 @@ async function getLandingpage(req, reply) {
   if (contentType == "json") {
     reply.send(templates.landingPage(baseurl))
   }
-  else if (contentType == "html") return reply.view("landingpage", { baseurl });
+  else if (contentType == "html") {
+    const metadata = req.params.dataset ? req.server.datasets?.get(req.params.dataset)?.metadata : undefined;
+    return reply.view("landingpage", {
+      baseurl,
+      dataset: req.params.dataset,
+      datasetsUrl: req.server.baseurl,
+      title: metadata?.title || req.params.dataset,
+      description: metadata?.abstract,
+    });
+  }
 };
 
 

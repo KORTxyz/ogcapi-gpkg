@@ -162,16 +162,7 @@ const generateVectortilesStylesheet = (db, baseurl, collectionId, collection) =>
                 ]
             }
         },
-        "layers": [
-            {
-                "id": "background",
-                "type": "background",
-                "paint": {
-                    "background-color": "grey"
-                }
-            },
-            ...layers
-        ]
+        "layers": layers
     }
 };
 
@@ -205,16 +196,7 @@ const generateVectorStylesheet = (db, baseurl, collectionId, collection) => {
                 ]
             }
         },
-        "layers": [
-            {
-                "id": "background",
-                "type": "background",
-                "paint": {
-                    "background-color": "grey"
-                }
-            },
-            ...generateMapboxLayerStyle(name)
-        ]
+        "layers": generateMapboxLayerStyle(name)
     }
 };
 
