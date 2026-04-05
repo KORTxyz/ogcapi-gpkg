@@ -2,91 +2,378 @@
 <html lang="en">
 
 <head>
-  <title>Collections</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="<%= it.baseurl %>/assets/tailwind.css" rel="stylesheet" />
+  <title>Collections</title>
+  <style>
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --c-bg: #171717; --c-bg-header: #171717; --c-bg-card: #262626; --c-bg-input: #262626;
+        --c-bg-active: #404040; --c-bg-inactive: #262626; --c-bg-btn: #f5f5f5; --c-bg-btn-hover: #fff;
+        --c-bg-overlay: #262626; --c-bg-field: #171717;
+        --c-border: #404040; --c-border-card: #404040; --c-border-badge: #525252;
+        --c-text: #d4d4d4; --c-text-heading: #f5f5f5; --c-text-muted: #737373; --c-text-secondary: #a3a3a3;
+        --c-text-btn: #171717; --c-text-badge: #a3a3a3; --c-text-active: #e5e5e5; --c-text-inactive: #a3a3a3;
+        --c-ring: #525252;
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --c-bg: #ffffff; --c-bg-header: #ffffff; --c-bg-card: #ffffff; --c-bg-input: #f5f5f5;
+        --c-bg-active: #e5e5e5; --c-bg-inactive: #f5f5f5; --c-bg-btn: #171717; --c-bg-btn-hover: #262626;
+        --c-bg-overlay: #ffffff; --c-bg-field: #f5f5f5;
+        --c-border: #e5e5e5; --c-border-card: #e5e5e5; --c-border-badge: #d4d4d4;
+        --c-text: #404040; --c-text-heading: #171717; --c-text-muted: #737373; --c-text-secondary: #525252;
+        --c-text-btn: #ffffff; --c-text-badge: #525252; --c-text-active: #171717; --c-text-inactive: #737373;
+        --c-ring: #a3a3a3;
+      }
+    }
+    body { background: var(--c-bg); color: var(--c-text); }
+    .t-heading { color: var(--c-text-heading); }
+    .t-muted { color: var(--c-text-muted); }
+    .t-secondary { color: var(--c-text-secondary); }
+    .t-input { background: var(--c-bg-input); border-color: var(--c-border); color: var(--c-text-heading); }
+    .t-input::placeholder { color: var(--c-text-muted); }
+    .t-input:focus { outline: none; box-shadow: 0 0 0 2px var(--c-ring); }
+    .t-card { background: var(--c-bg-card); border-color: var(--c-border-card); }
+    .t-card:hover { border-color: var(--c-text-muted); }
+    .t-badge { border-color: var(--c-border-badge); color: var(--c-text-badge); }
+    .t-toggle-active { background: var(--c-bg-active); color: var(--c-text-active); }
+    .t-toggle-inactive { background: var(--c-bg-inactive); color: var(--c-text-inactive); }
+    .t-toggle-inactive:hover, .t-toggle-active:hover { opacity: 0.85; }
+  </style>
 </head>
 
-<body class="bg-neutral-800 text-neutral-400">
+<body class="min-h-screen">
 
-  <header class="mx-1 flex text-xs items-center justify-between">
-    <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-      </svg>
-      <a class="hover:text-neutral-100" href="<%= it.baseurl %>">home</a>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 pt-2">
+    <!-- Breadcrumbs -->
+    <header class="mx-1 flex text-xs items-center justify-between mb-6">
+      <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+        </svg>
+        <% if(it.dataset){ %>
+          <a class="hover:text-neutral-100" href="<%= it.datasetsUrl %>">Home</a>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+          <a class="hover:text-neutral-100" href="<%= it.baseurl %>"><%= it.dataset %></a>
+        <% } else { %>
+          <a class="hover:text-neutral-100" href="<%= it.baseurl %>">home</a>
+        <% } %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <a class="cursor-default">collections</a>
+      </div>
+      <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json" target="_blank">JSON</a>
+    </header>
 
-      <a class="cursor-default">collections</a>
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-1">
+        <h1 class="text-3xl font-bold t-heading">Collections</h1>
+        <div class="flex items-center gap-1">
+          <button id="gridViewBtn" class="t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors" title="Grid view">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+            </svg>
+          </button>
+          <button id="listViewBtn" class="t-muted flex items-center justify-center w-7 h-7 rounded transition-colors" title="List view">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <p class="t-muted">Browse available feature collections</p>
     </div>
-    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
-      target="_blank">JSON</a>
-  </header>
-  <div id="content" class="p-5">
 
-    <div class="flex justify-between items-center">
-      <h1 class="text-4xl mb-2.5">
-        Collections
-      </h1>
+    <!-- Search and Sort -->
+    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+      <div class="relative flex-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="searchInput" type="search" placeholder="Search collections by name..." class="t-input w-full h-10 pl-10 pr-4 rounded-lg border text-sm">
+      </div>
 
     </div>
 
-    <input class="my-2 p-4 w-full bg-neutral-700 text-l text-neutral-200 focus:outline-none focus:ring" placeholder="Search for collections" oninput="search(this)">
+    <!-- Collection Count -->
+    <p id="collectionCount" class="text-sm t-muted mb-6"></p>
 
-    <div id="collections" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-6 gap-4 mt-6"></div>
+    <!-- Collections Grid -->
+    <div id="collectionsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-  </div>
-  </div>
+    <!-- Collections Table -->
+    <div id="collectionsList" class="hidden overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-16 hidden">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto mb-4" style="color: var(--c-border)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>
+      </svg>
+      <h3 class="font-semibold text-lg mb-2" style="color: var(--c-text)">No collections found</h3>
+      <p class="t-muted">Try adjusting your search query</p>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-16">
+      <p class="t-muted">Loading collections...</p>
+    </div>
+  </main>
+
   <script>
-    let url = new URL(location.href);
-        url.searchParams.set("f", "json")
+    const baseurl = "<%= it.baseurl %>";
 
-    const renderCollections = async () => {
+    // --- State ---
+    let collections = [];
+    let searchQuery = "";
+    let sortBy = "title-asc";
+    let viewMode = "grid";
+    let tableSortCol = "title";
+    let tableSortDir = "asc";
+
+    // --- Elements ---
+    const searchInput = document.getElementById("searchInput");
+    const gridViewBtn = document.getElementById("gridViewBtn");
+    const listViewBtn = document.getElementById("listViewBtn");
+    const collectionsGrid = document.getElementById("collectionsGrid");
+    const collectionsList = document.getElementById("collectionsList");
+    const tableHead = document.getElementById("tableHead");
+    const tableBody = document.getElementById("tableBody");
+    const collectionCount = document.getElementById("collectionCount");
+    const emptyState = document.getElementById("emptyState");
+    const loadingState = document.getElementById("loadingState");
+
+    // --- Filtering & Sorting ---
+    function getFilteredCollections() {
+      const q = searchQuery.toLowerCase();
+      let filtered = collections.filter(c =>
+        (c.title || c.id).toLowerCase().includes(q) ||
+        (c.description || "").toLowerCase().includes(q) ||
+        (c.itemType || "").toLowerCase().includes(q)
+      );
+
+      if (viewMode === "list") {
+        const dir = tableSortDir === "asc" ? 1 : -1;
+        filtered.sort((a, b) => {
+          if (tableSortCol === "title") return dir * (a.title || a.id).localeCompare(b.title || b.id);
+          if (tableSortCol === "type") return dir * (a.itemType || "").localeCompare(b.itemType || "");
+          if (tableSortCol === "description") return dir * (a.description || "").localeCompare(b.description || "");
+          if (tableSortCol === "updated") return dir * (getTemporalDate(a)).localeCompare(getTemporalDate(b));
+          return 0;
+        });
+      } else {
+        filtered.sort((a, b) => {
+          if (sortBy === "title-asc") return (a.title || a.id).localeCompare(b.title || b.id);
+          if (sortBy === "title-desc") return (b.title || b.id).localeCompare(a.title || a.id);
+          if (sortBy === "type") return (a.itemType || "").localeCompare(b.itemType || "");
+          return 0;
+        });
+      }
+      return filtered;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str || "";
+      return div.innerHTML;
+    }
+
+    function getTemporalDate(collection) {
+      try {
+        const interval = collection.extent && collection.extent.temporal && collection.extent.temporal.interval;
+        if (interval && interval[0] && interval[0][0]) return interval[0][0];
+      } catch (e) {}
+      return "";
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d)) return escapeHtml(dateStr);
+      return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    // --- Render ---
+    function renderCollections() {
+      const filtered = getFilteredCollections();
+
+      collectionCount.textContent = filtered.length + " " + (filtered.length === 1 ? "collection" : "collections") + " found";
+
+      if (filtered.length === 0) {
+        collectionsGrid.classList.add("hidden");
+        collectionsList.classList.add("hidden");
+        emptyState.classList.remove("hidden");
+        return;
+      }
+      emptyState.classList.add("hidden");
+
+      if (viewMode === "grid") {
+        collectionsGrid.classList.remove("hidden");
+        collectionsList.classList.add("hidden");
+        collectionsGrid.innerHTML = filtered.map(renderGridCard).join("");
+      } else {
+        collectionsGrid.classList.add("hidden");
+        collectionsList.classList.remove("hidden");
+        renderTable(filtered);
+      }
+    }
+
+    function getCollectionLinks(collection) {
+      const rel = collection.links.map(e => e.rel);
+      const id = escapeHtml(collection.id);
+      const links = [];
+
+      if (rel.includes("items")) {
+        links.push({ title: "Items", href: baseurl + "/collections/" + id + "/items", icon: '<path d="M12 2l-5.5 9h11z"/><circle cx="17.5" cy="17.5" r="4.5"/><path d="M3 13.5h8v8H3z"/>' });
+      }
+      if (rel.includes("tiles") || rel.includes("maptiles")) {
+        const tilePath = rel.includes("maptiles") ? "/map/tiles" : "/tiles";
+        links.push({ title: "Tiles", href: baseurl + "/collections/" + id + tilePath, icon: '<path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>' });
+      }
+      if (rel.includes("items")) {
+        links.push({ title: "Styles", href: baseurl + "/collections/" + id + "/styles", icon: '<circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-1.5 4-3 4c-1.3 0-2.1-.8-2.6-1.5S15.7 14 15 14c-1.1 0-2 .9-2 2 0 2.8-1.3 6-1 6z"/>' });
+      }
+      return links;
+    }
+
+    function renderGridCard(collection) {
+      const title = escapeHtml(collection.title || collection.id);
+      const desc = escapeHtml(collection.description || "No description");
+      const itemType = escapeHtml(collection.itemType || "");
+      const id = escapeHtml(collection.id);
+      const updated = formatDate(getTemporalDate(collection));
+      const links = getCollectionLinks(collection);
+
+      const linksHtml = links.map(l =>
+        '<a href="' + l.href + '" title="' + l.title + '" class="t-muted hover:t-heading transition-colors" onclick="event.stopPropagation()">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/>' + l.icon + '</svg>' +
+        '</a>'
+      ).join("");
+
+      return '<div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col cursor-pointer" onclick="window.location=\'' + baseurl + '/collections/' + id + '\'">' +
+          '<div class="flex items-center justify-between mb-3">' +
+            '<span class="t-badge px-2 py-0.5 rounded-full text-xs border capitalize">' + itemType + '</span>' +
+            '<div class="flex items-center gap-2">' + linksHtml + '</div>' +
+          '</div>' +
+          '<h3 class="font-semibold t-heading mb-1 truncate" title="' + title + '">' + title + '</h3>' +
+          '<p class="text-sm t-secondary line-clamp-2" title="' + desc + '">' + desc + '</p>' +
+          (updated ? '<p class="text-xs t-muted mt-2">Updated ' + updated + '</p>' : '') +
+        '</div>';
+    }
+
+    function sortArrow(col) {
+      if (tableSortCol !== col) return '<span class="t-muted ml-1 inline-block w-3">&nbsp;</span>';
+      return tableSortDir === "asc"
+        ? '<span class="ml-1 inline-block w-3">&#9650;</span>'
+        : '<span class="ml-1 inline-block w-3">&#9660;</span>';
+    }
+
+    function renderTable(filtered) {
+      const cols = [
+        { key: "title", label: "Title" },
+        { key: "type", label: "Type" },
+        { key: "description", label: "Description" },
+        { key: "updated", label: "Updated" }
+      ];
+
+      tableHead.innerHTML = '<tr class="border-b" style="border-color:var(--c-border)">' +
+        cols.map(c =>
+          '<th class="text-left px-4 py-3 font-semibold t-heading cursor-pointer select-none whitespace-nowrap hover:opacity-75 transition-opacity" data-col="' + c.key + '">' +
+            c.label + sortArrow(c.key) +
+          '</th>'
+        ).join("") +
+        '<th class="text-right px-4 py-3 font-semibold t-heading">Links</th>' +
+      '</tr>';
+
+      tableHead.querySelectorAll("th[data-col]").forEach(th => {
+        th.addEventListener("click", function() {
+          const col = this.getAttribute("data-col");
+          if (tableSortCol === col) {
+            tableSortDir = tableSortDir === "asc" ? "desc" : "asc";
+          } else {
+            tableSortCol = col;
+            tableSortDir = "asc";
+          }
+          renderCollections();
+        });
+      });
+
+      tableBody.innerHTML = filtered.map(function(collection) {
+        const title = escapeHtml(collection.title || collection.id);
+        const desc = escapeHtml(collection.description || "");
+        const itemType = escapeHtml(collection.itemType || "");
+        const id = escapeHtml(collection.id);
+        const updated = formatDate(getTemporalDate(collection));
+        const links = getCollectionLinks(collection);
+
+        const linksHtml = links.map(l =>
+          '<a href="' + l.href + '" title="' + l.title + '" class="t-muted hover:t-heading transition-colors" onclick="event.stopPropagation()">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/>' + l.icon + '</svg>' +
+          '</a>'
+        ).join("");
+
+        return '<tr class="border-b cursor-pointer transition-colors" style="border-color:var(--c-border)" ' +
+          'onmouseover="this.style.background=\'var(--c-bg-active)\'" onmouseout="this.style.background=\'\'" ' +
+          'onclick="window.location=\'' + baseurl + '/collections/' + id + '\'">' +
+          '<td class="px-4 py-3 font-medium t-heading truncate max-w-xs" title="' + title + '">' + title + '</td>' +
+          '<td class="px-4 py-3"><span class="t-badge px-2 py-0.5 rounded-full text-xs border capitalize">' + itemType + '</span></td>' +
+          '<td class="px-4 py-3 t-secondary truncate max-w-md" title="' + desc + '">' + desc + '</td>' +
+          '<td class="px-4 py-3 t-muted whitespace-nowrap">' + updated + '</td>' +
+          '<td class="px-4 py-3 text-right"><div class="flex items-center justify-end gap-2">' + linksHtml + '</div></td>' +
+        '</tr>';
+      }).join("");
+    }
+
+    // --- View Mode ---
+    function setViewMode(mode) {
+      viewMode = mode;
+      if (mode === "grid") {
+        gridViewBtn.className = "t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors";
+        listViewBtn.className = "t-muted flex items-center justify-center w-7 h-7 rounded transition-colors";
+      } else {
+        listViewBtn.className = "t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors";
+        gridViewBtn.className = "t-muted flex items-center justify-center w-7 h-7 rounded transition-colors";
+      }
+      renderCollections();
+    }
+
+    // --- Event Listeners ---
+    searchInput.addEventListener("input", function() {
+      searchQuery = this.value;
+      renderCollections();
+    });
+
+
+    gridViewBtn.addEventListener("click", () => setViewMode("grid"));
+    listViewBtn.addEventListener("click", () => setViewMode("list"));
+
+    // --- Init ---
+    async function init() {
+      const url = new URL(location.href);
+      url.searchParams.set("f", "json");
+
       const response = await fetch(url.href);
-      const { collections } = await response.json();
+      const data = await response.json();
+      collections = data.collections;
 
-      const collectionsGrid = document.querySelector("#collections");
-
-      const template = collections.map(collection => {
-        const rel = collection.links.map(e => e.rel);
-
-        return `
-          <div class="bg-neutral-700 pl-5 pt-5 h-60 hover:cursor-pointer hover:bg-neutral-600 flex flex-col" onclick="window.location='collections/${collection.id}'">
-            <div class="text-xs mb-2 capitalize">${collection.itemType}</div>
-            <div class="text-neutral-100 hover:underline shrink-0 text-xl mb-4 font-bold truncate pr-5" title=${collection.title || collection.id} >${collection.title || collection.id}</div>
-            <div class="pr-5 text-sm overflow-clip" title="${collection.description}">${collection.description || "No description"}</div>
-            <div id="spacer" class="flex-1"></div>
-            <div id="toolbar" class="flex justify-end">
-              <a title="Items" ${rel.includes("items") ? 'class="fill-neutral-300 hover:fill-neutral-50" href="<%= it.baseurl %>/collections/' + collection.id + '/items"' : 'class="fill-neutral-500"'}>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 m-2" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2l-5.5 9h11z"/><circle cx="17.5" cy="17.5" r="4.5"/><path d="M3 13.5h8v8H3z"/></svg>
-              </a>
-              <a title="Tiles" ${rel.includes("tiles") || rel.includes("maptiles") ? 'class="fill-neutral-300 hover:fill-neutral-50" href="<%= it.baseurl %>/collections/' + collection.id + `${rel.includes("maptiles")?'/map':''}`  +  '/tiles"' : 'class="fill-neutral-500"'}>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 m-2" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/></svg>
-              </a>
-              <a title="Styles" ${rel.includes("items") ? 'class="fill-neutral-300 hover:fill-neutral-50" href="<%= it.baseurl %>/collections/' + collection.id + '/styles"' : 'class="fill-neutral-500"'} >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 m-2" enable-background="new 0 0 20 20" viewBox="0 0 20 20"><g><rect fill="none" height="20" width="20"/></g><g><path d="M10,2c-4.41,0-8,3.59-8,8s3.59,8,8,8c1.1,0,2-0.9,2-2c0-0.49-0.18-0.96-0.51-1.34c-0.06-0.08-0.1-0.17-0.1-0.26 c0-0.22,0.18-0.4,0.4-0.4h1.42c2.65,0,4.8-2.15,4.8-4.8C18,5.23,14.41,2,10,2z M5.5,10.75c-0.69,0-1.25-0.56-1.25-1.25 c0-0.69,0.56-1.25,1.25-1.25S6.75,8.81,6.75,9.5C6.75,10.19,6.19,10.75,5.5,10.75z M8,7.75c-0.69,0-1.25-0.56-1.25-1.25 c0-0.69,0.56-1.25,1.25-1.25S9.25,5.81,9.25,6.5C9.25,7.19,8.69,7.75,8,7.75z M12,7.75c-0.69,0-1.25-0.56-1.25-1.25 c0-0.69,0.56-1.25,1.25-1.25s1.25,0.56,1.25,1.25C13.25,7.19,12.69,7.75,12,7.75z M14.5,10.75c-0.69,0-1.25-0.56-1.25-1.25 c0-0.69,0.56-1.25,1.25-1.25s1.25,0.56,1.25,1.25C15.75,10.19,15.19,10.75,14.5,10.75z"/></g></svg>
-              </a>
-            </div>
-          </div>
-          `
-      }).join("")
-
-      collectionsGrid.innerHTML = template
+      loadingState.classList.add("hidden");
+      renderCollections();
     }
 
-    const search = (e) => {
-      let inputs = e.value.split(" ").filter(e => e[0] != "@").join("+");
-      url.searchParams.set("q", inputs)
-      renderCollections()
-    }
-
-    renderCollections()
-
+    init();
   </script>
-</body>
 
+</body>
 </html>

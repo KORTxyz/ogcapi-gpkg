@@ -91,7 +91,7 @@
 <body class="min-h-screen">
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-8">
+  <main class="max-w-7xl mx-auto px-4 py-8 pt-2">
     <!-- Breadcrumbs -->
     <header class="mx-1 flex text-xs items-center justify-between mb-6">
       <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">

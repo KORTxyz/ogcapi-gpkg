@@ -51,7 +51,7 @@
 <body class="min-h-screen">
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 pt-8">
+  <main class="max-w-7xl mx-auto px-4 pt-2">
     <!-- Breadcrumbs -->
     <header class="mx-1 flex text-xs items-center justify-between mb-6">
       <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
@@ -217,7 +217,7 @@
     </div>
 
     <!-- Map View -->
-    <div id="mapView" class="hidden flex" style="height: calc(100vh - 15rem)">
+    <div id="mapView" class="hidden flex flex-1 min-h-0 mb-4">
       <!-- Layer Panel -->
       <div id="layerPanel" class="flex flex-col border-r" style="width: 320px; min-width: 320px; border-color: var(--c-border); background: var(--c-bg-card)">
         <!-- Panel Header -->
@@ -593,18 +593,22 @@
     const linksView = document.getElementById("linksView");
     const mapView = document.getElementById("mapView");
 
+    const mainEl = document.querySelector("main");
+
     function setView(mode) {
       const descBlock = document.getElementById("descriptionBlock");
       if (mode === "links") {
         linksView.classList.remove("hidden");
         mapView.classList.add("hidden");
         descBlock.classList.remove("hidden");
+        mainEl.classList.remove("flex", "flex-col", "h-screen");
         linksViewBtn.className = "t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors";
         mapViewBtn.className = "t-muted flex items-center justify-center w-7 h-7 rounded transition-colors";
       } else {
         linksView.classList.add("hidden");
         mapView.classList.remove("hidden");
         descBlock.classList.add("hidden");
+        mainEl.classList.add("flex", "flex-col", "h-screen");
         linksViewBtn.className = "t-muted flex items-center justify-center w-7 h-7 rounded transition-colors";
         mapViewBtn.className = "t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors";
         if (!allCollections.length) loadCollections();
