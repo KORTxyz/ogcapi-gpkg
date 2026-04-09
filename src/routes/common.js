@@ -1,4 +1,5 @@
 import * as model from '../database/common.js';
+import { updateMetadata } from '../database/init.js';
 import * as templates from '../templates/common.js';
 
 async function getLandingpage(req, reply) {
@@ -16,6 +17,8 @@ async function getLandingpage(req, reply) {
       datasetsUrl: req.server.baseurl,
       title: metadata?.title || req.params.dataset,
       description: metadata?.abstract,
+      keywords: metadata?.keywords,
+      thumbnail: metadata?.thumbnail ? baseurl + '/resources/' + metadata.thumbnail : null,
     });
   }
 };
@@ -99,8 +102,28 @@ async function getDatasets(req, reply) {
   reply.send({ datasetList });
 };
 
+async function putLandingpage(req, reply) {
+  const { title, abstract: description, keywords } = req.body;
+
+  if (req.params.dataset) {
+    const entry = req.server.datasets?.get(req.params.dataset);
+    if (!entry) return reply.callNotFound();
+    updateMetadata(entry.db, { title, abstract: description, keywords });
+    entry.metadata.title = title;
+    entry.metadata.abstract = description;
+    entry.metadata.keywords = keywords;
+  } else {
+    const db = req.server.db;
+    if (!db) return reply.status(400).send({ error: 'No database available' });
+    updateMetadata(db, { title, abstract: description, keywords });
+  }
+
+  reply.status(200).send({ title, abstract: description, keywords });
+};
+
 export {
   getLandingpage,
+  putLandingpage,
   getConformance,
   getAPI,
   getCollections,

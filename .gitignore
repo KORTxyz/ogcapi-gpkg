@@ -5,3 +5,5 @@ test/data/dummydata.gpkg*
 .temp
 test
 TODO
+test/data/dummydata.gpkg-shm
+test/data/dummydata.gpkg-wal

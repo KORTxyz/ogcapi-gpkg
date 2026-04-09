@@ -1,6 +1,13 @@
 import Database from 'better-sqlite3';
 import { GeometryReader } from '@ngageoint/simple-features-wkb-js';
 
+const openDatabases = new Set();
+process.on('exit', () => {
+    for (const db of openDatabases) {
+        if (db.open) db.close();
+    }
+});
+
 const startUp = db => {
     db.function('ST_IsEmpty', (geom) => geom === null ? 1 : 0);
     db.function('ST_MinX', (geom) => GeometryReader.readGeometry(geom.slice(40)).getEnvelope()._minX);
@@ -198,9 +205,31 @@ const getThumbnail = db => {
     return row.symbol;
 }
 
+const updateMetadata = (db, metadata) => {
+    const update = db.transaction((meta) => {
+        const row = db.prepare(`
+            SELECT m.id
+            FROM gpkg_metadata m
+            JOIN gpkg_metadata_reference r ON m.id = r.md_file_id
+            WHERE r.reference_scope = 'geopackage' AND m.md_standard_uri = 'https://kort.xyz/metadata'
+            LIMIT 1
+        `).get();
+
+        if (row) {
+            db.prepare(`UPDATE gpkg_metadata SET metadata = ? WHERE id = ?`)
+                .run(Buffer.from(JSON.stringify(meta)), row.id);
+        } else {
+            addMetadata(db, meta);
+        }
+    });
+
+    update(metadata);
+}
+
 const initDb = async (databasePath,initialMetadata) => {
+    console.log("Reading:", databasePath)
     const db = new Database(databasePath, { fileMustExist: true });
-    process.on('exit', () => { if (db.open) db.close(); });
+    openDatabases.add(db);
 
     startUp(db)
     createNecessaryTables(db)
@@ -215,6 +244,8 @@ const initDb = async (databasePath,initialMetadata) => {
 
 export {
     initDb,
+    openDatabases,
     addThumbnail,
-    getThumbnail
+    getThumbnail,
+    updateMetadata
 }

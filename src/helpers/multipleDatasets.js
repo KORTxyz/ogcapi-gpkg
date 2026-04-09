@@ -1,5 +1,5 @@
 import { readdir } from 'node:fs/promises';
-import { basename, join } from 'node:path';
+import { basename, join, relative } from 'node:path';
 
 import {initDb} from '../database/init.js'
 
@@ -45,9 +45,9 @@ const expandAPI = api => {
 }
 
 const initDbMap = async (map, folderPath) => {
-    const files = await readdir(folderPath);
-    const gpkgFiles = files.filter(f => f.endsWith('.gpkg'));
-    for (const file of gpkgFiles) addDb(map,join(folderPath,file))
+    const entries = await readdir(folderPath, { withFileTypes: true, recursive: true });
+    const gpkgFiles = entries.filter(e => e.isFile() && e.name.endsWith('.gpkg'));
+    for (const entry of gpkgFiles) addDb(map, join(entry.parentPath, entry.name))
 };
 
 const addDb = async (map,file,initialMetadata) => {

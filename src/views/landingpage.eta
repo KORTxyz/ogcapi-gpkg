@@ -17,6 +17,9 @@
         --c-text: #d4d4d4; --c-text-heading: #f5f5f5; --c-text-muted: #737373; --c-text-secondary: #a3a3a3;
         --c-text-btn: #171717; --c-text-badge: #a3a3a3; --c-text-active: #e5e5e5; --c-text-inactive: #a3a3a3;
         --c-ring: #525252;
+        --c-tag-bg: rgba(255,255,255,0.08); --c-tag-border: rgba(255,255,255,0.12); --c-tag-text: #a1a1aa;
+        --c-tag-x: #71717a; --c-tag-x-hover: #fafafa;
+        --c-cancel-border: #525252; --c-cancel-text: #d4d4d4; --c-cancel-hover: #404040;
       }
     }
     @media (prefers-color-scheme: light) {
@@ -28,6 +31,9 @@
         --c-text: #404040; --c-text-heading: #171717; --c-text-muted: #737373; --c-text-secondary: #525252;
         --c-text-btn: #ffffff; --c-text-badge: #525252; --c-text-active: #171717; --c-text-inactive: #737373;
         --c-ring: #a3a3a3;
+        --c-tag-bg: rgba(0,0,0,0.05); --c-tag-border: rgba(0,0,0,0.12); --c-tag-text: #525252;
+        --c-tag-x: #737373; --c-tag-x-hover: #171717;
+        --c-cancel-border: #d4d4d4; --c-cancel-text: #404040; --c-cancel-hover: #f5f5f5;
       }
     }
     body { background: var(--c-bg); color: var(--c-text); }
@@ -45,6 +51,21 @@
     .t-toggle-inactive { background: var(--c-bg-inactive); color: var(--c-text-inactive); }
     .t-toggle-inactive:hover, .t-toggle-active:hover { opacity: 0.85; }
     .t-badge { border-color: var(--c-border-badge); color: var(--c-text-badge); }
+    .t-overlay { background: var(--c-bg-overlay); border-color: var(--c-border); }
+    .t-field { background: var(--c-bg-field); border-color: var(--c-border); color: var(--c-text-heading); }
+    .t-field::placeholder { color: var(--c-text-muted); }
+    .t-field:focus { outline: none; box-shadow: 0 0 0 2px var(--c-ring); }
+    .t-label { color: var(--c-text-heading); }
+    .tag-chip {
+      display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem;
+      border-radius: 9999px; font-size: 0.75rem;
+      background: var(--c-tag-bg); border: 1px solid var(--c-tag-border); color: var(--c-tag-text);
+    }
+    .tag-chip button {
+      display: inline-flex; align-items: center; cursor: pointer;
+      color: var(--c-tag-x); background: none; border: none; padding: 0; font-size: 0.875rem; line-height: 1;
+    }
+    .tag-chip button:hover { color: var(--c-tag-x-hover); }
   </style>
 </head>
 
@@ -76,6 +97,11 @@
       <div class="flex items-center justify-between mb-1">
         <h1 class="text-3xl font-bold t-heading"><%= it.title || "OGC API" %></h1>
         <div class="flex items-center gap-1">
+          <button id="editBtn" class="t-muted flex items-center justify-center w-7 h-7 rounded transition-colors" title="Edit metadata">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
           <button id="linksViewBtn" class="t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors" title="Links view">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
@@ -276,6 +302,59 @@
     </div>
   </main>
 
+  <!-- Edit Metadata Modal -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden">
+    <div class="fixed inset-0 bg-black/60" id="editBackdrop"></div>
+    <div class="fixed inset-0 flex items-center justify-center p-4">
+      <div class="t-overlay border rounded-xl shadow-2xl w-full max-w-lg relative">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-xl font-semibold t-heading">Edit Metadata</h2>
+            <button id="editModalClose" class="p-1 rounded t-secondary transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <p class="text-sm t-secondary mb-6">Update the title, description and keywords of this dataset.</p>
+
+          <form id="editForm" class="space-y-4">
+            <div class="space-y-1.5">
+              <label for="editTitle" class="block text-sm font-medium t-label">Dataset Name</label>
+              <input id="editTitle" type="text" placeholder="Enter dataset name" required class="t-field w-full px-3 py-2 rounded-lg border text-sm">
+            </div>
+
+            <div class="space-y-1.5">
+              <label for="editAbstract" class="block text-sm font-medium t-label">Description</label>
+              <textarea id="editAbstract" rows="3" placeholder="Brief description of the dataset" class="t-field w-full px-3 py-2 rounded-lg border text-sm resize-none"></textarea>
+            </div>
+
+            <div class="space-y-1.5">
+              <label for="editTagsInput" class="block text-sm font-medium t-label">Tags</label>
+              <div id="editTagsContainer" class="flex flex-wrap gap-1.5 p-2 rounded-lg border min-h-[2.5rem] cursor-text" style="background: var(--c-bg-field); border-color: var(--c-border)">
+                <input id="editTagsInput" type="text" placeholder="Type a tag and press Enter" class="flex-1 min-w-[120px] bg-transparent border-none text-sm focus:outline-none" style="color: var(--c-text-heading)">
+              </div>
+              <p class="text-xs t-muted">Press Enter or comma to add a tag</p>
+            </div>
+
+            <div class="space-y-1.5">
+              <label for="editImage" class="block text-sm font-medium t-label">Cover Image <span class="font-normal t-muted">(optional)</span></label>
+              <input id="editImage" type="file" accept="image/*" class="w-full text-sm cursor-pointer" style="color: var(--c-file-text)">
+              <div id="editImagePreview" class="<%= it.thumbnail ? '' : 'hidden ' %>mt-2">
+                <img id="editImagePreviewImg" class="rounded-lg border max-h-32 object-cover" style="border-color: var(--c-border)" alt="Preview" <% if (it.thumbnail) { %>src="<%= it.thumbnail %>"<% } %>>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+              <button type="button" id="editCancel" class="px-4 py-2 rounded-lg border text-sm transition-colors" style="border-color: var(--c-cancel-border); color: var(--c-cancel-text)">Cancel</button>
+              <button type="submit" class="px-4 py-2 rounded-lg t-btn font-medium text-sm transition-colors">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <style>
     .layer-item { padding: 0.25rem 0.75rem; cursor: pointer; transition: background 0.1s; }
     .layer-item:hover { background: var(--c-bg-active); }
@@ -294,6 +373,7 @@
     .remove-layer-btn:hover { color: var(--c-text-heading); }
   </style>
 
+  <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
   <script>
     const baseurl = "<%= it.baseurl %>";
 
@@ -627,6 +707,159 @@
       const expanded = descEl.classList.toggle("line-clamp-1");
       descToggleBtn.textContent = expanded ? "Show more" : "Show less";
     }
+
+    // --- Edit Metadata ---
+    const editBtn = document.getElementById("editBtn");
+    const editModal = document.getElementById("editModal");
+    const editBackdrop = document.getElementById("editBackdrop");
+    const editForm = document.getElementById("editForm");
+    const editModalClose = document.getElementById("editModalClose");
+    const editCancel = document.getElementById("editCancel");
+    const editTitle = document.getElementById("editTitle");
+    const editAbstract = document.getElementById("editAbstract");
+    const editTagsInput = document.getElementById("editTagsInput");
+    const editTagsContainer = document.getElementById("editTagsContainer");
+    const editTags = [];
+    const editImageInput = document.getElementById("editImage");
+    const editImagePreview = document.getElementById("editImagePreview");
+    const editImagePreviewImg = document.getElementById("editImagePreviewImg");
+
+    editImageInput.addEventListener("change", function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          editImagePreviewImg.src = e.target.result;
+          editImagePreview.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+      } else {
+        editImagePreview.classList.add("hidden");
+        editImagePreviewImg.src = "";
+      }
+    });
+
+    function openEditModal() {
+      editTitle.value = document.querySelector("h1").textContent;
+      editAbstract.value = descEl.textContent;
+      editTags.length = 0;
+      const existing = <%~ JSON.stringify(it.keywords || []) %>;
+      existing.forEach(t => editTags.push(t));
+      renderEditTags();
+      editImageInput.value = "";
+      <% if (it.thumbnail) { %>
+      editImagePreviewImg.src = "<%= it.thumbnail %>";
+      editImagePreview.classList.remove("hidden");
+      <% } else { %>
+      editImagePreview.classList.add("hidden");
+      editImagePreviewImg.src = "";
+      <% } %>
+      editModal.classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      editModal.classList.add("hidden");
+    }
+
+    editBtn.addEventListener("click", openEditModal);
+    editModalClose.addEventListener("click", closeEditModal);
+    editCancel.addEventListener("click", closeEditModal);
+    editBackdrop.addEventListener("click", closeEditModal);
+
+    // --- Tag Chips ---
+    editTagsContainer.addEventListener("click", () => editTagsInput.focus());
+
+    function addEditTag(text) {
+      const tag = text.trim().toLowerCase();
+      if (!tag || editTags.includes(tag)) return;
+      editTags.push(tag);
+      renderEditTags();
+    }
+
+    function removeEditTag(tag) {
+      const idx = editTags.indexOf(tag);
+      if (idx !== -1) editTags.splice(idx, 1);
+      renderEditTags();
+    }
+
+    function renderEditTags() {
+      const chips = editTagsContainer.querySelectorAll(".tag-chip");
+      chips.forEach(c => c.remove());
+
+      editTags.forEach(tag => {
+        const chip = document.createElement("span");
+        chip.className = "tag-chip";
+        chip.innerHTML = escapeHtml(tag) + '<button type="button" aria-label="Remove tag">&times;</button>';
+        chip.querySelector("button").addEventListener("click", () => removeEditTag(tag));
+        editTagsContainer.insertBefore(chip, editTagsInput);
+      });
+    }
+
+    editTagsInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" || e.key === ",") {
+        e.preventDefault();
+        addEditTag(this.value);
+        this.value = "";
+      }
+      if (e.key === "Backspace" && !this.value && editTags.length) {
+        removeEditTag(editTags[editTags.length - 1]);
+      }
+    });
+
+    editTagsInput.addEventListener("blur", function() {
+      if (this.value.trim()) {
+        addEditTag(this.value);
+        this.value = "";
+      }
+    });
+
+    function uploadEditThumbnail(onDone) {
+      const imageFile = editImageInput.files[0];
+      if (!imageFile) return onDone();
+      const dataset = <%~ JSON.stringify(it.dataset || "") %>;
+      const uploadEndpoint = <%~ JSON.stringify(it.datasetsUrl) %> + "/upload";
+      const thumbUpload = new tus.Upload(imageFile, {
+        endpoint: uploadEndpoint,
+        retryDelays: [0, 1000, 3000],
+        metadata: {
+          filename: imageFile.name,
+          filetype: imageFile.type || "image/png",
+          uploadType: "thumbnail",
+          dataset: dataset,
+        },
+        onSuccess: function() { onDone(); },
+        onError: function(err) {
+          console.warn("Thumbnail upload failed:", err);
+          onDone();
+        },
+      });
+      thumbUpload.start();
+    }
+
+    editForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const body = {
+        title: editTitle.value,
+        abstract: editAbstract.value,
+        keywords: editTags.slice()
+      };
+      try {
+        const res = await fetch(baseurl + "?f=json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          document.querySelector("h1").textContent = body.title;
+          descEl.textContent = body.abstract;
+          uploadEditThumbnail(function() {
+            closeEditModal();
+          });
+        }
+      } catch (err) {
+        console.error("Failed to update metadata:", err);
+      }
+    });
   </script>
 </body>
 

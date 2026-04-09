@@ -12,12 +12,14 @@ async function getItems(req, reply) {
     const { f, limit, offset, bbox, properties, ...searchParams } = req.query;
     /* TODO: bbox-crs as a URL-parameter*/
     if (contentType == "json") {
+        const featureStream = model.streamItems(db, collectionId, limit, offset, bbox, properties, searchParams);
+
         reply.header('Content-Type', 'application/geo+json');
         reply.raw.write('{"type":"FeatureCollection","features":[');
 
         let first = true;
 
-        for (const feature of model.streamItems(db, collectionId, limit, offset, bbox, properties, searchParams)) {
+        for (const feature of featureStream) {
             if (!first) reply.raw.write(',');
             first = false;
             reply.raw.write(JSON.stringify(feature));

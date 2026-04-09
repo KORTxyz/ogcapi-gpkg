@@ -7,7 +7,28 @@ const formatSelect = (properties, primaryKey, geomColName) => properties == unde
 
 const hasOptions = (options) => Object.keys(options).length > 0 && options.constructor === Object;
 
-const getWhereStatement = (options) => hasOptions(options) ? Object.entries(options).map(e => e[0] + " = '" + decodeURI(e[1]) + "'").join(" AND ") : '1=1';
+const quoteIdentifier = (identifier) => `"${String(identifier).replace(/"/g, '""')}"`;
+
+const getWhereStatement = (options, validColumns = []) => {
+  if (!hasOptions(options)) return { clause: '1=1', params: {} };
+
+  const validColumnSet = new Set(validColumns);
+  const entries = Object.entries(options);
+  const unknownColumns = entries
+    .map(([column]) => column)
+    .filter(column => !validColumnSet.has(column));
+
+  if (unknownColumns.length > 0) {
+    const error = new Error(`Unknown filter column(s): ${unknownColumns.join(', ')}`);
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return {
+    clause: entries.map(([column]) => `${quoteIdentifier(column)} = @${column}`).join(' AND '),
+    params: Object.fromEntries(entries.map(([column, value]) => [column, decodeURI(value)]))
+  };
+};
 
 const appendRthreeFilter = (whereStatement, bbox, srsId) => {
     let [minX, minY, maxX, maxY] = bbox?.split(",").map(e => Number(e))
@@ -48,6 +69,7 @@ function getGpkgHeader(data) {
 const toGeoJSON = (feature, primaryKey, geomColName) => {
     const { [geomColName]: geom, [primaryKey]:pk, ...properties } = feature;
     const data = geom instanceof ArrayBuffer ? new Uint8Array(geom) : geom;
+    if(!data) return;
 
     const {wkbOffset,srid} = getGpkgHeader(data)
     const wkb = data.slice(wkbOffset);
@@ -183,6 +205,7 @@ function toGPGKgeometry(feature, srsId = 4326, envelopeIndicator = 1) {
 
 export {
     formatSelect,
+  quoteIdentifier,
     getWhereStatement,
     appendRthreeFilter,
     toGeoJSON,

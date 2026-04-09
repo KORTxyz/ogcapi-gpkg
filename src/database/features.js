@@ -14,7 +14,7 @@ const getDataColumns = (db, collectionId) => {
             WHERE a.table_name = ?
             GROUP BY a.column_name, a.title, a.description
         `).all(collectionId);
-    
+
     return data_columns.map(column => ({
         name: column.column_name,
         properties: {
@@ -25,22 +25,22 @@ const getDataColumns = (db, collectionId) => {
     }));
 }
 
-function* streamItems(db, collectionId, limit, offset, bbox, properties, options) {
-  const {geomColName,srsId} = getGeomMetadata(db, collectionId);
-	const tableinfo = getTableinfo(db, collectionId);
+const buildItemsQuery = (db, collectionId, limit, offset, bbox, properties, options) => {
+    const { geomColName, srsId } = getGeomMetadata(db, collectionId);
+    const tableinfo = getTableinfo(db, collectionId);
+    const primaryKey = tableinfo.find(e => e.pk == 1).name;
+    const select = helpers.formatSelect(properties, primaryKey, geomColName);
+    const validColumns = tableinfo.map(column => column.name);
 
-	const primaryKey = tableinfo.find(e => e.pk == 1).name;
-	const select = helpers.formatSelect(properties, primaryKey, geomColName);
+    let fromStatement = `${helpers.quoteIdentifier(collectionId)} c`;
+    let { clause: whereStatement, params } = helpers.getWhereStatement(options, validColumns);
 
-	let fromStatement = `"${collectionId}" c`;
+    if (bbox && hasRtreeIndex(db, collectionId, geomColName)) {
+        fromStatement = `${helpers.quoteIdentifier(`rtree_${collectionId}_${geomColName}`)} r LEFT JOIN ${helpers.quoteIdentifier(collectionId)} c ON r.id=c.ROWID`;
+        whereStatement = helpers.appendRthreeFilter(whereStatement, bbox, srsId)
+    }
 
-	let whereStatement = helpers.getWhereStatement(options);
-	if (bbox && hasRtreeIndex(db, collectionId, geomColName)) {
-					fromStatement = `rtree_${collectionId}_${geomColName} r LEFT JOIN ${collectionId} c ON r.id=c.ROWID`;
-					whereStatement = helpers.appendRthreeFilter(whereStatement, bbox, srsId)
-	}
-
-	const sql = `
+    const sql = `
 					SELECT ${select}
 					FROM  ${fromStatement}
 					WHERE ${whereStatement}
@@ -48,37 +48,28 @@ function* streamItems(db, collectionId, limit, offset, bbox, properties, options
 					OFFSET ${offset || 0}
 	`;
 
-    const stmt = db.prepare(sql);
+    return {
+        geomColName,
+        primaryKey,
+        stmt: db.prepare(sql),
+        params
+    };
+};
 
-  for (const row of stmt.iterate()) {
-    yield helpers.toGeoJSON(row,primaryKey,geomColName);
-  }
+const streamItems = (db, collectionId, limit, offset, bbox, properties, options) => {
+    const { stmt, params, primaryKey, geomColName } = buildItemsQuery(db, collectionId, limit, offset, bbox, properties, options);
+
+    return (function* () {
+        for (const row of stmt.iterate(params)) {
+            yield helpers.toGeoJSON(row, primaryKey, geomColName);
+        }
+    })();
 }
 
 
 const getItems = async (db, collectionId, limit, offset, bbox, properties, options) => {
-    const { geomColName, srsId } = getGeomMetadata(db, collectionId);
-
-    const tableinfo = getTableinfo(db, collectionId);
-    const primaryKey = tableinfo.find(e => e.pk == 1).name;
-
-    const select = helpers.formatSelect(properties, primaryKey, geomColName);
-    let fromStatement = `${collectionId} c`;
-
-    let whereStatement = helpers.getWhereStatement(options);
-    if (bbox && hasRtreeIndex(db, collectionId, geomColName)) {
-        fromStatement = `"rtree_${collectionId}_${geomColName}" r LEFT JOIN "${collectionId}" c ON r.id=c.ROWID`;
-        whereStatement = helpers.appendRthreeFilter(whereStatement, bbox, srsId)
-    }
-
-    const sql = `
-        SELECT ${select}
-        FROM  ${fromStatement}
-        WHERE ${whereStatement}
-        LIMIT ${limit || 999}
-        OFFSET ${offset || 0}
-    `;
-    const features = db.prepare(sql).all();
+    const { stmt, params, primaryKey, geomColName } = buildItemsQuery(db, collectionId, limit, offset, bbox, properties, options);
+    const features = stmt.all(params);
     const geojsonfeatures = features.map(feature => helpers.toGeoJSON(feature, primaryKey, geomColName))
 
     return geojsonfeatures
@@ -185,13 +176,14 @@ const getSchema = (db, collectionId) => {
     // If gpkg_schema extension exists, enrich properties with gpkg_data_columns
     const existGpkgSchema = db.prepare("SELECT * FROM gpkg_extensions WHERE extension_name='gpkg_schema'").get();
     if (existGpkgSchema) {
-        const dataColumns = getDataColumns(db,collectionId);
+        const dataColumns = getDataColumns(db, collectionId);
         dataColumns.
             filter(dataColumn => dataColumn.name != geometryColumn.name).
             forEach(dataColumn => {
-                properties[dataColumn.name] = { 
-                    type: properties[dataColumn.name].type, 
-                    ...dataColumn.properties }
+                properties[dataColumn.name] = {
+                    type: properties[dataColumn.name].type,
+                    ...dataColumn.properties
+                }
             })
     }
 

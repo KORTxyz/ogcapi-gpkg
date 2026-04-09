@@ -45,12 +45,20 @@ const ogcapi = async (fastify, options) => {
         const { metadata, storage } = uploadEvent;
 
         if (metadata.uploadType === 'thumbnail') {
-            const dataset = fastify.datasets.get(metadata.dataset);
-            if (!dataset) return;
+            let db;
+            if (metadata.dataset && fastify.datasets) {
+                const dataset = fastify.datasets.get(metadata.dataset);
+                if (!dataset) return;
+                db = dataset.db;
+                dataset.metadata.thumbnail = 'coverimage';
+            } else if (fastify.db) {
+                db = fastify.db;
+            } else {
+                return;
+            }
             const imageBuffer = await readFile(storage.path);
-            postResource(dataset.db, 'coverimage', imageBuffer, metadata.filetype);
-            addThumbnail(dataset.db, 'coverimage');
-            dataset.metadata.thumbnail = 'coverimage';
+            postResource(db, 'coverimage', imageBuffer, metadata.filetype);
+            addThumbnail(db, 'coverimage');
             await unlink(storage.path).catch(() => {});
             return;
         }
@@ -71,9 +79,8 @@ const ogcapi = async (fastify, options) => {
         fastify.decorate('datasets', new Map());
         await expandAPI(fastify.api)
         await initDbMap(fastify.datasets, gpkg)
-
-       
     }
+
     else{
         const {db} = await initDb(gpkg)
         fastify.decorate("db",db)
@@ -126,9 +133,9 @@ const ogcapi = async (fastify, options) => {
     });
 
     fastify.addHook('onClose', () => {
-        if (fastify.db instanceof Map) {
-            for (const db of fastify.db.values()) db.close();
-        } else {
+        if (fastify.datasets instanceof Map) {
+            for (const { db } of fastify.datasets.values()) db.close();
+        } else if (fastify.db) {
             fastify.db.close();
         }
     });

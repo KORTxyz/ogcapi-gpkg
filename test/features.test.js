@@ -43,6 +43,14 @@ test('Testing OGC API - Features spec', async (t) => {
         assert.equal(response.json().features.length, 1, 'returns 1 features')
     });
 
+    await t.test('requests the "/dummydata/collections/points/items?missing=foo" route', async t => {
+        const response = await app.inject({
+            method: 'GET',
+            url: '/dummydata/collections/points/items?missing=foo'
+        })
+        assert.equal(response.statusCode, 400, 'returns a status code of 400')
+    });
+
     await t.test('requests the "/dummydata/collections/points/items?bbox=12,56,13,57" route (No data)', async t => {
         const response = await app.inject({
             method: 'GET',
