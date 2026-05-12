@@ -106,7 +106,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input id="searchInput" type="search" placeholder="Search tilesets by title..." class="t-input w-full h-10 pl-10 pr-4 rounded-lg border text-sm">
+        <input id="searchInput" type="search" placeholder="Search for tilesets..." class="t-input w-full h-10 pl-10 pr-4 rounded-lg border text-sm">
       </div>
     </div>
 
@@ -167,18 +167,15 @@
       const q = searchQuery.toLowerCase();
       let filtered = tilesets.filter(ts =>
         (ts.tileMatrixSetURI || ts.id || "").toLowerCase().includes(q) ||
-        (ts.tileMatrixSetURIName || "").toLowerCase().includes(q) ||
-        (ts.description || "").toLowerCase().includes(q) ||
-        (ts.dataType || "").toLowerCase().includes(q)
+        (ts.id || "").toLowerCase().includes(q) ||
+        (ts.crs || "").toLowerCase().includes(q)
       );
 
       if (viewMode === "list") {
         const dir = tableSortDir === "asc" ? 1 : -1;
         filtered.sort((a, b) => {
           if (tableSortCol === "tmsUri") return dir * (a.tileMatrixSetURI || a.id).localeCompare(b.tileMatrixSetURI || b.id);
-          if (tableSortCol === "tmsName") return dir * (a.tileMatrixSetURIName || "").localeCompare(b.tileMatrixSetURIName || "");
-          if (tableSortCol === "type") return dir * (a.dataType || "").localeCompare(b.dataType || "");
-          if (tableSortCol === "description") return dir * (a.description || "").localeCompare(b.description || "");
+          if (tableSortCol === "tmsId") return dir * (a.id || "").localeCompare(b.id || "");
           if (tableSortCol === "crs") return dir * (a.crs || "").localeCompare(b.crs || "");
           return 0;
         });
@@ -192,13 +189,6 @@
       const div = document.createElement("div");
       div.textContent = str || "";
       return div.innerHTML;
-    }
-
-    function formatBoundingBox(bbox) {
-      if (!bbox) return "N/A";
-      const ll = bbox.lowerLeft || [];
-      const ur = bbox.upperRight || [];
-      return `[${ll[0]?.toFixed(4)}, ${ll[1]?.toFixed(4)}, ${ur[0]?.toFixed(4)}, ${ur[1]?.toFixed(4)}]`;
     }
 
     // --- Render ---
@@ -244,28 +234,16 @@
 
     function renderGridCard(tileset) {
       const tmsUri = escapeHtml(tileset.tileMatrixSetURI || tileset.id || "TMS");
-      const tmsName = escapeHtml(tileset.tileMatrixSetURIName || "");
-      const desc = escapeHtml(tileset.description || "No description");
-      const dataType = escapeHtml(tileset.dataType || "");
+      const tmsId = escapeHtml(tileset.tileMatrixSetId || "");
       const crs = escapeHtml(tileset.crs || "");
-      const bbox = formatBoundingBox(tileset.boundingBox);
-      const links = getTilesetLinks(tileset);
 
-      const linksHtml = links.map(l =>
-        '<a href="' + l.href + '" title="' + l.title + '" class="t-muted hover:t-heading transition-colors" onclick="event.stopPropagation()">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/>' + l.icon + '</svg>' +
-        '</a>'
-      ).join("");
 
       return '<div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col cursor-pointer" onclick="window.location=\'' + baseurl + '/collections/' + collectionId + '/tiles/WebMercatorQuad\'">' +
           '<div class="flex items-center justify-between mb-3">' +
-            '<span class="t-badge px-2 py-0.5 rounded-full text-xs border capitalize">' + dataType + '</span>' +
-            '<div class="flex items-center gap-2">' + linksHtml + '</div>' +
+            '<span class="t-badge px-2 py-0.5 rounded-full text-xs border">'+crs+'</span>' +
           '</div>' +
-          '<h3 class="font-semibold t-heading mb-1 truncate" title="' + tmsUri + '">' + tmsUri + '</h3>' +
-          (tmsName ? '<p class="text-sm t-secondary line-clamp-2" title="' + tmsName + '">' + tmsName + '</p>' : '') +
-          '<div class="text-xs t-muted mt-2">' + crs + '</div>' +
-          '<div class="text-xs t-muted mt-1" title="Bounding Box">Bbox: ' + bbox + '</div>' +
+          '<h3 class="font-semibold t-heading mb-1 truncate" >' + tmsId + '</h3>' +
+          '<div class="text-sm t-secondary mt-1 break-all">' + tmsUri + '</div>' +
         '</div>';
     }
 
@@ -278,11 +256,9 @@
 
     function renderTable(filtered) {
       const cols = [
+        { key: "tmsId", label: "TileMatrixSet ID" },
         { key: "tmsUri", label: "TileMatrixSet URI" },
-        { key: "tmsName", label: "TileMatrixSet Name" },
-        { key: "type", label: "Type" },
-        { key: "crs", label: "CRS" },
-        { key: "description", label: "Description" }
+        { key: "crs", label: "CRS" }
       ];
 
       tableHead.innerHTML = '<tr class="border-b" style="border-color:var(--c-border)">' +
@@ -314,11 +290,9 @@
         ).join(" | ");
 
         return '<tr class="border-b hover:opacity-75 transition-opacity" style="border-color:var(--c-border);cursor:pointer" onclick="window.location=\'' + baseurl + '/collections/' + collectionId + '/tiles/WebMercatorQuad\'">' +
-          '<td class="px-4 py-3">' + escapeHtml(ts.tileMatrixSetURI || ts.id || "TMS") + '</td>' +
-          '<td class="px-4 py-3">' + escapeHtml(ts.tileMatrixSetURIName || "") + '</td>' +
-          '<td class="px-4 py-3 capitalize">' + escapeHtml(ts.dataType || "") + '</td>' +
-          '<td class="px-4 py-3">' + escapeHtml(ts.crs || "") + '</td>' +
-          '<td class="px-4 py-3">' + escapeHtml((ts.description || "").substring(0, 60)) + (ts.description?.length > 60 ? "..." : "") + '</td>' +
+          '<td class="px-4 py-3">' + escapeHtml(ts.tileMatrixSetId ) + '</td>' +
+          '<td class="px-4 py-3">' + escapeHtml(ts.tileMatrixSetURI ) + '</td>' +
+          '<td class="px-4 py-3">' + escapeHtml(ts.crs ) + '</td>' +
           '<td class="text-right px-4 py-3">' + linksHtml + '</td>' +
         '</tr>';
       }).join("");
