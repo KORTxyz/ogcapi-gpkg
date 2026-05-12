@@ -128,6 +128,7 @@ const collectionTileSet = (baseurl, collection, layers) => {
     [min_x, min_y, max_x, max_y] = [...transformation.transformCoordinateArray([min_x, min_y]), ...transformation.transformCoordinateArray([max_x, max_y])]
   }
   return {
+    "tileMatrixSetId":"WebMercatorQuad",
     "tileMatrixSetURI": "http://www.opengis.net/def/tilematrixset/OGC/1.0/WebMercatorQuad",
     "title": name,
     "description": description,

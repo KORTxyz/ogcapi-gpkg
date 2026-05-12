@@ -34,7 +34,7 @@ async function getItems(req, reply) {
         reply.send(templatedFeatures);
         */
     }
-    else if (contentType == "html") return reply.view("items", { baseurl, collectionId, readonly, properties, extraParams: new URLSearchParams( {limit, offset, ...searchParams}).toString()});
+    else if (contentType == "html") return reply.view("items", { baseurl, collectionId, readonly, properties, dataset: req.params.dataset, datasetsUrl: req.server.baseurl, extraParams: new URLSearchParams( {limit, offset, ...searchParams}).toString()});
 };
 
 

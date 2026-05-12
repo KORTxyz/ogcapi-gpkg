@@ -75,7 +75,7 @@ async function getCollection(req, reply) {
   if (contentType == "json") {
     reply.send(templates.collection(baseurl, collection))
   }
-  else if (contentType == "html") return reply.view("collection", { collection, baseurl });
+  else if (contentType == "html") return reply.view("collection", { collection, baseurl, dataset: req.params.dataset, datasetsUrl: req.server.baseurl });
 };
 
 

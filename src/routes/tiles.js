@@ -68,7 +68,13 @@ async function getCollectionTilesets(req, reply) {
   const collection = modelCommon.getCollection(db, collectionId);
 
   if (collection.data_type == "tiles") return reply.callNotFound();
-  if (contentType == "html") return reply.view("collectiontilesets", {baseurl, collectionId });
+  if (contentType == "html") return reply.view("collectiontilesets", {
+    baseurl,
+    collection,
+    collectionId,
+    dataset: req.params.dataset,
+    datasetsUrl: req.server.baseurl,
+  });
 
   reply.send(templates.collectionTileSets(baseurl, collection));
 };
@@ -82,7 +88,13 @@ async function getCollectionTileset(req, reply) {
 
   const collection = modelCommon.getCollection(db, collectionId)
 
-  if (contentType == "html") return reply.view("tileset", { baseurl, collectionId });
+  if (contentType == "html") return reply.view("collectiontileset", {
+    baseurl,
+    collectionId,
+    collection,
+    dataset: req.params.dataset,
+    datasetsUrl: req.server.baseurl,
+  });
 
   const layers = collection.data_type == 'vector-tiles' ? await model.getVectorTilesSpec(db, collection.name) : [{"id": collection.name,"dataType":'vector'}];
   

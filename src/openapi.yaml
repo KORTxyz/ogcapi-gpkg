@@ -1815,6 +1815,10 @@ components:
           allOf:
             - description: Coordinate Reference System (CRS)
             - $ref: "#/components/schemas/crs"
+        tileMatrixSetId:
+          description:
+            Identifier of the Tile Matrix Set.
+          type: string
         tileMatrixSetURI:
           description:
             Reference to a Tile Matrix Set on an offical source for Tile Matrix

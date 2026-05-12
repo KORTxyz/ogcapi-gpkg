@@ -2,126 +2,255 @@
 <html lang="en">
 
 <head>
-  <title>
-    <%= it.collection.name %>
-  </title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="../assets/tailwind.css" rel="stylesheet" />
-
-
+  <link href="<%= it.baseurl %>/assets/tailwind.css" rel="stylesheet" />
+  <title><%= it.collection.name %></title>
+  <style>
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --c-bg: #171717; --c-bg-header: #171717; --c-bg-card: #262626; --c-bg-input: #262626;
+        --c-bg-active: #404040; --c-bg-inactive: #262626; --c-bg-btn: #f5f5f5; --c-bg-btn-hover: #fff;
+        --c-bg-overlay: #262626; --c-bg-field: #171717;
+        --c-border: #404040; --c-border-card: #404040; --c-border-badge: #525252;
+        --c-text: #d4d4d4; --c-text-heading: #f5f5f5; --c-text-muted: #737373; --c-text-secondary: #a3a3a3;
+        --c-text-btn: #171717; --c-text-badge: #a3a3a3; --c-text-active: #e5e5e5; --c-text-inactive: #a3a3a3;
+        --c-ring: #525252;
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --c-bg: #ffffff; --c-bg-header: #ffffff; --c-bg-card: #ffffff; --c-bg-input: #f5f5f5;
+        --c-bg-active: #e5e5e5; --c-bg-inactive: #f5f5f5; --c-bg-btn: #171717; --c-bg-btn-hover: #262626;
+        --c-bg-overlay: #ffffff; --c-bg-field: #f5f5f5;
+        --c-border: #e5e5e5; --c-border-card: #e5e5e5; --c-border-badge: #d4d4d4;
+        --c-text: #404040; --c-text-heading: #171717; --c-text-muted: #737373; --c-text-secondary: #525252;
+        --c-text-btn: #ffffff; --c-text-badge: #525252; --c-text-active: #171717; --c-text-inactive: #737373;
+        --c-ring: #a3a3a3;
+      }
+    }
+    body { background: var(--c-bg); color: var(--c-text); }
+    .t-heading { color: var(--c-text-heading); }
+    .t-muted { color: var(--c-text-muted); }
+    .t-secondary { color: var(--c-text-secondary); }
+    .t-card { background: var(--c-bg-card); border-color: var(--c-border-card); }
+    .t-card:hover { border-color: var(--c-text-muted); }
+  </style>
 </head>
 
-<body class="bg-neutral-800 text-neutral-400">
-  <header class="mx-1 flex text-xs items-center justify-between">
-    <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
-      <div id="homebreadcrumb" class="flex">
+<body class="min-h-screen">
 
-        <a class="hover:text-neutral-100 flex" href="<%= it.baseurl %>">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+  <main class="max-w-7xl mx-auto px-4 pt-2">
+    <!-- Breadcrumbs -->
+    <header class="mx-1 flex text-xs items-center justify-between mb-6">
+      <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+        </svg>
+        <% if (it.dataset) { %>
+          <a class="hover:t-heading" href="<%= it.datasetsUrl %>">Home</a>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
-          home
-        </a>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
+          <a class="hover:t-heading" href="<%= it.baseurl %>"><%= it.dataset %></a>
+        <% } else { %>
+          <a class="hover:t-heading" href="<%= it.baseurl %>">Home</a>
+        <% } %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-
+        <a class="hover:t-heading" href="<%= it.baseurl %>/collections">collections</a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <a class="cursor-default"><%= it.collection.name %></a>
       </div>
+      <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json" target="_blank">JSON</a>
+    </header>
 
-      <a class="hover:text-neutral-100" href="<%= it.baseurl %>/collections">collections</a>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
-      <a class="cursor-default">
-        <%= it.collection.name %>
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold t-heading mb-1"><%= it.collection.name %></h1>
+      <p class="t-muted"><%= it.collection.description || "No description" %></p>
+    </div>
+
+    <!-- Data Resources -->
+    <h2 class="text-xl font-semibold t-heading mb-4">Data Resources</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <% if (it.collection.data_type === "features") { %>
+        <a href="<%= it.baseurl %>/collections/<%= it.collection.name %>/items" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Items</h3>
+            </div>
+            <p class="text-sm t-secondary">Access the items in the collection</p>
+          </div>
+        </a>
+        <a href="<%= it.baseurl %>/collections/<%= it.collection.name %>/tiles" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Tiles</h3>
+            </div>
+            <p class="text-sm t-secondary">Access the data as vector tiles</p>
+          </div>
+        </a>
+      <% } %>
+      <% if (it.collection.data_type === "tiles") { %>
+        <a href="<%= it.baseurl %>/collections/<%= it.collection.name %>/map/tiles" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Map Tiles</h3>
+            </div>
+            <p class="text-sm t-secondary">Access the data as map tiles</p>
+          </div>
+        </a>
+      <% } %>
+      <% if (it.collection.data_type === "vector-tiles") { %>
+        <a href="<%= it.baseurl %>/collections/<%= it.collection.name %>/tiles" class="block group">
+          <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+              </div>
+              <h3 class="font-semibold t-heading">Vector Tiles</h3>
+            </div>
+            <p class="text-sm t-secondary">Access the data as vector tiles</p>
+          </div>
+        </a>
+      <% } %>
+      <a href="<%= it.baseurl %>/collections/<%= it.collection.name %>/styles" class="block group">
+        <div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="flex items-center justify-center w-10 h-10 rounded-lg" style="background: var(--c-bg-active)">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 t-heading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-1.5 4-3 4c-1.3 0-2.1-.8-2.6-1.5S15.7 14 15 14c-1.1 0-2 .9-2 2 0 2.8-1.3 6-1 6z"/>
+              </svg>
+            </div>
+            <h3 class="font-semibold t-heading">Styles</h3>
+          </div>
+          <p class="text-sm t-secondary">Styles to render the data in maps</p>
+        </div>
       </a>
     </div>
-    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
-      target="_blank">JSON</a>
-  </header>
-  <div id="content" class="p-5">
 
-    <h1 class="text-4xl mb-2.5">
-      <%=it.collection.name%>
-    </h1>
-    <div class="text-l">
-      <%=it.collection.description || "No description" %>
-    </div>
-    <br>
-
-    <h1 class="text-4xl mb-2.5">Links to the main resources</h1>
-    <div class="flex flex-col">
-      <% if(it.collection.data_type=="features" ){ %>
-        <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-          href="<%= it.baseurl %>/collections/<%= it.collection.name %>/items">Access the features in the collection</a>
-        <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-          href="<%= it.baseurl %>/collections/<%= it.collection.name %>/tiles">Access the data as tiles</a>
-
-      <% } %>
-
-      <% if(it.collection.data_type=="tiles" ){ %>
-        <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-          href="<%= it.baseurl %>/collections/<%= it.collection.name %>/map/tiles">Access the data as map tiles</a>
-      <% } %>
-      <% if(it.collection.data_type=="vector-tiles" ){ %>
-        <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-          href="<%= it.baseurl %>/collections/<%= it.collection.name %>/tiles">Access the data as vectortiles</a>
-      <% } %>
-        <a class="text-xl text-blue-500 hover:underline hover:text-blue-600"
-        href="<%= it.baseurl %>/collections/<%= it.collection.name %>/styles">Access the styles for the collection</a>
-    </div>
-
-    <br>
-
-    <h1 class="text-4xl mb-2.5">Information about the collection</h1>
-
-    <br>
-
-    <div class="flex my-3">
-      <div class="basis-1/4 font-bold">Spatial Extent</div>
-      <div class="basis-3/4 h-96" id="map"></div>
-    </div>
-    <div class="flex">
-      <div class="basis-1/4 font-bold">Temporal Extent</div>
-      <div class="basis-3/4">"no info"</div>
-    </div>
-    <br>
-
-    <h1 class="text-4xl mb-2.5 my-3">Expert information</h1>
-    <% if (it.collection.data_type=="features" ) { %>
-      <div class="flex">
-        <div class="basis-1/4 font-bold">Reference Systems
+    <!-- Collection Information -->
+    <h2 class="text-xl font-semibold t-heading mb-4">Collection Information</h2>
+    <div class="space-y-1 mb-8">
+      <!-- Type of Data -->
+      <div class="flex items-center py-2">
+        <div class="flex items-center gap-2 w-48 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>
+          </svg>
+          <span class="text-sm font-medium t-heading">Data Type</span>
         </div>
-        <div class="basis-3/4 flex flex-col">
-          <a href="http://www.opengis.net/def/crs/OGC/1.3/CRS84">http://www.opengis.net/def/crs/OGC/1.3/CRS84</a>
-          <a href="http://www.opengis.net/def/crs/EPSG/0/3857">http://www.opengis.net/def/crs/EPSG/0/3857</a>
-          <a href="http://www.opengis.net/def/crs/EPSG/0/4326">http://www.opengis.net/def/crs/EPSG/0/4326</a>
-
+        <div class="flex-1">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background: var(--c-bg-active); color: var(--c-text-heading)"><%= it.collection.data_type %></span>
         </div>
       </div>
-      <div class="flex my-3 ">
-        <div class="basis-1/4 font-bold">Storage CRS</div>
-        <a href="http://www.opengis.net/def/crs/OGC/1.3/CRS84">http://www.opengis.net/def/crs/OGC/1.3/CRS84</a>
-      </div>
-      <div class="flex my-3">
-        <div class="basis-1/4 font-bold">Additional Links</div>
-        <div class="basis-3/4 flex flex-col">
-          <a>Queryable attributes</a>
-          <a href="<%= it.baseurl %>/collections/<%= it.collection.name %>/schema">Schema of feature collections</a>
+      <% if (it.collection.geometry_type_name) { %>
+      <!-- Geometry Type -->
+      <div class="flex items-center py-2">
+        <div class="flex items-center gap-2 w-48 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+          </svg>
+          <span class="text-sm font-medium t-heading">Geometry</span>
         </div>
+        <span class="text-sm t-secondary"><%= it.collection.geometry_type_name %></span>
       </div>
       <% } %>
-        <div class="flex my-3">
-          <div class="basis-1/4 font-bold">Type of Data</div>
-          <div class="basis-3/4">
-            <%= it.collection.data_type %>
+      <!-- Spatial Extent -->
+      <div class="flex flex-col py-2">
+        <div class="flex items-center gap-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+          </svg>
+          <span class="text-sm font-medium t-heading">Spatial Extent</span>
+        </div>
+        <div id="map" class="w-full rounded-lg overflow-hidden" style="height: 20rem;"></div>
+      </div>
+      <!-- Temporal Extent -->
+      <div class="flex items-center py-2">
+        <div class="flex items-center gap-2 w-48 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span class="text-sm font-medium t-heading">Temporal Extent</span>
+        </div>
+        <span class="text-sm t-muted">No info</span>
+      </div>
+    </div>
+
+    <!-- Expert Information -->
+    <% if (it.collection.data_type === "features") { %>
+      <h2 class="text-xl font-semibold t-heading mb-4">Expert Information</h2>
+      <div class="space-y-1 mb-8">
+        <!-- Reference Systems -->
+        <div class="flex py-2">
+          <div class="flex items-start gap-2 w-48 shrink-0 pt-0.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 t-muted shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <span class="text-sm font-medium t-heading">Reference Systems</span>
+          </div>
+          <div class="flex-1 flex flex-col gap-1.5">
+            <a class="text-sm t-secondary hover:t-heading transition-colors inline-flex items-center gap-1" href="http://www.opengis.net/def/crs/OGC/1.3/CRS84">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" style="background: var(--c-bg-active); color: var(--c-text-heading)">CRS84</span>
+              <span class="t-muted text-xs">OGC/1.3</span>
+            </a>
+            <a class="text-sm t-secondary hover:t-heading transition-colors inline-flex items-center gap-1" href="http://www.opengis.net/def/crs/EPSG/0/3857">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" style="background: var(--c-bg-active); color: var(--c-text-heading)">EPSG:3857</span>
+              <span class="t-muted text-xs">Web Mercator</span>
+            </a>
+            <a class="text-sm t-secondary hover:t-heading transition-colors inline-flex items-center gap-1" href="http://www.opengis.net/def/crs/EPSG/0/4326">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" style="background: var(--c-bg-active); color: var(--c-text-heading)">EPSG:4326</span>
+              <span class="t-muted text-xs">WGS 84</span>
+            </a>
           </div>
         </div>
-  </div>
-
+        <!-- Storage CRS -->
+        <div class="flex items-center py-2">
+          <div class="flex items-center gap-2 w-48 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span class="text-sm font-medium t-heading">Storage CRS</span>
+          </div>
+          <a class="text-sm t-secondary hover:t-heading transition-colors inline-flex items-center gap-1" href="http://www.opengis.net/def/crs/OGC/1.3/CRS84">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" style="background: var(--c-bg-active); color: var(--c-text-heading)">CRS84</span>
+          </a>
+        </div>
+        <!-- Additional Links -->
+        <div class="flex items-center py-2">
+          <div class="flex items-center gap-2 w-48 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            <span class="text-sm font-medium t-heading">Links</span>
+          </div>
+          <a class="text-sm t-secondary hover:t-heading transition-colors" href="<%= it.baseurl %>/collections/<%= it.collection.name %>/schema">Schema of feature collection &rarr;</a>
+        </div>
+      </div>
+    <% } %>
+  </main>
 
 </body>
 

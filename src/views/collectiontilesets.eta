@@ -2,90 +2,372 @@
 <html lang="en">
 
 <head>
-  <title>Tiles</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link href="../../assets/tailwind.css" rel="stylesheet" />
-
-  <script type="module" src="../../assets/kortxyz-components.esm.js"></script>
-
+  <link href="<%= it.baseurl %>/assets/tailwind.css" rel="stylesheet" />
+  <title>Tilesets | <%= it.collection?.name || it.collectionId %></title>
+  <style>
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --c-bg: #171717; --c-bg-header: #171717; --c-bg-card: #262626; --c-bg-input: #262626;
+        --c-bg-active: #404040; --c-bg-inactive: #262626; --c-bg-btn: #f5f5f5; --c-bg-btn-hover: #fff;
+        --c-bg-overlay: #262626; --c-bg-field: #171717;
+        --c-border: #404040; --c-border-card: #404040; --c-border-badge: #525252;
+        --c-text: #d4d4d4; --c-text-heading: #f5f5f5; --c-text-muted: #737373; --c-text-secondary: #a3a3a3;
+        --c-text-btn: #171717; --c-text-badge: #a3a3a3; --c-text-active: #e5e5e5; --c-text-inactive: #a3a3a3;
+        --c-ring: #525252;
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --c-bg: #ffffff; --c-bg-header: #ffffff; --c-bg-card: #ffffff; --c-bg-input: #f5f5f5;
+        --c-bg-active: #e5e5e5; --c-bg-inactive: #f5f5f5; --c-bg-btn: #171717; --c-bg-btn-hover: #262626;
+        --c-bg-overlay: #ffffff; --c-bg-field: #f5f5f5;
+        --c-border: #e5e5e5; --c-border-card: #e5e5e5; --c-border-badge: #d4d4d4;
+        --c-text: #404040; --c-text-heading: #171717; --c-text-muted: #737373; --c-text-secondary: #525252;
+        --c-text-btn: #ffffff; --c-text-badge: #525252; --c-text-active: #171717; --c-text-inactive: #737373;
+        --c-ring: #a3a3a3;
+      }
+    }
+    body { background: var(--c-bg); color: var(--c-text); }
+    .t-heading { color: var(--c-text-heading); }
+    .t-muted { color: var(--c-text-muted); }
+    .t-secondary { color: var(--c-text-secondary); }
+    .t-input { background: var(--c-bg-input); border-color: var(--c-border); color: var(--c-text-heading); }
+    .t-input::placeholder { color: var(--c-text-muted); }
+    .t-input:focus { outline: none; box-shadow: 0 0 0 2px var(--c-ring); }
+    .t-card { background: var(--c-bg-card); border-color: var(--c-border-card); }
+    .t-card:hover { border-color: var(--c-text-muted); }
+    .t-badge { border-color: var(--c-border-badge); color: var(--c-text-badge); }
+    .t-toggle-active { background: var(--c-bg-active); color: var(--c-text-active); }
+    .t-toggle-inactive { background: var(--c-bg-inactive); color: var(--c-text-inactive); }
+    .t-toggle-inactive:hover, .t-toggle-active:hover { opacity: 0.85; }
+  </style>
 </head>
 
-<body class="bg-neutral-800 text-neutral-400">
-  <header class="flex text-xs items-center justify-between">
-    <div id="breadcrumbs" class="mx-1 flex cursor-pointer opacity-20 hover:opacity-100 transition">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5	" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-      </svg>
-      <a class="hover:text-neutral-100" href="<%=it.baseurl%>">home</a>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
-      <% if(it.collectionId){ %>
-        <a class="hover:text-neutral-100" href="<%=it.baseurl%>/collections">collections</a>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
+<body class="min-h-screen">
 
-        <a class="hover:text-neutral-100" href="<%=it.baseurl%>/collections/<%= it.collectionId %>">
-          <%= it.collectionId %>
-        </a>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1	" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 pt-2">
+    <!-- Breadcrumbs -->
+    <header class="mx-1 flex text-xs items-center justify-between mb-6">
+      <div id="breadcrumbs" class="flex cursor-pointer opacity-20 hover:opacity-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 py-0.5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
         </svg>
+        <% if(it.dataset){ %>
+          <a class="hover:t-heading" href="<%= it.datasetsUrl %>">Home</a>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+          <a class="hover:t-heading" href="<%= it.baseurl %>"><%= it.dataset %></a>
+        <% } else { %>
+          <a class="hover:t-heading" href="<%= it.baseurl %>">home</a>
         <% } %>
-          <a class="cursor-default">tiles</a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <a class="hover:t-heading" href="<%= it.baseurl %>/collections">collections</a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <a class="hover:t-heading" href="<%= it.baseurl %>/collections/<%= it.collectionId %>"><%= it.collection?.name || it.collectionId %></a>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <a class="cursor-default">tiles</a>
+      </div>
+      <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json" target="_blank">JSON</a>
+    </header>
+
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-1">
+        <h1 class="text-3xl font-bold t-heading">Tilesets</h1>
+        <div class="flex items-center gap-1">
+          <button id="gridViewBtn" class="t-toggle-active flex items-center justify-center w-7 h-7 rounded transition-colors" title="Grid view">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+            </svg>
+          </button>
+          <button id="listViewBtn" class="t-muted flex items-center justify-center w-7 h-7 rounded transition-colors" title="List view">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <p class="t-muted">Available tile services for this collection</p>
     </div>
-    <a class="hover:text-neutral-300 px-1 opacity-20 hover:opacity-100 transition" href="?f=json"
-      target="_blank">JSON</a>
-  </header>
 
-  <div id="content" class="p-5">
-
-    <h1 class="text-4xl mb-2.5">
-      Tiles
-    </h1>
-
-    <div class="flex my-3">
-      <div class="basis-1/4 font-bold">Tile Matrix Set</div>
-      <div class="basis-3/4">
-        <select name="TileMatrixSet" id="TileMatrixSet" class="text-neutral-900">
-          <option value="WebMercatorQuad">WebMercatorQuad</option>
-        </select>
+    <!-- Search -->
+    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+      <div class="relative flex-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 t-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="searchInput" type="search" placeholder="Search tilesets by title..." class="t-input w-full h-10 pl-10 pr-4 rounded-lg border text-sm">
       </div>
     </div>
 
-    <div class="flex my-3">
-      <div class="basis-1/4 font-bold">URL template</div>
-      <div class="basis-3/4 cursor-pointer hover:text-neutral-100 truncate"
-        onclick="copy('<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/WebMercatorQuad/{z}/{x}/{y}')">
-        <%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/WebMercatorQuad/{z}/{x}/{y}
-      </div>
+    <!-- Tileset Count -->
+    <p id="tilesetCount" class="text-sm t-muted mb-6"></p>
+
+    <!-- Tilesets Grid -->
+    <div id="tilesetsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+    <!-- Tilesets Table -->
+    <div id="tilesetsList" class="hidden overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
     </div>
 
-    <div class="flex my-3">
-      <div class="basis-1/4 font-bold">Metadata</div>
-      <a class="basis-3/4 text-neutral-100 hover:underline" target="_blank"
-        href="<%=it.baseurl%>/collections/<%=it.collectionId%>/tiles/WebMercatorQuad?f=json">
-        Metadata for these tiles in the JSON format
-      </a>
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-16 hidden">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto mb-4" style="color: var(--c-border)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+      </svg>
+      <h3 class="font-semibold text-lg mb-2" style="color: var(--c-text)">No tilesets found</h3>
+      <p class="t-muted">Try adjusting your search query</p>
     </div>
 
-    <div class="flex my-3">
-      <div class="basis-1/4 font-bold">Tiles</div>
-      <div class="flex basis-3/4 h-96" id="map">
-        <kortxyz-maplibre class="flex-1" show-tile-boundaries hoverpopup
-          mapstyle="<%=it.baseurl%>/collections/<%=it.collectionId%>/styles/default?f=mbs"></kortxyz-maplibre>
-      </div>
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-16">
+      <p class="t-muted">Loading tilesets...</p>
     </div>
-    <br>
+  </main>
 
+  <script>
+    const baseurl = "<%= it.baseurl %>";
+    const collectionId = "<%= it.collectionId %>";
 
-  </div>
+    // --- State ---
+    let tilesets = [];
+    let searchQuery = "";
+    let viewMode = "grid";
+    let tableSortCol = "tmsUri";
+    let tableSortDir = "asc";
+
+    // --- Elements ---
+    const searchInput = document.getElementById("searchInput");
+    const gridViewBtn = document.getElementById("gridViewBtn");
+    const listViewBtn = document.getElementById("listViewBtn");
+    const tilesetsGrid = document.getElementById("tilesetsGrid");
+    const tilesetsList = document.getElementById("tilesetsList");
+    const tableHead = document.getElementById("tableHead");
+    const tableBody = document.getElementById("tableBody");
+    const tilesetCount = document.getElementById("tilesetCount");
+    const emptyState = document.getElementById("emptyState");
+    const loadingState = document.getElementById("loadingState");
+
+    // --- Filtering & Sorting ---
+    function getFilteredTilesets() {
+      const q = searchQuery.toLowerCase();
+      let filtered = tilesets.filter(ts =>
+        (ts.tileMatrixSetURI || ts.id || "").toLowerCase().includes(q) ||
+        (ts.tileMatrixSetURIName || "").toLowerCase().includes(q) ||
+        (ts.description || "").toLowerCase().includes(q) ||
+        (ts.dataType || "").toLowerCase().includes(q)
+      );
+
+      if (viewMode === "list") {
+        const dir = tableSortDir === "asc" ? 1 : -1;
+        filtered.sort((a, b) => {
+          if (tableSortCol === "tmsUri") return dir * (a.tileMatrixSetURI || a.id).localeCompare(b.tileMatrixSetURI || b.id);
+          if (tableSortCol === "tmsName") return dir * (a.tileMatrixSetURIName || "").localeCompare(b.tileMatrixSetURIName || "");
+          if (tableSortCol === "type") return dir * (a.dataType || "").localeCompare(b.dataType || "");
+          if (tableSortCol === "description") return dir * (a.description || "").localeCompare(b.description || "");
+          if (tableSortCol === "crs") return dir * (a.crs || "").localeCompare(b.crs || "");
+          return 0;
+        });
+      } else {
+        filtered.sort((a, b) => (a.tileMatrixSetURI || a.id).localeCompare(b.tileMatrixSetURI || b.id));
+      }
+      return filtered;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str || "";
+      return div.innerHTML;
+    }
+
+    function formatBoundingBox(bbox) {
+      if (!bbox) return "N/A";
+      const ll = bbox.lowerLeft || [];
+      const ur = bbox.upperRight || [];
+      return `[${ll[0]?.toFixed(4)}, ${ll[1]?.toFixed(4)}, ${ur[0]?.toFixed(4)}, ${ur[1]?.toFixed(4)}]`;
+    }
+
+    // --- Render ---
+    function renderTilesets() {
+      const filtered = getFilteredTilesets();
+
+      tilesetCount.textContent = filtered.length + " " + (filtered.length === 1 ? "tileset" : "tilesets") + " found";
+
+      if (filtered.length === 0) {
+        tilesetsGrid.classList.add("hidden");
+        tilesetsList.classList.add("hidden");
+        emptyState.classList.remove("hidden");
+        return;
+      }
+      emptyState.classList.add("hidden");
+
+      if (viewMode === "grid") {
+        tilesetsGrid.classList.remove("hidden");
+        tilesetsList.classList.add("hidden");
+        tilesetsGrid.innerHTML = filtered.map(renderGridCard).join("");
+      } else {
+        tilesetsGrid.classList.add("hidden");
+        tilesetsList.classList.remove("hidden");
+        renderTable(filtered);
+      }
+    }
+
+    function getTilesetLinks(tileset) {
+      const links = [];
+      if (tileset.links) {
+        tileset.links.forEach(link => {
+          if (link.rel === "item") {
+            links.push({
+              title: "Tiles",
+              href: baseurl + `/collections/${collectionId}/tiles/WebMercatorQuad`,
+              icon: '<path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>'
+            });
+          }
+        });
+      }
+      return links;
+    }
+
+    function renderGridCard(tileset) {
+      const tmsUri = escapeHtml(tileset.tileMatrixSetURI || tileset.id || "TMS");
+      const tmsName = escapeHtml(tileset.tileMatrixSetURIName || "");
+      const desc = escapeHtml(tileset.description || "No description");
+      const dataType = escapeHtml(tileset.dataType || "");
+      const crs = escapeHtml(tileset.crs || "");
+      const bbox = formatBoundingBox(tileset.boundingBox);
+      const links = getTilesetLinks(tileset);
+
+      const linksHtml = links.map(l =>
+        '<a href="' + l.href + '" title="' + l.title + '" class="t-muted hover:t-heading transition-colors" onclick="event.stopPropagation()">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0z" fill="none"/>' + l.icon + '</svg>' +
+        '</a>'
+      ).join("");
+
+      return '<div class="t-card rounded-xl border p-5 transition-colors h-full flex flex-col cursor-pointer" onclick="window.location=\'' + baseurl + '/collections/' + collectionId + '/tiles/WebMercatorQuad\'">' +
+          '<div class="flex items-center justify-between mb-3">' +
+            '<span class="t-badge px-2 py-0.5 rounded-full text-xs border capitalize">' + dataType + '</span>' +
+            '<div class="flex items-center gap-2">' + linksHtml + '</div>' +
+          '</div>' +
+          '<h3 class="font-semibold t-heading mb-1 truncate" title="' + tmsUri + '">' + tmsUri + '</h3>' +
+          (tmsName ? '<p class="text-sm t-secondary line-clamp-2" title="' + tmsName + '">' + tmsName + '</p>' : '') +
+          '<div class="text-xs t-muted mt-2">' + crs + '</div>' +
+          '<div class="text-xs t-muted mt-1" title="Bounding Box">Bbox: ' + bbox + '</div>' +
+        '</div>';
+    }
+
+    function sortArrow(col) {
+      if (tableSortCol !== col) return '<span class="t-muted ml-1 inline-block w-3">&nbsp;</span>';
+      return tableSortDir === "asc"
+        ? '<span class="ml-1 inline-block w-3">&#9650;</span>'
+        : '<span class="ml-1 inline-block w-3">&#9660;</span>';
+    }
+
+    function renderTable(filtered) {
+      const cols = [
+        { key: "tmsUri", label: "TileMatrixSet URI" },
+        { key: "tmsName", label: "TileMatrixSet Name" },
+        { key: "type", label: "Type" },
+        { key: "crs", label: "CRS" },
+        { key: "description", label: "Description" }
+      ];
+
+      tableHead.innerHTML = '<tr class="border-b" style="border-color:var(--c-border)">' +
+        cols.map(c =>
+          '<th class="text-left px-4 py-3 font-semibold t-heading cursor-pointer select-none whitespace-nowrap hover:opacity-75 transition-opacity" data-col="' + c.key + '">' +
+            c.label + sortArrow(c.key) +
+          '</th>'
+        ).join("") +
+        '<th class="text-right px-4 py-3 font-semibold t-heading">Links</th>' +
+      '</tr>';
+
+      tableHead.querySelectorAll("th[data-col]").forEach(th => {
+        th.addEventListener("click", () => {
+          const col = th.dataset.col;
+          if (tableSortCol === col) {
+            tableSortDir = tableSortDir === "asc" ? "desc" : "asc";
+          } else {
+            tableSortCol = col;
+            tableSortDir = "asc";
+          }
+          renderTilesets();
+        });
+      });
+
+      tableBody.innerHTML = filtered.map(ts => {
+        const links = getTilesetLinks(ts);
+        const linksHtml = links.map(l =>
+          '<a href="' + l.href + '" class="t-secondary hover:t-heading transition-colors text-sm">' + l.title + '</a>'
+        ).join(" | ");
+
+        return '<tr class="border-b hover:opacity-75 transition-opacity" style="border-color:var(--c-border);cursor:pointer" onclick="window.location=\'' + baseurl + '/collections/' + collectionId + '/tiles/WebMercatorQuad\'">' +
+          '<td class="px-4 py-3">' + escapeHtml(ts.tileMatrixSetURI || ts.id || "TMS") + '</td>' +
+          '<td class="px-4 py-3">' + escapeHtml(ts.tileMatrixSetURIName || "") + '</td>' +
+          '<td class="px-4 py-3 capitalize">' + escapeHtml(ts.dataType || "") + '</td>' +
+          '<td class="px-4 py-3">' + escapeHtml(ts.crs || "") + '</td>' +
+          '<td class="px-4 py-3">' + escapeHtml((ts.description || "").substring(0, 60)) + (ts.description?.length > 60 ? "..." : "") + '</td>' +
+          '<td class="text-right px-4 py-3">' + linksHtml + '</td>' +
+        '</tr>';
+      }).join("");
+    }
+
+    // --- Event Listeners ---
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      renderTilesets();
+    });
+
+    gridViewBtn.addEventListener("click", () => {
+      viewMode = "grid";
+      gridViewBtn.classList.add("t-toggle-active");
+      gridViewBtn.classList.remove("t-muted");
+      listViewBtn.classList.remove("t-toggle-active");
+      listViewBtn.classList.add("t-muted");
+      renderTilesets();
+    });
+
+    listViewBtn.addEventListener("click", () => {
+      viewMode = "list";
+      listViewBtn.classList.add("t-toggle-active");
+      listViewBtn.classList.remove("t-muted");
+      gridViewBtn.classList.remove("t-toggle-active");
+      gridViewBtn.classList.add("t-muted");
+      renderTilesets();
+    });
+
+    // --- Initialization ---
+    async function init() {
+      try {
+        const url = new URL(location.href);
+        url.searchParams.set("f", "json");
+        
+        const response = await fetch(url.href);
+        const data = await response.json();
+        
+        tilesets = data.tilesets || [];
+        loadingState.classList.add("hidden");
+        renderTilesets();
+      } catch (error) {
+        console.error("Failed to load tilesets:", error);
+        loadingState.innerHTML = '<p class="t-muted">Failed to load tilesets</p>';
+      }
+    }
+
+    init();
+  </script>
 </body>
 
 </html>
